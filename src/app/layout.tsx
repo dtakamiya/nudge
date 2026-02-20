@@ -1,31 +1,13 @@
 import type { Metadata } from "next";
-import { DM_Serif_Display, Source_Sans_3, Noto_Serif_JP, Noto_Sans_JP } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { Noto_Sans_JP } from "next/font/google";
+import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/layout/sidebar";
 import "./globals.css";
 
-const dmSerifDisplay = DM_Serif_Display({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-heading",
-  display: "swap",
-});
-
-const sourceSans3 = Source_Sans_3({
-  subsets: ["latin"],
-  variable: "--font-body",
-  display: "swap",
-});
-
-const notoSerifJP = Noto_Serif_JP({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-heading-jp",
-  display: "swap",
-});
-
 const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],
-  variable: "--font-body-jp",
+  variable: "--font-noto-jp",
   display: "swap",
 });
 
@@ -34,15 +16,34 @@ export const metadata: Metadata = {
   description: "1on1ログ & アクショントラッカー",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+async function getSidebarData() {
+  try {
+    const [members, actionCount] = await Promise.all([
+      prisma.member.findMany({
+        orderBy: { name: "asc" },
+        take: 5,
+        select: { id: true, name: true },
+      }),
+      prisma.actionItem.count({
+        where: { status: { not: "DONE" } },
+      }),
+    ]);
+    return { members, actionCount };
+  } catch {
+    // ビルド時やDB未接続時はデフォルト値を返す
+    return { members: [], actionCount: 0 };
+  }
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { members, actionCount } = await getSidebarData();
+
   return (
     <html lang="ja">
-      <body
-        className={`${dmSerifDisplay.variable} ${sourceSans3.variable} ${notoSerifJP.variable} ${notoSansJP.variable} flex h-screen`}
-      >
-        <Sidebar />
-        <main className="flex-1 overflow-auto p-4 pt-18 lg:p-8 lg:pt-8">
-          <div className="max-w-4xl mx-auto">{children}</div>
+      <body className={`${GeistSans.variable} ${notoSansJP.variable} flex h-screen`}>
+        <Sidebar members={members} actionCount={actionCount} />
+        <main className="flex-1 overflow-auto p-6 pt-18 lg:p-10 lg:pt-10">
+          <div className="max-w-5xl mx-auto">{children}</div>
         </main>
       </body>
     </html>

@@ -1,9 +1,11 @@
 import { MemberForm } from "@/components/member/member-form";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
 
 export default function NewMemberPage() {
   return (
     <div className="animate-fade-in-up">
-      <h1 className="font-heading text-3xl mb-6 text-foreground">メンバー追加</h1>
+      <Breadcrumb items={[{ label: "ダッシュボード", href: "/" }, { label: "メンバー追加" }]} />
+      <h1 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">メンバー追加</h1>
       <MemberForm />
     </div>
   );

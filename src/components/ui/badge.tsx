@@ -16,9 +16,9 @@ const badgeVariants = cva(
           "border-border text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         ghost: "[a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         link: "text-primary underline-offset-4 [a&]:hover:underline",
-        "status-done": "bg-[#6B8F71] text-white",
-        "status-progress": "bg-[oklch(0.65_0.17_70)] text-white",
-        "status-todo": "bg-[#E8DDD3] text-[#594A3A]",
+        "status-done": "bg-[oklch(0.95_0.05_155)] text-[oklch(0.35_0.1_155)]",
+        "status-progress": "bg-[oklch(0.95_0.05_80)] text-[oklch(0.4_0.1_80)]",
+        "status-todo": "bg-[oklch(0.96_0.005_260)] text-[oklch(0.45_0.01_260)]",
       },
     },
     defaultVariants: {

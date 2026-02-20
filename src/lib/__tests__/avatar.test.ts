@@ -19,8 +19,8 @@ describe("getAvatarGradient", () => {
   it("returns a gradient tuple for a given name", () => {
     const result = getAvatarGradient("田中太郎");
     expect(result).toHaveLength(2);
-    expect(result[0]).toMatch(/^#[0-9A-Fa-f]{6}$/);
-    expect(result[1]).toMatch(/^#[0-9A-Fa-f]{6}$/);
+    expect(typeof result[0]).toBe("string");
+    expect(typeof result[1]).toBe("string");
   });
 
   it("returns same gradient for same name", () => {

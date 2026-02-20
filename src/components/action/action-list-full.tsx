@@ -44,10 +44,7 @@ export function ActionListFull({ actionItems }: Props) {
   return (
     <div className="flex flex-col gap-3">
       {actionItems.map((item) => (
-        <Card
-          key={item.id}
-          className="hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(61,46,31,0.10)]"
-        >
+        <Card key={item.id} className="hover:shadow-sm hover:border-[oklch(0.88_0.008_260)]">
           <CardContent className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Select value={item.status} onValueChange={(val) => handleStatusChange(item.id, val)}>

@@ -117,7 +117,7 @@ export function MeetingForm({ memberId }: Props) {
       <Card>
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
-            <CardTitle className="font-heading text-base">話題</CardTitle>
+            <CardTitle className="text-sm font-medium">話題</CardTitle>
             <Button type="button" variant="outline" size="sm" onClick={addTopic}>
               + 話題を追加
             </Button>
@@ -181,7 +181,7 @@ export function MeetingForm({ memberId }: Props) {
       <Card>
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
-            <CardTitle className="font-heading text-base">アクションアイテム</CardTitle>
+            <CardTitle className="text-sm font-medium">アクションアイテム</CardTitle>
             <Button type="button" variant="outline" size="sm" onClick={addAction}>
               + アクション追加
             </Button>

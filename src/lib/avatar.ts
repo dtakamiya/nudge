@@ -1,12 +1,12 @@
 const AVATAR_GRADIENTS: readonly (readonly [string, string])[] = [
-  ["#D97706", "#C27549"],
-  ["#6B8F71", "#8FAF85"],
-  ["#B45309", "#D97706"],
-  ["#C27549", "#D4A37A"],
-  ["#7B8F6B", "#6B8F71"],
-  ["#A67B5B", "#C49A6C"],
-  ["#8B6F47", "#B8956A"],
-  ["#5F8A6B", "#7DA88A"],
+  ["oklch(0.55 0.15 260)", "oklch(0.65 0.12 260)"],
+  ["oklch(0.50 0.18 270)", "oklch(0.62 0.15 270)"],
+  ["oklch(0.52 0.12 200)", "oklch(0.65 0.10 200)"],
+  ["oklch(0.48 0.10 280)", "oklch(0.60 0.08 280)"],
+  ["oklch(0.55 0.08 240)", "oklch(0.68 0.06 240)"],
+  ["oklch(0.50 0.15 250)", "oklch(0.62 0.12 250)"],
+  ["oklch(0.53 0.10 220)", "oklch(0.65 0.08 220)"],
+  ["oklch(0.48 0.14 290)", "oklch(0.60 0.11 290)"],
 ] as const;
 
 function hashString(str: string): number {

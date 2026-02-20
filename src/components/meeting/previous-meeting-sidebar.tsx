@@ -28,7 +28,7 @@ export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Prop
     <div className="flex flex-col gap-4">
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="font-heading text-sm">未完了アクション</CardTitle>
+          <CardTitle className="text-sm font-medium">未完了アクション</CardTitle>
         </CardHeader>
         <CardContent>
           {pendingActions.length === 0 ? (
@@ -53,7 +53,7 @@ export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Prop
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="font-heading text-sm">
+          <CardTitle className="text-sm font-medium">
             {previousMeeting ? `前回: ${formatDate(previousMeeting.date)}` : "前回の記録"}
           </CardTitle>
         </CardHeader>

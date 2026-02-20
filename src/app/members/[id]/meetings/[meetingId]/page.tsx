@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getMeeting } from "@/lib/actions/meeting-actions";
+import { formatDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { MeetingDetail } from "@/components/meeting/meeting-detail";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
 
 type Props = { params: Promise<{ id: string; meetingId: string }> };
 
@@ -20,8 +22,17 @@ export default async function MeetingDetailPage({ params }: Props) {
 
   return (
     <div className="animate-fade-in-up">
+      <Breadcrumb
+        items={[
+          { label: "ダッシュボード", href: "/" },
+          { label: meeting.member.name, href: `/members/${id}` },
+          { label: formatDate(meeting.date) },
+        ]}
+      />
       <div className="flex justify-between items-center mb-6">
-        <h1 className="font-heading text-3xl text-foreground">{meeting.member.name}との1on1</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          {meeting.member.name}との1on1
+        </h1>
         <Link href={`/members/${id}`}>
           <Button variant="outline">戻る</Button>
         </Link>
