@@ -1,0 +1,39 @@
+import { notFound } from "next/navigation";
+import { getMember } from "@/lib/actions/member-actions";
+import { getPreviousMeeting } from "@/lib/actions/meeting-actions";
+import { getPendingActionItems } from "@/lib/actions/action-item-actions";
+import { MeetingPrepare } from "@/components/meeting/meeting-prepare";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
+
+type Props = { params: Promise<{ id: string }> };
+
+export default async function PrepareMeetingPage({ params }: Props) {
+  const { id } = await params;
+  const member = await getMember(id);
+  if (!member) {
+    notFound();
+  }
+
+  const previousMeeting = await getPreviousMeeting(id);
+  const pendingActions = await getPendingActionItems(id);
+
+  return (
+    <div className="animate-fade-in-up">
+      <Breadcrumb
+        items={[
+          { label: "ダッシュボード", href: "/" },
+          { label: member.name, href: `/members/${id}` },
+          { label: "1on1 準備" },
+        ]}
+      />
+      <h1 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">
+        {member.name}との1on1 準備
+      </h1>
+      <MeetingPrepare
+        memberId={id}
+        previousMeeting={previousMeeting}
+        pendingActions={pendingActions}
+      />
+    </div>
+  );
+}
