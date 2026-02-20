@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { formatDate } from "@/lib/format";
 
 type MemberWithStats = {
   id: string;
@@ -16,9 +17,6 @@ type Props = {
   members: MemberWithStats[];
 };
 
-function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString("ja-JP");
-}
 
 export function MemberList({ members }: Props) {
   if (members.length === 0) {

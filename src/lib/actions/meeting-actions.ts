@@ -1,12 +1,13 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { createMeetingSchema } from "@/lib/validations/meeting";
 import type { CreateMeetingInput } from "@/lib/validations/meeting";
 
 export async function createMeeting(input: CreateMeetingInput) {
   const validated = createMeetingSchema.parse(input);
-  return prisma.meeting.create({
+  const result = await prisma.meeting.create({
     data: {
       memberId: validated.memberId,
       date: new Date(validated.date),
@@ -29,6 +30,8 @@ export async function createMeeting(input: CreateMeetingInput) {
     },
     include: { topics: { orderBy: { sortOrder: "asc" } }, actionItems: true },
   });
+  revalidatePath("/", "layout");
+  return result;
 }
 
 export async function getMeeting(id: string) {
@@ -47,5 +50,8 @@ export async function getPreviousMeeting(memberId: string, excludeMeetingId?: st
 }
 
 export async function deleteMeeting(id: string) {
-  return prisma.meeting.delete({ where: { id } });
+  if (!id) throw new Error("Invalid meeting ID");
+  const result = await prisma.meeting.delete({ where: { id } });
+  revalidatePath("/", "layout");
+  return result;
 }

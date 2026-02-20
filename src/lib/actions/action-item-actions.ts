@@ -1,7 +1,10 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { updateActionItemStatusSchema } from "@/lib/validations/action-item";
 import type { ActionItemStatusType } from "@/lib/validations/action-item";
+import type { Prisma } from "@/generated/prisma/client";
 
 type ActionItemFilters = {
   status?: ActionItemStatusType;
@@ -9,7 +12,7 @@ type ActionItemFilters = {
 };
 
 export async function getActionItems(filters: ActionItemFilters = {}) {
-  const where: Record<string, unknown> = {};
+  const where: Prisma.ActionItemWhereInput = {};
   if (filters.status) where.status = filters.status;
   if (filters.memberId) where.memberId = filters.memberId;
   return prisma.actionItem.findMany({
@@ -30,7 +33,14 @@ export async function getPendingActionItems(memberId: string) {
   });
 }
 
-export async function updateActionItemStatus(id: string, status: ActionItemStatusType) {
-  const completedAt = status === "DONE" ? new Date() : null;
-  return prisma.actionItem.update({ where: { id }, data: { status, completedAt } });
+export async function updateActionItemStatus(id: string, status: string) {
+  const { status: validatedStatus } = updateActionItemStatusSchema.parse({ status });
+  if (!id) throw new Error("Invalid action item ID");
+  const completedAt = validatedStatus === "DONE" ? new Date() : null;
+  const result = await prisma.actionItem.update({
+    where: { id },
+    data: { status: validatedStatus, completedAt },
+  });
+  revalidatePath("/", "layout");
+  return result;
 }

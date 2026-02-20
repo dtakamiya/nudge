@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { CATEGORY_LABELS } from "@/lib/constants";
+import { formatDate } from "@/lib/format";
 
 type TopicSummary = { id: string; category: string; title: string };
 type MeetingSummary = {
@@ -12,17 +14,6 @@ type MeetingSummary = {
 };
 type Props = { meetings: MeetingSummary[]; memberId: string };
 
-const categoryLabels: Record<string, string> = {
-  WORK_PROGRESS: "業務進捗",
-  CAREER: "キャリア",
-  ISSUES: "課題・相談",
-  FEEDBACK: "フィードバック",
-  OTHER: "その他",
-};
-
-function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString("ja-JP");
-}
 
 export function MeetingHistory({ meetings, memberId }: Props) {
   if (meetings.length === 0) {
@@ -42,7 +33,7 @@ export function MeetingHistory({ meetings, memberId }: Props) {
                     <div className="flex gap-1 mt-1 flex-wrap">
                       {meeting.topics.map((topic) => (
                         <Badge key={topic.id} variant="outline" className="text-xs">
-                          {categoryLabels[topic.category] ?? topic.category}
+                          {CATEGORY_LABELS[topic.category] ?? topic.category}
                         </Badge>
                       ))}
                     </div>

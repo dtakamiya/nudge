@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { updateActionItemStatus } from "@/lib/actions/action-item-actions";
+import { formatDate } from "@/lib/format";
 import { useRouter } from "next/navigation";
 
 type ActionItemRow = {
@@ -24,10 +25,6 @@ const statusColors: Record<string, "default" | "secondary" | "outline"> = {
   DONE: "default",
 };
 
-function formatDate(date: Date | null): string {
-  if (!date) return "";
-  return new Date(date).toLocaleDateString("ja-JP");
-}
 
 export function ActionListCompact({ actionItems }: Props) {
   const router = useRouter();
@@ -41,8 +38,12 @@ export function ActionListCompact({ actionItems }: Props) {
         : currentStatus === "IN_PROGRESS"
           ? "DONE"
           : "TODO";
-    await updateActionItemStatus(id, next as "TODO" | "IN_PROGRESS" | "DONE");
-    router.refresh();
+    try {
+      await updateActionItemStatus(id, next);
+      router.refresh();
+    } catch {
+      // Silently fail - status will remain unchanged in UI
+    }
   }
   return (
     <div className="flex flex-col gap-2">

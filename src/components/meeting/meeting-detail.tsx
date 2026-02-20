@@ -2,6 +2,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ActionListCompact } from "@/components/action/action-list-compact";
+import { CATEGORY_LABELS } from "@/lib/constants";
+import { formatDate } from "@/lib/format";
 
 type Topic = {
   id: string;
@@ -25,17 +27,6 @@ type Props = {
   actionItems: ActionItem[];
 };
 
-const categoryLabels: Record<string, string> = {
-  WORK_PROGRESS: "業務進捗",
-  CAREER: "キャリア",
-  ISSUES: "課題・相談",
-  FEEDBACK: "フィードバック",
-  OTHER: "その他",
-};
-
-function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString("ja-JP");
-}
 
 export function MeetingDetail({ date, topics, actionItems }: Props) {
   return (
@@ -52,7 +43,7 @@ export function MeetingDetail({ date, topics, actionItems }: Props) {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-1">
                     <Badge variant="outline">
-                      {categoryLabels[topic.category] ?? topic.category}
+                      {CATEGORY_LABELS[topic.category] ?? topic.category}
                     </Badge>
                     <span className="font-medium">{topic.title}</span>
                   </div>

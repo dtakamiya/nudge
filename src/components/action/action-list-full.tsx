@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { updateActionItemStatus } from "@/lib/actions/action-item-actions";
+import { formatDate } from "@/lib/format";
 
 type ActionItemRow = {
   id: string;
@@ -24,10 +25,6 @@ type ActionItemRow = {
 
 type Props = { actionItems: ActionItemRow[] };
 
-function formatDate(date: Date | null): string {
-  if (!date) return "-";
-  return new Date(date).toLocaleDateString("ja-JP");
-}
 
 export function ActionListFull({ actionItems }: Props) {
   const router = useRouter();
@@ -41,11 +38,12 @@ export function ActionListFull({ actionItems }: Props) {
   }
 
   async function handleStatusChange(id: string, newStatus: string) {
-    await updateActionItemStatus(
-      id,
-      newStatus as "TODO" | "IN_PROGRESS" | "DONE",
-    );
-    router.refresh();
+    try {
+      await updateActionItemStatus(id, newStatus);
+      router.refresh();
+    } catch {
+      // Silently fail - status will remain unchanged in UI
+    }
   }
 
   return (

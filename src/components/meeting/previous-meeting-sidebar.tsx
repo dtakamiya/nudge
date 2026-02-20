@@ -4,26 +4,25 @@ import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { updateActionItemStatus } from "@/lib/actions/action-item-actions";
+import { CATEGORY_LABELS } from "@/lib/constants";
+import { formatDate } from "@/lib/format";
 
 type Topic = { id: string; category: string; title: string; notes: string };
 type ActionItem = { id: string; title: string; status: string; dueDate: Date | null };
 type MeetingData = { id: string; date: Date; topics: Topic[]; actionItems: ActionItem[] } | null;
 type Props = { previousMeeting: MeetingData; pendingActions: ActionItem[] };
 
-const categoryLabels: Record<string, string> = {
-  WORK_PROGRESS: "業務進捗", CAREER: "キャリア", ISSUES: "課題・相談", FEEDBACK: "フィードバック", OTHER: "その他",
-};
-
-function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString("ja-JP");
-}
 
 export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Props) {
   const router = useRouter();
 
   async function markDone(id: string) {
-    await updateActionItemStatus(id, "DONE");
-    router.refresh();
+    try {
+      await updateActionItemStatus(id, "DONE");
+      router.refresh();
+    } catch {
+      // Silently fail
+    }
   }
 
   return (
@@ -65,7 +64,7 @@ export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Prop
               {previousMeeting.topics.map((topic) => (
                 <div key={topic.id}>
                   <div className="flex items-center gap-1">
-                    <Badge variant="outline" className="text-xs">{categoryLabels[topic.category] ?? topic.category}</Badge>
+                    <Badge variant="outline" className="text-xs">{CATEGORY_LABELS[topic.category] ?? topic.category}</Badge>
                     <span className="text-sm font-medium">{topic.title}</span>
                   </div>
                   {topic.notes && <p className="text-xs text-gray-500 mt-1">{topic.notes}</p>}
