@@ -12,6 +12,9 @@ Nudge は 1on1 ミーティングの記録・管理を行うシングルユー�
 - **スタイリング:** Tailwind CSS 4 + shadcn/ui
 - **バリデーション:** Zod 4
 - **テスト:** Vitest + Testing Library + jsdom
+- **デザインシステム:** Hearth テーマ（OKLch カラーパレット、Google Fonts）
+- **アイコン:** lucide-react
+- **コード品質:** ESLint, Prettier, husky + lint-staged
 - **言語:** TypeScript 5 (strict mode)
 
 ## ディレクトリ構成
@@ -21,16 +24,20 @@ src/
 ├── app/                    # Next.js App Router ページ
 │   ├── actions/            # アクションアイテム一覧
 │   ├── members/            # メンバー CRUD・ミーティングページ
-│   └── layout.tsx          # ルートレイアウト
+│   ├── globals.css         # テーマ変数・アニメーション定義
+│   ├── layout.tsx          # ルートレイアウト（フォント・サイドバー統合）
+│   └── page.tsx            # ダッシュボード
 ├── components/
 │   ├── action/             # アクションアイテム コンポーネント
+│   ├── layout/             # レイアウト コンポーネント（サイドバー）
 │   ├── meeting/            # ミーティング コンポーネント
 │   ├── member/             # メンバー コンポーネント
-│   └── ui/                 # shadcn/ui ベースコンポーネント
+│   └── ui/                 # shadcn/ui ベースコンポーネント（avatar-initial 含む）
 ├── generated/prisma/       # Prisma 生成クライアント（gitignore対象）
 └── lib/
     ├── actions/            # Server Actions（データ変更処理）
     ├── validations/        # Zod スキーマ
+    ├── avatar.ts           # アバターイニシャル・グラデーション生成
     ├── prisma.ts           # Prisma クライアント シングルトン
     ├── constants.ts        # アプリ定数
     ├── format.ts           # 日付フォーマット ユーティリティ
@@ -40,6 +47,37 @@ prisma/
 ├── seed.ts                 # シードデータ
 └── migrations/             # マイグレーションファイル
 ```
+
+## デザインシステム（Hearth テーマ）
+
+### タイポグラフィ
+
+- **見出し:** DM Serif Display（`font-heading`）、日本語フォールバック Noto Serif JP
+- **本文:** Source Sans 3（`font-sans`）、日本語フォールバック Noto Sans JP
+- Tailwind ユーティリティ `font-heading` で見出しフォントを適用
+
+### カラーパレット
+
+OKLch ベースの暖色系パレット。定義場所: `src/app/globals.css`
+
+- **Primary:** アンバー（`oklch(0.65 0.17 70)`）
+- **Background:** クリーム（`oklch(0.99 0.01 85)`）
+- **Destructive:** テラコッタ（`oklch(0.6 0.18 40)`）
+
+### アニメーション
+
+`globals.css` に定義。クラス名で適用:
+
+- `animate-fade-in-up` — フェードイン＋上方向スライド
+- `animate-slide-in` — 上方向スライドイン
+- `animate-badge-bounce` — バッジバウンス
+- `stagger-1` 〜 `stagger-5` — 段階的アニメーション遅延
+
+### レイアウト
+
+- **デスクトップ:** 固定サイドバー + メインコンテンツ
+- **モバイル:** ハンバーガーメニュー + オーバーレイサイドバー
+- 実装: `src/components/layout/sidebar.tsx`
 
 ## コマンド
 
@@ -58,6 +96,8 @@ npx prisma db seed       # シードデータ投入
 npx prisma generate      # Prisma クライアント生成
 npx prisma studio        # Prisma Studio 起動
 ```
+
+コミット時に husky + lint-staged が自動で Prettier フォーマット・ESLint 修正・TypeScript 型チェックを実行する。
 
 ## コーディング規約
 
