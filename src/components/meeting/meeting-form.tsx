@@ -27,7 +27,10 @@ const categoryOptions = [
   { value: "OTHER", label: "その他" },
 ];
 
-type Props = { memberId: string };
+type Props = {
+  memberId: string;
+  initialTopics?: Array<{ category: string; title: string; notes: string; sortOrder: number }>;
+};
 
 function createEmptyTopic(sortOrder: number): TopicFormData {
   return { category: "WORK_PROGRESS", title: "", notes: "", sortOrder };
@@ -37,10 +40,14 @@ function createEmptyAction(): ActionFormData {
   return { title: "", description: "", dueDate: "" };
 }
 
-export function MeetingForm({ memberId }: Props) {
+export function MeetingForm({ memberId, initialTopics }: Props) {
   const router = useRouter();
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [topics, setTopics] = useState<TopicFormData[]>([createEmptyTopic(0)]);
+  const [topics, setTopics] = useState<TopicFormData[]>(
+    initialTopics && initialTopics.length > 0
+      ? initialTopics.map((t) => ({ ...t, sortOrder: t.sortOrder }))
+      : [createEmptyTopic(0)],
+  );
   const [actionItems, setActionItems] = useState<ActionFormData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
