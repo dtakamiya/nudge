@@ -5,6 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { formatRelativeDate } from "@/lib/format";
 import { ArrowUpDown } from "lucide-react";
@@ -30,7 +38,9 @@ function getLastMeetingDays(date: Date | null): number {
 function getStatusBadge(days: number): React.ReactNode {
   if (days >= 14)
     return (
-      <Badge className="bg-[oklch(0.95_0.05_25)] text-[oklch(0.45_0.15_25)]">要フォロー</Badge>
+      <Badge className="animate-pulse-attention bg-[oklch(0.95_0.05_25)] text-[oklch(0.45_0.15_25)]">
+        要フォロー
+      </Badge>
     );
   if (days >= 7)
     return <Badge className="bg-[oklch(0.95_0.05_80)] text-[oklch(0.4_0.1_80)]">注意</Badge>;
@@ -78,16 +88,16 @@ export function MemberList({ members }: Props) {
 
   return (
     <div className="animate-fade-in-up rounded-xl border bg-card overflow-hidden">
-      <table className="w-full">
-        <thead>
-          <tr className="border-b">
-            <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">
               メンバー
-            </th>
-            <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3 hidden sm:table-cell">
+            </TableHead>
+            <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3 hidden sm:table-cell">
               部署
-            </th>
-            <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">
+            </TableHead>
+            <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">
               <button
                 onClick={() => toggleSort("lastMeeting")}
                 className="flex items-center gap-1 hover:text-foreground transition-colors duration-150"
@@ -95,8 +105,8 @@ export function MemberList({ members }: Props) {
                 最終1on1
                 <ArrowUpDown className="w-3 h-3" />
               </button>
-            </th>
-            <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">
+            </TableHead>
+            <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">
               <button
                 onClick={() => toggleSort("actions")}
                 className="flex items-center gap-1 hover:text-foreground transition-colors duration-150"
@@ -104,21 +114,21 @@ export function MemberList({ members }: Props) {
                 未完了
                 <ArrowUpDown className="w-3 h-3" />
               </button>
-            </th>
-            <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3 hidden md:table-cell">
+            </TableHead>
+            <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3 hidden md:table-cell">
               ステータス
-            </th>
-            <th className="px-4 py-3">
+            </TableHead>
+            <TableHead className="px-4 py-3">
               <span className="sr-only">アクション</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {sortedMembers.map((member) => {
             const lastDate = member.meetings[0]?.date ?? null;
             const days = getLastMeetingDays(lastDate);
             return (
-              <tr
+              <TableRow
                 key={member.id}
                 onClick={() => router.push(`/members/${member.id}`)}
                 onKeyDown={(e) => {
@@ -126,34 +136,43 @@ export function MemberList({ members }: Props) {
                 }}
                 tabIndex={0}
                 role="link"
-                className="border-b last:border-b-0 hover:bg-muted/50 cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="hover:bg-muted/50 hover:shadow-sm cursor-pointer transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <td className="px-4 py-3">
+                <TableCell className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     <AvatarInitial name={member.name} size="sm" />
-                    <span className="font-medium text-sm">{member.name}</span>
+                    <div>
+                      <span className="font-medium text-sm">{member.name}</span>
+                      {member.position && (
+                        <p className="text-xs text-muted-foreground">{member.position}</p>
+                      )}
+                    </div>
                   </div>
-                </td>
-                <td className="px-4 py-3 text-sm text-muted-foreground hidden sm:table-cell">
+                </TableCell>
+                <TableCell className="px-4 py-3 text-sm text-muted-foreground hidden sm:table-cell">
                   {member.department ?? "—"}
-                </td>
-                <td className="px-4 py-3 text-sm text-muted-foreground">
+                </TableCell>
+                <TableCell className="px-4 py-3 text-sm text-muted-foreground">
                   {formatRelativeDate(lastDate)}
-                </td>
-                <td className="px-4 py-3 text-sm">
-                  {member._count.actionItems > 0 ? (
-                    <span className="text-foreground">{member._count.actionItems}件</span>
-                  ) : (
-                    <span className="text-muted-foreground">—</span>
-                  )}
-                  {member.overdueActionCount > 0 && (
-                    <span className="ml-1 text-[oklch(0.55_0.2_25)] text-xs">
-                      ({member.overdueActionCount}件超過)
-                    </span>
-                  )}
-                </td>
-                <td className="px-4 py-3 hidden md:table-cell">{getStatusBadge(days)}</td>
-                <td className="px-4 py-3 text-right">
+                </TableCell>
+                <TableCell className="px-4 py-3 text-sm">
+                  <div>
+                    {member._count.actionItems > 0 ? (
+                      <span className="text-foreground">{member._count.actionItems}件</span>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                    {member.overdueActionCount > 0 && (
+                      <p className="text-destructive text-xs">
+                        {member.overdueActionCount}件超過
+                      </p>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell className="px-4 py-3 hidden md:table-cell">
+                  {getStatusBadge(days)}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-right">
                   <Link
                     href={`/members/${member.id}/meetings/new`}
                     onClick={(e) => e.stopPropagation()}
@@ -162,12 +181,12 @@ export function MemberList({ members }: Props) {
                       1on1
                     </Button>
                   </Link>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             );
           })}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }
