@@ -17,12 +17,17 @@ const baseSummary: DashboardSummaryType = {
 };
 
 describe("DashboardSummary", () => {
-  it("renders all four summary cards", () => {
+  it("renders three summary cards", () => {
     render(<DashboardSummary summary={baseSummary} />);
     expect(screen.getByText("要フォロー")).toBeDefined();
     expect(screen.getByText("アクション完了率")).toBeDefined();
-    expect(screen.getByText("今月の1on1")).toBeDefined();
     expect(screen.getByText("期限超過")).toBeDefined();
+  });
+
+  it("does not render meetings this month card", () => {
+    const summary = { ...baseSummary, meetingsThisMonth: 5 };
+    render(<DashboardSummary summary={summary} />);
+    expect(screen.queryByText("今月の1on1")).toBeNull();
   });
 
   it("displays needsFollowUp count", () => {
@@ -42,13 +47,6 @@ describe("DashboardSummary", () => {
     render(<DashboardSummary summary={summary} />);
     expect(screen.getByText("75")).toBeDefined();
     expect(screen.getByText("%")).toBeDefined();
-  });
-
-  it("displays meetings this month count", () => {
-    const summary = { ...baseSummary, meetingsThisMonth: 5 };
-    render(<DashboardSummary summary={summary} />);
-    expect(screen.getByText("5")).toBeDefined();
-    expect(screen.getByText("回")).toBeDefined();
   });
 
   it("displays overdue actions count", () => {
