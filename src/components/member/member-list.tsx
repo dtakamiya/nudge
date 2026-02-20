@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { formatDate } from "@/lib/format";
 
 type MemberWithStats = {
@@ -20,7 +21,7 @@ type Props = {
 export function MemberList({ members }: Props) {
   if (members.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
+      <div className="text-center py-12 text-muted-foreground">
         <p>メンバーがまだ登録されていません</p>
         <Link href="/members/new">
           <Button className="mt-4">メンバーを追加</Button>
@@ -31,24 +32,31 @@ export function MemberList({ members }: Props) {
 
   return (
     <div className="grid gap-4">
-      {members.map((member) => (
-        <Card key={member.id}>
-          <CardContent className="flex items-center justify-between p-4">
+      {members.map((member, index) => (
+        <Card
+          key={member.id}
+          className={`animate-fade-in-up hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(61,46,31,0.10)] stagger-${Math.min(index + 1, 5)}`}
+        >
+          <CardContent className="flex items-center justify-between p-5">
             <div className="flex items-center gap-4">
+              <AvatarInitial name={member.name} size="lg" />
               <div>
-                <Link href={`/members/${member.id}`} className="font-medium hover:underline">
+                <Link
+                  href={`/members/${member.id}`}
+                  className="font-heading text-lg text-foreground hover:text-primary transition-colors"
+                >
                   {member.name}
                 </Link>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-muted-foreground">
                   {[member.department, member.position].filter(Boolean).join(" / ")}
                 </div>
               </div>
               {member._count.actionItems > 0 && (
-                <Badge variant="secondary">未完了 {member._count.actionItems}件</Badge>
+                <Badge variant="status-todo">未完了 {member._count.actionItems}件</Badge>
               )}
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-muted-foreground">
                 {member.meetings[0] ? `最終: ${formatDate(member.meetings[0].date)}` : "未実施"}
               </span>
               <Link href={`/members/${member.id}/meetings/new`}>

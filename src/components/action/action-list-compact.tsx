@@ -19,16 +19,16 @@ const statusLabels: Record<string, string> = {
   IN_PROGRESS: "進行中",
   DONE: "完了",
 };
-const statusColors: Record<string, "default" | "secondary" | "outline"> = {
-  TODO: "outline",
-  IN_PROGRESS: "secondary",
-  DONE: "default",
+const statusColors: Record<string, "status-done" | "status-progress" | "status-todo"> = {
+  TODO: "status-todo",
+  IN_PROGRESS: "status-progress",
+  DONE: "status-done",
 };
 
 export function ActionListCompact({ actionItems }: Props) {
   const router = useRouter();
   if (actionItems.length === 0) {
-    return <p className="text-gray-500 py-4">アクションアイテムはありません</p>;
+    return <p className="text-muted-foreground py-4">アクションアイテムはありません</p>;
   }
   async function cycleStatus(id: string, currentStatus: string) {
     const next =
@@ -51,7 +51,7 @@ export function ActionListCompact({ actionItems }: Props) {
             <span className="text-sm">{item.title}</span>
           </div>
           {item.dueDate && (
-            <span className="text-xs text-gray-500">期限: {formatDate(item.dueDate)}</span>
+            <span className="text-xs text-muted-foreground">期限: {formatDate(item.dueDate)}</span>
           )}
         </div>
       ))}

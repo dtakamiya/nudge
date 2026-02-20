@@ -16,7 +16,7 @@ type Props = { meetings: MeetingSummary[]; memberId: string };
 
 export function MeetingHistory({ meetings, memberId }: Props) {
   if (meetings.length === 0) {
-    return <p className="text-gray-500 py-4">まだ1on1の記録がありません</p>;
+    return <p className="text-muted-foreground py-4">まだ1on1の記録がありません</p>;
   }
   return (
     <div className="flex flex-col gap-3">
@@ -24,11 +24,11 @@ export function MeetingHistory({ meetings, memberId }: Props) {
         const doneCount = meeting.actionItems.filter((a) => a.status === "DONE").length;
         return (
           <Link key={meeting.id} href={`/members/${memberId}/meetings/${meeting.id}`}>
-            <Card className="hover:bg-gray-50 cursor-pointer">
+            <Card className="hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(61,46,31,0.10)] cursor-pointer">
               <CardContent className="p-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-medium">{formatDate(meeting.date)}</p>
+                    <p className="font-heading font-medium">{formatDate(meeting.date)}</p>
                     <div className="flex gap-1 mt-1 flex-wrap">
                       {meeting.topics.map((topic) => (
                         <Badge key={topic.id} variant="outline" className="text-xs">
@@ -37,7 +37,7 @@ export function MeetingHistory({ meetings, memberId }: Props) {
                       ))}
                     </div>
                   </div>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-muted-foreground">
                     アクション: {doneCount}/{meeting.actionItems.length}
                   </span>
                 </div>

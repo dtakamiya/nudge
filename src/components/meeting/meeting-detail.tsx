@@ -30,11 +30,11 @@ type Props = {
 export function MeetingDetail({ date, topics, actionItems }: Props) {
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-lg text-gray-600">{formatDate(date)}</p>
+      <p className="text-lg text-muted-foreground">{formatDate(date)}</p>
       <div>
-        <h2 className="text-lg font-semibold mb-3">話題</h2>
+        <h2 className="font-heading text-xl mb-3">話題</h2>
         {topics.length === 0 ? (
-          <p className="text-gray-500">話題なし</p>
+          <p className="text-muted-foreground">話題なし</p>
         ) : (
           <div className="flex flex-col gap-3">
             {topics.map((topic) => (
@@ -47,7 +47,9 @@ export function MeetingDetail({ date, topics, actionItems }: Props) {
                     <span className="font-medium">{topic.title}</span>
                   </div>
                   {topic.notes && (
-                    <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{topic.notes}</p>
+                    <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
+                      {topic.notes}
+                    </p>
                   )}
                 </CardContent>
               </Card>
@@ -57,7 +59,7 @@ export function MeetingDetail({ date, topics, actionItems }: Props) {
       </div>
       <Separator />
       <div>
-        <h2 className="text-lg font-semibold mb-3">アクションアイテム</h2>
+        <h2 className="font-heading text-xl mb-3">アクションアイテム</h2>
         <ActionListCompact
           actionItems={actionItems.map((a) => ({
             ...a,

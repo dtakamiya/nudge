@@ -36,7 +36,7 @@ export function MemberForm() {
   return (
     <Card className="max-w-lg">
       <CardHeader>
-        <CardTitle>メンバー登録</CardTitle>
+        <CardTitle className="font-heading text-xl">メンバー登録</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -52,7 +52,7 @@ export function MemberForm() {
             <Label htmlFor="position">役職</Label>
             <Input id="position" name="position" placeholder="例: シニアエンジニア" />
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "登録中..." : "登録する"}
           </Button>

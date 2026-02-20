@@ -117,7 +117,7 @@ export function MeetingForm({ memberId }: Props) {
       <Card>
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-base">話題</CardTitle>
+            <CardTitle className="font-heading text-base">話題</CardTitle>
             <Button type="button" variant="outline" size="sm" onClick={addTopic}>
               + 話題を追加
             </Button>
@@ -181,7 +181,7 @@ export function MeetingForm({ memberId }: Props) {
       <Card>
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-base">アクションアイテム</CardTitle>
+            <CardTitle className="font-heading text-base">アクションアイテム</CardTitle>
             <Button type="button" variant="outline" size="sm" onClick={addAction}>
               + アクション追加
             </Button>
@@ -189,7 +189,7 @@ export function MeetingForm({ memberId }: Props) {
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {actionItems.length === 0 && (
-            <p className="text-sm text-gray-500">アクションはまだありません</p>
+            <p className="text-sm text-muted-foreground">アクションはまだありません</p>
           )}
           {actionItems.map((action, index) => (
             <div key={index} className="border rounded p-3 flex flex-col gap-2">
@@ -227,7 +227,7 @@ export function MeetingForm({ memberId }: Props) {
         </CardContent>
       </Card>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
       <Button type="submit" disabled={isSubmitting} className="self-start">
         {isSubmitting ? "保存中..." : "1on1を保存"}
       </Button>
