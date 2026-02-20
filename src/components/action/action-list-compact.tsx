@@ -25,7 +25,6 @@ const statusColors: Record<string, "default" | "secondary" | "outline"> = {
   DONE: "default",
 };
 
-
 export function ActionListCompact({ actionItems }: Props) {
   const router = useRouter();
   if (actionItems.length === 0) {
@@ -33,11 +32,7 @@ export function ActionListCompact({ actionItems }: Props) {
   }
   async function cycleStatus(id: string, currentStatus: string) {
     const next =
-      currentStatus === "TODO"
-        ? "IN_PROGRESS"
-        : currentStatus === "IN_PROGRESS"
-          ? "DONE"
-          : "TODO";
+      currentStatus === "TODO" ? "IN_PROGRESS" : currentStatus === "IN_PROGRESS" ? "DONE" : "TODO";
     try {
       await updateActionItemStatus(id, next);
       router.refresh();

@@ -16,7 +16,7 @@ A personal app for managing 1-on-1 meeting records, topics, and action items wit
 ### Member
 
 | Field      | Type     | Notes          |
-|------------|----------|----------------|
+| ---------- | -------- | -------------- |
 | id         | UUID     | Primary key    |
 | name       | string   | Required       |
 | department | string   | Optional       |
@@ -27,7 +27,7 @@ A personal app for managing 1-on-1 meeting records, topics, and action items wit
 ### Meeting
 
 | Field     | Type     | Notes                |
-|-----------|----------|----------------------|
+| --------- | -------- | -------------------- |
 | id        | UUID     | Primary key          |
 | memberId  | UUID     | FK -> Member         |
 | date      | datetime | When the 1on1 occurs |
@@ -36,31 +36,31 @@ A personal app for managing 1-on-1 meeting records, topics, and action items wit
 
 ### Topic
 
-| Field     | Type   | Notes                                                     |
-|-----------|--------|-----------------------------------------------------------|
-| id        | UUID   | Primary key                                               |
-| meetingId | UUID   | FK -> Meeting                                             |
-| category  | enum   | WORK_PROGRESS, CAREER, ISSUES, FEEDBACK, OTHER            |
-| title     | string | Required                                                  |
-| notes     | string | Detailed notes                                            |
-| sortOrder | int    | Display order within a meeting                            |
-| createdAt | datetime | Auto-generated                                          |
-| updatedAt | datetime | Auto-generated                                          |
+| Field     | Type     | Notes                                          |
+| --------- | -------- | ---------------------------------------------- |
+| id        | UUID     | Primary key                                    |
+| meetingId | UUID     | FK -> Meeting                                  |
+| category  | enum     | WORK_PROGRESS, CAREER, ISSUES, FEEDBACK, OTHER |
+| title     | string   | Required                                       |
+| notes     | string   | Detailed notes                                 |
+| sortOrder | int      | Display order within a meeting                 |
+| createdAt | datetime | Auto-generated                                 |
+| updatedAt | datetime | Auto-generated                                 |
 
 ### ActionItem
 
-| Field       | Type     | Notes                           |
-|-------------|----------|---------------------------------|
-| id          | UUID     | Primary key                     |
-| meetingId   | UUID     | FK -> Meeting (where created)   |
-| memberId    | UUID     | FK -> Member                    |
-| title       | string   | Required                        |
-| description | string   | Optional details                |
-| status      | enum     | TODO, IN_PROGRESS, DONE         |
-| dueDate     | date     | Optional                        |
-| completedAt | datetime | Set when status becomes DONE    |
-| createdAt   | datetime | Auto-generated                  |
-| updatedAt   | datetime | Auto-generated                  |
+| Field       | Type     | Notes                         |
+| ----------- | -------- | ----------------------------- |
+| id          | UUID     | Primary key                   |
+| meetingId   | UUID     | FK -> Meeting (where created) |
+| memberId    | UUID     | FK -> Member                  |
+| title       | string   | Required                      |
+| description | string   | Optional details              |
+| status      | enum     | TODO, IN_PROGRESS, DONE       |
+| dueDate     | date     | Optional                      |
+| completedAt | datetime | Set when status becomes DONE  |
+| createdAt   | datetime | Auto-generated                |
+| updatedAt   | datetime | Auto-generated                |
 
 ## Screen Structure
 
@@ -117,14 +117,14 @@ A personal app for managing 1-on-1 meeting records, topics, and action items wit
 
 ## Technical Stack
 
-| Layer      | Technology                |
-|------------|---------------------------|
-| Framework  | Next.js 15 (App Router)   |
-| ORM        | Prisma                    |
-| Database   | SQLite                    |
-| UI         | Tailwind CSS + shadcn/ui  |
-| Validation | Zod                       |
-| Testing    | Vitest + Testing Library  |
+| Layer      | Technology               |
+| ---------- | ------------------------ |
+| Framework  | Next.js 15 (App Router)  |
+| ORM        | Prisma                   |
+| Database   | SQLite                   |
+| UI         | Tailwind CSS + shadcn/ui |
+| Validation | Zod                      |
+| Testing    | Vitest + Testing Library |
 
 ## Project Structure
 

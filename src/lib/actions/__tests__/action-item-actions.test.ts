@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { getActionItems, getPendingActionItems, updateActionItemStatus } from "../action-item-actions";
+import {
+  getActionItems,
+  getPendingActionItems,
+  updateActionItemStatus,
+} from "../action-item-actions";
 import { createMember } from "../member-actions";
 import { createMeeting } from "../meeting-actions";
 
@@ -17,14 +21,27 @@ beforeEach(async () => {
 
 describe("getActionItems", () => {
   it("returns all action items with member and meeting info", async () => {
-    await createMeeting({ memberId, date: new Date().toISOString(), topics: [], actionItems: [{ title: "Task A", description: "" }] });
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "Task A", description: "" }],
+    });
     const items = await getActionItems();
     expect(items).toHaveLength(1);
     expect(items[0].member).toBeDefined();
   });
 
   it("filters by status", async () => {
-    await createMeeting({ memberId, date: new Date().toISOString(), topics: [], actionItems: [{ title: "Task A", description: "" }, { title: "Task B", description: "" }] });
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [
+        { title: "Task A", description: "" },
+        { title: "Task B", description: "" },
+      ],
+    });
     const items = await getActionItems();
     expect(items).toHaveLength(2);
     await updateActionItemStatus(items[0].id, "DONE");
@@ -35,8 +52,18 @@ describe("getActionItems", () => {
 
   it("filters by member", async () => {
     const member2 = await createMember({ name: "Member 2" });
-    await createMeeting({ memberId, date: new Date().toISOString(), topics: [], actionItems: [{ title: "Task A", description: "" }] });
-    await createMeeting({ memberId: member2.id, date: new Date().toISOString(), topics: [], actionItems: [{ title: "Task B", description: "" }] });
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "Task A", description: "" }],
+    });
+    await createMeeting({
+      memberId: member2.id,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "Task B", description: "" }],
+    });
     const filtered = await getActionItems({ memberId });
     expect(filtered).toHaveLength(1);
     expect(filtered[0].title).toBe("Task A");
@@ -45,7 +72,15 @@ describe("getActionItems", () => {
 
 describe("getPendingActionItems", () => {
   it("returns only non-DONE items for a member", async () => {
-    await createMeeting({ memberId, date: new Date().toISOString(), topics: [], actionItems: [{ title: "Pending", description: "" }, { title: "Done", description: "" }] });
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [
+        { title: "Pending", description: "" },
+        { title: "Done", description: "" },
+      ],
+    });
     const all = await getActionItems();
     await updateActionItemStatus(all.find((a) => a.title === "Done")!.id, "DONE");
     const pending = await getPendingActionItems(memberId);
@@ -56,7 +91,12 @@ describe("getPendingActionItems", () => {
 
 describe("updateActionItemStatus", () => {
   it("updates status to IN_PROGRESS", async () => {
-    await createMeeting({ memberId, date: new Date().toISOString(), topics: [], actionItems: [{ title: "Task", description: "" }] });
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "Task", description: "" }],
+    });
     const items = await getActionItems();
     const updated = await updateActionItemStatus(items[0].id, "IN_PROGRESS");
     expect(updated.status).toBe("IN_PROGRESS");
@@ -64,7 +104,12 @@ describe("updateActionItemStatus", () => {
   });
 
   it("sets completedAt when marking DONE", async () => {
-    await createMeeting({ memberId, date: new Date().toISOString(), topics: [], actionItems: [{ title: "Task", description: "" }] });
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "Task", description: "" }],
+    });
     const items = await getActionItems();
     const updated = await updateActionItemStatus(items[0].id, "DONE");
     expect(updated.status).toBe("DONE");
@@ -72,7 +117,12 @@ describe("updateActionItemStatus", () => {
   });
 
   it("clears completedAt when reverting from DONE", async () => {
-    await createMeeting({ memberId, date: new Date().toISOString(), topics: [], actionItems: [{ title: "Task", description: "" }] });
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "Task", description: "" }],
+    });
     const items = await getActionItems();
     await updateActionItemStatus(items[0].id, "DONE");
     const reverted = await updateActionItemStatus(items[0].id, "TODO");

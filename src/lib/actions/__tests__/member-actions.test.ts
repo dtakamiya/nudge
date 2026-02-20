@@ -11,7 +11,11 @@ beforeEach(async () => {
 
 describe("createMember", () => {
   it("creates a member with valid data", async () => {
-    const result = await createMember({ name: "Tanaka Taro", department: "Engineering", position: "Senior" });
+    const result = await createMember({
+      name: "Tanaka Taro",
+      department: "Engineering",
+      position: "Senior",
+    });
     expect(result.id).toBeDefined();
     expect(result.name).toBe("Tanaka Taro");
     expect(result.department).toBe("Engineering");

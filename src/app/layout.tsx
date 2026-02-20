@@ -14,10 +14,7 @@ function Sidebar() {
         Nudge
       </Link>
       <nav className="flex flex-col gap-1">
-        <Link
-          href="/"
-          className="px-3 py-2 rounded-md hover:bg-gray-200 text-sm font-medium"
-        >
+        <Link href="/" className="px-3 py-2 rounded-md hover:bg-gray-200 text-sm font-medium">
           ダッシュボード
         </Link>
         <Link
@@ -37,11 +34,7 @@ function Sidebar() {
   );
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
       <body className="flex h-screen">

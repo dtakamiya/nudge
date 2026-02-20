@@ -13,11 +13,13 @@
 ### Task 1: Project Scaffolding
 
 **Files:**
+
 - Create: `package.json`, `next.config.ts`, `tsconfig.json`, `tailwind.config.ts`, `postcss.config.mjs`, `src/app/layout.tsx`, `src/app/page.tsx`, `src/app/globals.css`
 
 **Step 1: Initialize Next.js project**
 
 Run:
+
 ```bash
 npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm
 ```
@@ -41,12 +43,14 @@ git commit -m "chore: scaffold Next.js 15 project with TypeScript and Tailwind"
 ### Task 2: Install and Configure Prisma + SQLite
 
 **Files:**
+
 - Create: `prisma/schema.prisma`, `src/lib/prisma.ts`
 - Modify: `package.json` (dependencies)
 
 **Step 1: Install Prisma**
 
 Run:
+
 ```bash
 npm install prisma --save-dev
 npm install @prisma/client
@@ -60,6 +64,7 @@ Expected: Creates `prisma/schema.prisma` with SQLite datasource.
 **Step 3: Create Prisma client singleton**
 
 Create `src/lib/prisma.ts`:
+
 ```typescript
 import { PrismaClient } from "@prisma/client";
 
@@ -86,11 +91,13 @@ git commit -m "chore: add Prisma with SQLite datasource"
 ### Task 3: Define Database Schema
 
 **Files:**
+
 - Modify: `prisma/schema.prisma`
 
 **Step 1: Write the full Prisma schema**
 
 Replace contents of `prisma/schema.prisma`:
+
 ```prisma
 generator client {
   provider = "prisma-client-js"
@@ -185,6 +192,7 @@ Expected: Migration created and applied. `prisma/dev.db` created.
 **Step 3: Add `prisma/dev.db` to .gitignore**
 
 Append to `.gitignore`:
+
 ```
 prisma/dev.db
 prisma/dev.db-journal
@@ -202,12 +210,14 @@ git commit -m "feat: define database schema with Member, Meeting, Topic, ActionI
 ### Task 4: Install and Configure Vitest
 
 **Files:**
+
 - Create: `vitest.config.ts`, `src/lib/__tests__/prisma.test.ts`
 - Modify: `package.json` (scripts, dependencies)
 
 **Step 1: Install Vitest and Testing Library**
 
 Run:
+
 ```bash
 npm install --save-dev vitest @vitejs/plugin-react @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom
 ```
@@ -215,6 +225,7 @@ npm install --save-dev vitest @vitejs/plugin-react @testing-library/react @testi
 **Step 2: Create Vitest config**
 
 Create `vitest.config.ts`:
+
 ```typescript
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
@@ -238,6 +249,7 @@ export default defineConfig({
 **Step 3: Add test script to package.json**
 
 Add to `scripts` in `package.json`:
+
 ```json
 "test": "vitest run",
 "test:watch": "vitest"
@@ -246,6 +258,7 @@ Add to `scripts` in `package.json`:
 **Step 4: Write a smoke test for Prisma client import**
 
 Create `src/lib/__tests__/prisma.test.ts`:
+
 ```typescript
 import { describe, it, expect } from "vitest";
 
@@ -274,6 +287,7 @@ git commit -m "chore: configure Vitest with React Testing Library"
 ### Task 5: Zod Validation Schemas
 
 **Files:**
+
 - Create: `src/lib/validations/member.ts`, `src/lib/validations/meeting.ts`, `src/lib/validations/action-item.ts`
 - Create: `src/lib/validations/__tests__/member.test.ts`, `src/lib/validations/__tests__/meeting.test.ts`, `src/lib/validations/__tests__/action-item.test.ts`
 
@@ -284,6 +298,7 @@ Run: `npm install zod`
 **Step 2: Write failing tests for member validation**
 
 Create `src/lib/validations/__tests__/member.test.ts`:
+
 ```typescript
 import { describe, it, expect } from "vitest";
 import { createMemberSchema, updateMemberSchema } from "../member";
@@ -330,6 +345,7 @@ Expected: FAIL — module not found.
 **Step 4: Implement member validation**
 
 Create `src/lib/validations/member.ts`:
+
 ```typescript
 import { z } from "zod";
 
@@ -357,6 +373,7 @@ Expected: All member validation tests pass.
 **Step 6: Write failing tests for meeting validation**
 
 Create `src/lib/validations/__tests__/meeting.test.ts`:
+
 ```typescript
 import { describe, it, expect } from "vitest";
 import { createMeetingSchema } from "../meeting";
@@ -435,16 +452,11 @@ describe("createMeetingSchema", () => {
 **Step 7: Implement meeting validation**
 
 Create `src/lib/validations/meeting.ts`:
+
 ```typescript
 import { z } from "zod";
 
-const topicCategory = z.enum([
-  "WORK_PROGRESS",
-  "CAREER",
-  "ISSUES",
-  "FEEDBACK",
-  "OTHER",
-]);
+const topicCategory = z.enum(["WORK_PROGRESS", "CAREER", "ISSUES", "FEEDBACK", "OTHER"]);
 
 const topicInputSchema = z.object({
   category: topicCategory,
@@ -479,6 +491,7 @@ Expected: All meeting validation tests pass.
 **Step 9: Write failing tests for action-item validation**
 
 Create `src/lib/validations/__tests__/action-item.test.ts`:
+
 ```typescript
 import { describe, it, expect } from "vitest";
 import { updateActionItemStatusSchema } from "../action-item";
@@ -510,6 +523,7 @@ describe("updateActionItemStatusSchema", () => {
 **Step 10: Implement action-item validation**
 
 Create `src/lib/validations/action-item.ts`:
+
 ```typescript
 import { z } from "zod";
 
@@ -540,12 +554,14 @@ git commit -m "feat: add Zod validation schemas for member, meeting, and action-
 ### Task 6: Server Actions — Members
 
 **Files:**
+
 - Create: `src/lib/actions/member-actions.ts`
 - Create: `src/lib/actions/__tests__/member-actions.test.ts`
 
 **Step 1: Write failing tests for member server actions**
 
 Create `src/lib/actions/__tests__/member-actions.test.ts`:
+
 ```typescript
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
@@ -619,6 +635,7 @@ Expected: FAIL — member-actions module not found.
 **Step 3: Implement member server actions**
 
 Create `src/lib/actions/member-actions.ts`:
+
 ```typescript
 "use server";
 
@@ -697,12 +714,14 @@ git commit -m "feat: add member server actions with CRUD operations"
 ### Task 7: Server Actions — Meetings
 
 **Files:**
+
 - Create: `src/lib/actions/meeting-actions.ts`
 - Create: `src/lib/actions/__tests__/meeting-actions.test.ts`
 
 **Step 1: Write failing tests for meeting server actions**
 
 Create `src/lib/actions/__tests__/meeting-actions.test.ts`:
+
 ```typescript
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
@@ -728,9 +747,7 @@ describe("createMeeting", () => {
       topics: [
         { category: "WORK_PROGRESS", title: "Sprint review", notes: "Good progress", sortOrder: 0 },
       ],
-      actionItems: [
-        { title: "Fix bug #123", description: "Critical bug", dueDate: "2026-03-01" },
-      ],
+      actionItems: [{ title: "Fix bug #123", description: "Critical bug", dueDate: "2026-03-01" }],
     });
     expect(result.id).toBeDefined();
     expect(result.topics).toHaveLength(1);
@@ -786,6 +803,7 @@ Expected: FAIL — meeting-actions module not found.
 **Step 3: Implement meeting server actions**
 
 Create `src/lib/actions/meeting-actions.ts`:
+
 ```typescript
 "use server";
 
@@ -871,16 +889,22 @@ git commit -m "feat: add meeting server actions with topic and action item creat
 ### Task 8: Server Actions — Action Items
 
 **Files:**
+
 - Create: `src/lib/actions/action-item-actions.ts`
 - Create: `src/lib/actions/__tests__/action-item-actions.test.ts`
 
 **Step 1: Write failing tests for action item server actions**
 
 Create `src/lib/actions/__tests__/action-item-actions.test.ts`:
+
 ```typescript
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { getActionItems, getPendingActionItems, updateActionItemStatus } from "../action-item-actions";
+import {
+  getActionItems,
+  getPendingActionItems,
+  updateActionItemStatus,
+} from "../action-item-actions";
 import { createMember } from "../member-actions";
 import { createMeeting } from "../meeting-actions";
 
@@ -1017,6 +1041,7 @@ Expected: FAIL — action-item-actions module not found.
 **Step 3: Implement action item server actions**
 
 Create `src/lib/actions/action-item-actions.ts`:
+
 ```typescript
 "use server";
 
@@ -1082,20 +1107,24 @@ git commit -m "feat: add action item server actions with filtering and status up
 ### Task 9: Install shadcn/ui and Create Layout
 
 **Files:**
+
 - Create: `components.json`, `src/components/ui/button.tsx`, `src/components/ui/card.tsx`, `src/components/ui/input.tsx`, `src/components/ui/select.tsx`, `src/components/ui/badge.tsx`, `src/components/ui/textarea.tsx`
 - Modify: `src/app/layout.tsx`, `src/app/globals.css`
 
 **Step 1: Initialize shadcn/ui**
 
 Run:
+
 ```bash
 npx shadcn@latest init -d
 ```
+
 Expected: Creates `components.json` and sets up shadcn/ui.
 
 **Step 2: Install required shadcn/ui components**
 
 Run:
+
 ```bash
 npx shadcn@latest add button card input select badge textarea label separator dialog
 ```
@@ -1103,6 +1132,7 @@ npx shadcn@latest add button card input select badge textarea label separator di
 **Step 3: Create the root layout with sidebar navigation**
 
 Modify `src/app/layout.tsx`:
+
 ```tsx
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -1120,10 +1150,7 @@ function Sidebar() {
         Nudge
       </Link>
       <nav className="flex flex-col gap-1">
-        <Link
-          href="/"
-          className="px-3 py-2 rounded-md hover:bg-gray-200 text-sm font-medium"
-        >
+        <Link href="/" className="px-3 py-2 rounded-md hover:bg-gray-200 text-sm font-medium">
           ダッシュボード
         </Link>
         <Link
@@ -1143,11 +1170,7 @@ function Sidebar() {
   );
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
       <body className="flex h-screen">
@@ -1176,12 +1199,14 @@ git commit -m "feat: add shadcn/ui components and sidebar layout"
 ### Task 10: Dashboard Page
 
 **Files:**
+
 - Modify: `src/app/page.tsx`
 - Create: `src/components/member/member-list.tsx`
 
 **Step 1: Create MemberList component**
 
 Create `src/components/member/member-list.tsx`:
+
 ```tsx
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -1224,29 +1249,20 @@ export function MemberList({ members }: Props) {
           <CardContent className="flex items-center justify-between p-4">
             <div className="flex items-center gap-4">
               <div>
-                <Link
-                  href={`/members/${member.id}`}
-                  className="font-medium hover:underline"
-                >
+                <Link href={`/members/${member.id}`} className="font-medium hover:underline">
                   {member.name}
                 </Link>
                 <div className="text-sm text-gray-500">
-                  {[member.department, member.position]
-                    .filter(Boolean)
-                    .join(" / ")}
+                  {[member.department, member.position].filter(Boolean).join(" / ")}
                 </div>
               </div>
               {member._count.actionItems > 0 && (
-                <Badge variant="secondary">
-                  未完了 {member._count.actionItems}件
-                </Badge>
+                <Badge variant="secondary">未完了 {member._count.actionItems}件</Badge>
               )}
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-500">
-                {member.meetings[0]
-                  ? `最終: ${formatDate(member.meetings[0].date)}`
-                  : "未実施"}
+                {member.meetings[0] ? `最終: ${formatDate(member.meetings[0].date)}` : "未実施"}
               </span>
               <Link href={`/members/${member.id}/meetings/new`}>
                 <Button size="sm">新規1on1</Button>
@@ -1263,6 +1279,7 @@ export function MemberList({ members }: Props) {
 **Step 2: Create dashboard page**
 
 Modify `src/app/page.tsx`:
+
 ```tsx
 import { getMembers } from "@/lib/actions/member-actions";
 import { MemberList } from "@/components/member/member-list";
@@ -1296,12 +1313,14 @@ git commit -m "feat: add dashboard page with member list"
 ### Task 11: New Member Page
 
 **Files:**
+
 - Create: `src/app/members/new/page.tsx`
 - Create: `src/components/member/member-form.tsx`
 
 **Step 1: Create MemberForm client component**
 
 Create `src/components/member/member-form.tsx`:
+
 ```tsx
 "use client";
 
@@ -1351,19 +1370,11 @@ export function MemberForm() {
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="department">部署</Label>
-            <Input
-              id="department"
-              name="department"
-              placeholder="例: エンジニアリング"
-            />
+            <Input id="department" name="department" placeholder="例: エンジニアリング" />
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="position">役職</Label>
-            <Input
-              id="position"
-              name="position"
-              placeholder="例: シニアエンジニア"
-            />
+            <Input id="position" name="position" placeholder="例: シニアエンジニア" />
           </div>
           {error && <p className="text-sm text-red-600">{error}</p>}
           <Button type="submit" disabled={isSubmitting}>
@@ -1379,6 +1390,7 @@ export function MemberForm() {
 **Step 2: Create the page**
 
 Create `src/app/members/new/page.tsx`:
+
 ```tsx
 import { MemberForm } from "@/components/member/member-form";
 
@@ -1409,6 +1421,7 @@ git commit -m "feat: add new member registration page"
 ### Task 12: Member Detail Page
 
 **Files:**
+
 - Create: `src/app/members/[id]/page.tsx`
 - Create: `src/components/meeting/meeting-history.tsx`
 - Create: `src/components/action/action-list-compact.tsx`
@@ -1416,6 +1429,7 @@ git commit -m "feat: add new member registration page"
 **Step 1: Create MeetingHistory component**
 
 Create `src/components/meeting/meeting-history.tsx`:
+
 ```tsx
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -1460,14 +1474,9 @@ export function MeetingHistory({ meetings, memberId }: Props) {
   return (
     <div className="flex flex-col gap-3">
       {meetings.map((meeting) => {
-        const doneCount = meeting.actionItems.filter(
-          (a) => a.status === "DONE"
-        ).length;
+        const doneCount = meeting.actionItems.filter((a) => a.status === "DONE").length;
         return (
-          <Link
-            key={meeting.id}
-            href={`/members/${memberId}/meetings/${meeting.id}`}
-          >
+          <Link key={meeting.id} href={`/members/${memberId}/meetings/${meeting.id}`}>
             <Card className="hover:bg-gray-50 cursor-pointer">
               <CardContent className="p-4">
                 <div className="flex justify-between items-start">
@@ -1498,6 +1507,7 @@ export function MeetingHistory({ meetings, memberId }: Props) {
 **Step 2: Create ActionListCompact component**
 
 Create `src/components/action/action-list-compact.tsx`:
+
 ```tsx
 "use client";
 
@@ -1543,11 +1553,7 @@ export function ActionListCompact({ actionItems }: Props) {
 
   async function cycleStatus(id: string, currentStatus: string) {
     const next =
-      currentStatus === "TODO"
-        ? "IN_PROGRESS"
-        : currentStatus === "IN_PROGRESS"
-          ? "DONE"
-          : "TODO";
+      currentStatus === "TODO" ? "IN_PROGRESS" : currentStatus === "IN_PROGRESS" ? "DONE" : "TODO";
     await updateActionItemStatus(id, next as "TODO" | "IN_PROGRESS" | "DONE");
     router.refresh();
   }
@@ -1555,22 +1561,15 @@ export function ActionListCompact({ actionItems }: Props) {
   return (
     <div className="flex flex-col gap-2">
       {actionItems.map((item) => (
-        <div
-          key={item.id}
-          className="flex items-center justify-between p-2 border rounded"
-        >
+        <div key={item.id} className="flex items-center justify-between p-2 border rounded">
           <div className="flex items-center gap-2">
             <button onClick={() => cycleStatus(item.id, item.status)}>
-              <Badge variant={statusColors[item.status]}>
-                {statusLabels[item.status]}
-              </Badge>
+              <Badge variant={statusColors[item.status]}>{statusLabels[item.status]}</Badge>
             </button>
             <span className="text-sm">{item.title}</span>
           </div>
           {item.dueDate && (
-            <span className="text-xs text-gray-500">
-              期限: {formatDate(item.dueDate)}
-            </span>
+            <span className="text-xs text-gray-500">期限: {formatDate(item.dueDate)}</span>
           )}
         </div>
       ))}
@@ -1582,6 +1581,7 @@ export function ActionListCompact({ actionItems }: Props) {
 **Step 3: Create member detail page**
 
 Create `src/app/members/[id]/page.tsx`:
+
 ```tsx
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -1646,12 +1646,14 @@ git commit -m "feat: add member detail page with meeting history and action list
 ### Task 13: New 1on1 Meeting Page — Form
 
 **Files:**
+
 - Create: `src/app/members/[id]/meetings/new/page.tsx`
 - Create: `src/components/meeting/meeting-form.tsx`
 
 **Step 1: Create MeetingForm client component**
 
 Create `src/components/meeting/meeting-form.tsx`:
+
 ```tsx
 "use client";
 
@@ -1721,9 +1723,7 @@ export function MeetingForm({ memberId }: Props) {
   }
 
   function updateTopic(index: number, field: keyof TopicFormData, value: string | number) {
-    setTopics((prev) =>
-      prev.map((t, i) => (i === index ? { ...t, [field]: value } : t))
-    );
+    setTopics((prev) => prev.map((t, i) => (i === index ? { ...t, [field]: value } : t)));
   }
 
   function addAction() {
@@ -1735,9 +1735,7 @@ export function MeetingForm({ memberId }: Props) {
   }
 
   function updateAction(index: number, field: keyof ActionFormData, value: string) {
-    setActionItems((prev) =>
-      prev.map((a, i) => (i === index ? { ...a, [field]: value } : a))
-    );
+    setActionItems((prev) => prev.map((a, i) => (i === index ? { ...a, [field]: value } : a)));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -1884,12 +1882,7 @@ export function MeetingForm({ memberId }: Props) {
                     onChange={(e) => updateAction(index, "dueDate", e.target.value)}
                   />
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeAction(index)}
-                >
+                <Button type="button" variant="ghost" size="sm" onClick={() => removeAction(index)}>
                   削除
                 </Button>
               </div>
@@ -1918,6 +1911,7 @@ export function MeetingForm({ memberId }: Props) {
 **Step 2: Create the new meeting page**
 
 Create `src/app/members/[id]/meetings/new/page.tsx`:
+
 ```tsx
 import { notFound } from "next/navigation";
 import { getMember } from "@/lib/actions/member-actions";
@@ -1943,9 +1937,7 @@ export default async function NewMeetingPage({ params }: Props) {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">
-        {member.name}との1on1
-      </h1>
+      <h1 className="text-2xl font-bold mb-6">{member.name}との1on1</h1>
       <div className="flex gap-8">
         <div className="flex-1">
           <MeetingForm memberId={id} />
@@ -1971,11 +1963,13 @@ Hold — do not commit yet. Continue to Task 14.
 ### Task 14: Previous Meeting Sidebar
 
 **Files:**
+
 - Create: `src/components/meeting/previous-meeting-sidebar.tsx`
 
 **Step 1: Create PreviousMeetingSidebar component**
 
 Create `src/components/meeting/previous-meeting-sidebar.tsx`:
+
 ```tsx
 "use client";
 
@@ -2023,10 +2017,7 @@ function formatDate(date: Date): string {
   return new Date(date).toLocaleDateString("ja-JP");
 }
 
-export function PreviousMeetingSidebar({
-  previousMeeting,
-  pendingActions,
-}: Props) {
+export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Props) {
   const router = useRouter();
 
   async function markDone(id: string) {
@@ -2047,15 +2038,8 @@ export function PreviousMeetingSidebar({
           ) : (
             <div className="flex flex-col gap-2">
               {pendingActions.map((action) => (
-                <div
-                  key={action.id}
-                  className="flex items-center gap-2 text-sm"
-                >
-                  <input
-                    type="checkbox"
-                    onChange={() => markDone(action.id)}
-                    className="rounded"
-                  />
+                <div key={action.id} className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" onChange={() => markDone(action.id)} className="rounded" />
                   <span>{action.title}</span>
                   {action.dueDate && (
                     <span className="text-xs text-gray-400 ml-auto">
@@ -2073,9 +2057,7 @@ export function PreviousMeetingSidebar({
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm">
-            {previousMeeting
-              ? `前回: ${formatDate(previousMeeting.date)}`
-              : "前回の記録"}
+            {previousMeeting ? `前回: ${formatDate(previousMeeting.date)}` : "前回の記録"}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -2091,9 +2073,7 @@ export function PreviousMeetingSidebar({
                     </Badge>
                     <span className="text-sm font-medium">{topic.title}</span>
                   </div>
-                  {topic.notes && (
-                    <p className="text-xs text-gray-500 mt-1">{topic.notes}</p>
-                  )}
+                  {topic.notes && <p className="text-xs text-gray-500 mt-1">{topic.notes}</p>}
                 </div>
               ))}
               {previousMeeting.topics.length === 0 && (
@@ -2125,12 +2105,14 @@ git commit -m "feat: add new 1on1 meeting page with form and previous meeting si
 ### Task 15: Meeting Detail Page
 
 **Files:**
+
 - Create: `src/app/members/[id]/meetings/[meetingId]/page.tsx`
 - Create: `src/components/meeting/meeting-detail.tsx`
 
 **Step 1: Create MeetingDetail component**
 
 Create `src/components/meeting/meeting-detail.tsx`:
+
 ```tsx
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -2192,9 +2174,7 @@ export function MeetingDetail({ date, topics, actionItems }: Props) {
                     <span className="font-medium">{topic.title}</span>
                   </div>
                   {topic.notes && (
-                    <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">
-                      {topic.notes}
-                    </p>
+                    <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{topic.notes}</p>
                   )}
                 </CardContent>
               </Card>
@@ -2222,6 +2202,7 @@ export function MeetingDetail({ date, topics, actionItems }: Props) {
 **Step 2: Create the meeting detail page**
 
 Create `src/app/members/[id]/meetings/[meetingId]/page.tsx`:
+
 ```tsx
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -2281,6 +2262,7 @@ git commit -m "feat: add meeting detail page with topics and action items"
 ### Task 16: Action List Page (Cross-Member)
 
 **Files:**
+
 - Create: `src/app/actions/page.tsx`
 - Create: `src/components/action/action-list-full.tsx`
 - Create: `src/components/action/action-filters.tsx`
@@ -2288,6 +2270,7 @@ git commit -m "feat: add meeting detail page with topics and action items"
 **Step 1: Create ActionFilters component**
 
 Create `src/components/action/action-filters.tsx`:
+
 ```tsx
 "use client";
 
@@ -2363,6 +2346,7 @@ export function ActionFilters({ members }: Props) {
 **Step 2: Create ActionListFull component**
 
 Create `src/components/action/action-list-full.tsx`:
+
 ```tsx
 "use client";
 
@@ -2422,10 +2406,7 @@ export function ActionListFull({ actionItems }: Props) {
         <Card key={item.id}>
           <CardContent className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Select
-                value={item.status}
-                onValueChange={(val) => handleStatusChange(item.id, val)}
-              >
+              <Select value={item.status} onValueChange={(val) => handleStatusChange(item.id, val)}>
                 <SelectTrigger className="w-28">
                   <SelectValue />
                 </SelectTrigger>
@@ -2438,10 +2419,7 @@ export function ActionListFull({ actionItems }: Props) {
               <div>
                 <p className="font-medium">{item.title}</p>
                 <p className="text-sm text-gray-500">
-                  <Link
-                    href={`/members/${item.member.id}`}
-                    className="hover:underline"
-                  >
+                  <Link href={`/members/${item.member.id}`} className="hover:underline">
                     {item.member.name}
                   </Link>
                   {" ・ "}
@@ -2463,6 +2441,7 @@ export function ActionListFull({ actionItems }: Props) {
 **Step 3: Create the actions page**
 
 Create `src/app/actions/page.tsx`:
+
 ```tsx
 import { Suspense } from "react";
 import { getActionItems } from "@/lib/actions/action-item-actions";
@@ -2486,10 +2465,7 @@ export default async function ActionsPage({ searchParams }: Props) {
     filters.memberId = params.memberId;
   }
 
-  const [actionItems, members] = await Promise.all([
-    getActionItems(filters),
-    getMembers(),
-  ]);
+  const [actionItems, members] = await Promise.all([getActionItems(filters), getMembers()]);
 
   const memberList = members.map((m) => ({ id: m.id, name: m.name }));
 
@@ -2534,6 +2510,7 @@ Expected: Build succeeds with no errors.
 **Step 3: Commit any fixes if needed**
 
 If tests or build fail, fix issues and commit:
+
 ```bash
 git add -A
 git commit -m "fix: resolve build/test issues"
@@ -2544,6 +2521,7 @@ git commit -m "fix: resolve build/test issues"
 ### Task 18: Seed Data for Development
 
 **Files:**
+
 - Create: `prisma/seed.ts`
 - Modify: `package.json` (prisma seed config)
 
@@ -2554,6 +2532,7 @@ Run: `npm install --save-dev tsx`
 **Step 2: Create seed script**
 
 Create `prisma/seed.ts`:
+
 ```typescript
 import { PrismaClient } from "@prisma/client";
 
@@ -2586,14 +2565,34 @@ async function main() {
       date: new Date("2026-02-10"),
       topics: {
         create: [
-          { category: "WORK_PROGRESS", title: "Sprint 14 の進捗", notes: "予定通り進行中。APIの実装が完了。", sortOrder: 0 },
-          { category: "CAREER", title: "テックリードへのキャリアパス", notes: "Q2からテックリードのロールに挑戦したい。", sortOrder: 1 },
+          {
+            category: "WORK_PROGRESS",
+            title: "Sprint 14 の進捗",
+            notes: "予定通り進行中。APIの実装が完了。",
+            sortOrder: 0,
+          },
+          {
+            category: "CAREER",
+            title: "テックリードへのキャリアパス",
+            notes: "Q2からテックリードのロールに挑戦したい。",
+            sortOrder: 1,
+          },
         ],
       },
       actionItems: {
         create: [
-          { memberId: tanaka.id, title: "テックリード向け研修を調査", status: "IN_PROGRESS", dueDate: new Date("2026-02-28") },
-          { memberId: tanaka.id, title: "コードレビューガイドラインを作成", status: "TODO", dueDate: new Date("2026-03-15") },
+          {
+            memberId: tanaka.id,
+            title: "テックリード向け研修を調査",
+            status: "IN_PROGRESS",
+            dueDate: new Date("2026-02-28"),
+          },
+          {
+            memberId: tanaka.id,
+            title: "コードレビューガイドラインを作成",
+            status: "TODO",
+            dueDate: new Date("2026-03-15"),
+          },
         ],
       },
     },
@@ -2605,14 +2604,35 @@ async function main() {
       date: new Date("2026-02-12"),
       topics: {
         create: [
-          { category: "WORK_PROGRESS", title: "新機能のユーザーリサーチ", notes: "5名のインタビュー完了。主要なペインポイントを特定。", sortOrder: 0 },
-          { category: "ISSUES", title: "デザインチームとの連携", notes: "コミュニケーション頻度を上げる必要がある。", sortOrder: 1 },
+          {
+            category: "WORK_PROGRESS",
+            title: "新機能のユーザーリサーチ",
+            notes: "5名のインタビュー完了。主要なペインポイントを特定。",
+            sortOrder: 0,
+          },
+          {
+            category: "ISSUES",
+            title: "デザインチームとの連携",
+            notes: "コミュニケーション頻度を上げる必要がある。",
+            sortOrder: 1,
+          },
         ],
       },
       actionItems: {
         create: [
-          { memberId: suzuki.id, title: "リサーチレポートをまとめる", status: "TODO", dueDate: new Date("2026-02-20") },
-          { memberId: suzuki.id, title: "デザインチームと週次ミーティングを設定", status: "DONE", dueDate: new Date("2026-02-15"), completedAt: new Date("2026-02-14") },
+          {
+            memberId: suzuki.id,
+            title: "リサーチレポートをまとめる",
+            status: "TODO",
+            dueDate: new Date("2026-02-20"),
+          },
+          {
+            memberId: suzuki.id,
+            title: "デザインチームと週次ミーティングを設定",
+            status: "DONE",
+            dueDate: new Date("2026-02-15"),
+            completedAt: new Date("2026-02-14"),
+          },
         ],
       },
     },
@@ -2624,13 +2644,28 @@ async function main() {
       date: new Date("2026-02-14"),
       topics: {
         create: [
-          { category: "WORK_PROGRESS", title: "バグ修正タスクの進捗", notes: "3件中2件完了。残り1件は明日完了予定。", sortOrder: 0 },
-          { category: "FEEDBACK", title: "ペアプログラミングの効果", notes: "生産性が上がっている。週2回は継続したい。", sortOrder: 1 },
+          {
+            category: "WORK_PROGRESS",
+            title: "バグ修正タスクの進捗",
+            notes: "3件中2件完了。残り1件は明日完了予定。",
+            sortOrder: 0,
+          },
+          {
+            category: "FEEDBACK",
+            title: "ペアプログラミングの効果",
+            notes: "生産性が上がっている。週2回は継続したい。",
+            sortOrder: 1,
+          },
         ],
       },
       actionItems: {
         create: [
-          { memberId: sato.id, title: "残りのバグ修正を完了", status: "TODO", dueDate: new Date("2026-02-17") },
+          {
+            memberId: sato.id,
+            title: "残りのバグ修正を完了",
+            status: "TODO",
+            dueDate: new Date("2026-02-17"),
+          },
         ],
       },
     },
@@ -2652,6 +2687,7 @@ main()
 **Step 3: Add prisma seed config to package.json**
 
 Add to `package.json`:
+
 ```json
 "prisma": {
   "seed": "tsx prisma/seed.ts"
@@ -2674,24 +2710,24 @@ git commit -m "feat: add seed data with sample members, meetings, and action ite
 
 ## Summary
 
-| Task | Description | Estimated Steps |
-|------|-------------|-----------------|
-| 1 | Project scaffolding | 3 |
-| 2 | Prisma + SQLite setup | 4 |
-| 3 | Database schema | 4 |
-| 4 | Vitest configuration | 6 |
-| 5 | Zod validation schemas (TDD) | 12 |
-| 6 | Member server actions (TDD) | 5 |
-| 7 | Meeting server actions (TDD) | 5 |
-| 8 | Action item server actions (TDD) | 5 |
-| 9 | shadcn/ui + Layout | 5 |
-| 10 | Dashboard page | 4 |
-| 11 | New member page | 4 |
-| 12 | Member detail page | 5 |
-| 13 | New meeting page — form | 2 |
-| 14 | Previous meeting sidebar | 3 |
-| 15 | Meeting detail page | 4 |
-| 16 | Action list page with filters | 5 |
-| 17 | Full test suite + build verification | 3 |
-| 18 | Seed data | 5 |
-| **Total** | | **84 steps** |
+| Task      | Description                          | Estimated Steps |
+| --------- | ------------------------------------ | --------------- |
+| 1         | Project scaffolding                  | 3               |
+| 2         | Prisma + SQLite setup                | 4               |
+| 3         | Database schema                      | 4               |
+| 4         | Vitest configuration                 | 6               |
+| 5         | Zod validation schemas (TDD)         | 12              |
+| 6         | Member server actions (TDD)          | 5               |
+| 7         | Meeting server actions (TDD)         | 5               |
+| 8         | Action item server actions (TDD)     | 5               |
+| 9         | shadcn/ui + Layout                   | 5               |
+| 10        | Dashboard page                       | 4               |
+| 11        | New member page                      | 4               |
+| 12        | Member detail page                   | 5               |
+| 13        | New meeting page — form              | 2               |
+| 14        | Previous meeting sidebar             | 3               |
+| 15        | Meeting detail page                  | 4               |
+| 16        | Action list page with filters        | 5               |
+| 17        | Full test suite + build verification | 3               |
+| 18        | Seed data                            | 5               |
+| **Total** |                                      | **84 steps**    |
