@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { MeetingHistory } from "@/components/meeting/meeting-history";
 import { ActionListCompact } from "@/components/action/action-list-compact";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -17,6 +18,7 @@ export default async function MemberDetailPage({ params }: Props) {
   }
   return (
     <div className="animate-fade-in-up">
+      <Breadcrumb items={[{ label: "ダッシュボード", href: "/" }, { label: member.name }]} />
       <div className="flex justify-between items-start mb-8">
         <div className="flex items-center gap-4">
           <AvatarInitial name={member.name} size="lg" />

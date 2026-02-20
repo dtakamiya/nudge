@@ -3,6 +3,7 @@ import { getActionItems } from "@/lib/actions/action-item-actions";
 import { getMembers } from "@/lib/actions/member-actions";
 import { ActionListFull } from "@/components/action/action-list-full";
 import { ActionFilters } from "@/components/action/action-filters";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
 import type { ActionItemStatusType } from "@/lib/validations/action-item";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +25,7 @@ export default async function ActionsPage({ searchParams }: Props) {
 
   return (
     <div className="animate-fade-in-up">
+      <Breadcrumb items={[{ label: "ダッシュボード", href: "/" }, { label: "アクション一覧" }]} />
       <h1 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">アクション一覧</h1>
       <Suspense>
         <ActionFilters members={memberList} />

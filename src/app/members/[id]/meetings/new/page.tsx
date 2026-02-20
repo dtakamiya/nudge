@@ -4,6 +4,7 @@ import { getPreviousMeeting } from "@/lib/actions/meeting-actions";
 import { getPendingActionItems } from "@/lib/actions/action-item-actions";
 import { MeetingForm } from "@/components/meeting/meeting-form";
 import { PreviousMeetingSidebar } from "@/components/meeting/previous-meeting-sidebar";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -19,6 +20,13 @@ export default async function NewMeetingPage({ params }: Props) {
 
   return (
     <div className="animate-fade-in-up">
+      <Breadcrumb
+        items={[
+          { label: "ダッシュボード", href: "/" },
+          { label: member.name, href: `/members/${id}` },
+          { label: "新規1on1" },
+        ]}
+      />
       <h1 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">
         {member.name}との1on1
       </h1>
