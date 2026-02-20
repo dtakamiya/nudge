@@ -1,0 +1,61 @@
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+
+type TopicSummary = { id: string; category: string; title: string };
+type MeetingSummary = {
+  id: string;
+  date: Date;
+  memberId: string;
+  topics: TopicSummary[];
+  actionItems: { id: string; status: string }[];
+};
+type Props = { meetings: MeetingSummary[]; memberId: string };
+
+const categoryLabels: Record<string, string> = {
+  WORK_PROGRESS: "業務進捗",
+  CAREER: "キャリア",
+  ISSUES: "課題・相談",
+  FEEDBACK: "フィードバック",
+  OTHER: "その他",
+};
+
+function formatDate(date: Date): string {
+  return new Date(date).toLocaleDateString("ja-JP");
+}
+
+export function MeetingHistory({ meetings, memberId }: Props) {
+  if (meetings.length === 0) {
+    return <p className="text-gray-500 py-4">まだ1on1の記録がありません</p>;
+  }
+  return (
+    <div className="flex flex-col gap-3">
+      {meetings.map((meeting) => {
+        const doneCount = meeting.actionItems.filter((a) => a.status === "DONE").length;
+        return (
+          <Link key={meeting.id} href={`/members/${memberId}/meetings/${meeting.id}`}>
+            <Card className="hover:bg-gray-50 cursor-pointer">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-medium">{formatDate(meeting.date)}</p>
+                    <div className="flex gap-1 mt-1 flex-wrap">
+                      {meeting.topics.map((topic) => (
+                        <Badge key={topic.id} variant="outline" className="text-xs">
+                          {categoryLabels[topic.category] ?? topic.category}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    アクション: {doneCount}/{meeting.actionItems.length}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
