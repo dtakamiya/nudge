@@ -6,13 +6,27 @@ import { createMemberSchema, updateMemberSchema } from "@/lib/validations/member
 import type { CreateMemberInput, UpdateMemberInput } from "@/lib/validations/member";
 
 export async function getMembers() {
-  return prisma.member.findMany({
+  const now = new Date();
+  const members = await prisma.member.findMany({
     orderBy: { name: "asc" },
     include: {
       _count: { select: { actionItems: { where: { status: { not: "DONE" } } } } },
       meetings: { orderBy: { date: "desc" }, take: 1, select: { date: true } },
+      actionItems: {
+        where: {
+          status: { not: "DONE" },
+          dueDate: { lt: now },
+        },
+        select: { id: true },
+      },
     },
   });
+
+  return members.map((member) => ({
+    ...member,
+    overdueActionCount: member.actionItems.length,
+    actionItems: undefined,
+  }));
 }
 
 export async function getMember(id: string) {
