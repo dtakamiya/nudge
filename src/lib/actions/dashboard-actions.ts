@@ -18,31 +18,30 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
 
   const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [members, actionCounts, meetingsThisMonth, overdueActions] =
-    await Promise.all([
-      prisma.member.findMany({
-        include: {
-          meetings: {
-            orderBy: { date: "desc" },
-            take: 1,
-            select: { date: true },
-          },
+  const [members, actionCounts, meetingsThisMonth, overdueActions] = await Promise.all([
+    prisma.member.findMany({
+      include: {
+        meetings: {
+          orderBy: { date: "desc" },
+          take: 1,
+          select: { date: true },
         },
-      }),
-      prisma.actionItem.groupBy({
-        by: ["status"],
-        _count: { id: true },
-      }),
-      prisma.meeting.count({
-        where: { date: { gte: firstOfMonth } },
-      }),
-      prisma.actionItem.count({
-        where: {
-          status: { not: "DONE" },
-          dueDate: { lt: now },
-        },
-      }),
-    ]);
+      },
+    }),
+    prisma.actionItem.groupBy({
+      by: ["status"],
+      _count: { id: true },
+    }),
+    prisma.meeting.count({
+      where: { date: { gte: firstOfMonth } },
+    }),
+    prisma.actionItem.count({
+      where: {
+        status: { not: "DONE" },
+        dueDate: { lt: now },
+      },
+    }),
+  ]);
 
   const needsFollowUp = members.filter((m) => {
     const lastMeeting = m.meetings[0];
@@ -51,8 +50,7 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
   }).length;
 
   const totalActions = actionCounts.reduce((sum, g) => sum + g._count.id, 0);
-  const completedActions =
-    actionCounts.find((g) => g.status === "DONE")?._count.id ?? 0;
+  const completedActions = actionCounts.find((g) => g.status === "DONE")?._count.id ?? 0;
   const actionCompletionRate =
     totalActions > 0 ? Math.round((completedActions / totalActions) * 100) : 0;
 

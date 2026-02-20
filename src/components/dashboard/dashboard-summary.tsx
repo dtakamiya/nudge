@@ -23,9 +23,7 @@ function SummaryCard({ title, value, unit, icon, colorClass }: SummaryCardProps)
           <p className="text-sm text-muted-foreground">{title}</p>
           <p className="font-heading text-2xl text-foreground">
             {value}
-            <span className="ml-0.5 text-sm font-normal text-muted-foreground">
-              {unit}
-            </span>
+            <span className="ml-0.5 text-sm font-normal text-muted-foreground">{unit}</span>
           </p>
         </div>
       </CardContent>
@@ -34,22 +32,17 @@ function SummaryCard({ title, value, unit, icon, colorClass }: SummaryCardProps)
 }
 
 function getFollowUpColor(count: number): string {
-  return count > 0
-    ? "bg-[#C27549]/10 text-[#C27549]"
-    : "bg-[#6B8F71]/10 text-[#6B8F71]";
+  return count > 0 ? "bg-[#C27549]/10 text-[#C27549]" : "bg-[#6B8F71]/10 text-[#6B8F71]";
 }
 
 function getCompletionColor(rate: number): string {
   if (rate >= 80) return "bg-[#6B8F71]/10 text-[#6B8F71]";
-  if (rate >= 50)
-    return "bg-[oklch(0.65_0.17_70)]/10 text-[oklch(0.65_0.17_70)]";
+  if (rate >= 50) return "bg-[oklch(0.65_0.17_70)]/10 text-[oklch(0.65_0.17_70)]";
   return "bg-[#C27549]/10 text-[#C27549]";
 }
 
 function getOverdueColor(count: number): string {
-  return count > 0
-    ? "bg-[#C27549]/10 text-[#C27549]"
-    : "bg-[#6B8F71]/10 text-[#6B8F71]";
+  return count > 0 ? "bg-[#C27549]/10 text-[#C27549]" : "bg-[#6B8F71]/10 text-[#6B8F71]";
 }
 
 export function DashboardSummary({ summary }: Props) {

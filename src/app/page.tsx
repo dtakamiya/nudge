@@ -6,10 +6,7 @@ import { DashboardSummary } from "@/components/dashboard/dashboard-summary";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const [members, summary] = await Promise.all([
-    getMembers(),
-    getDashboardSummary(),
-  ]);
+  const [members, summary] = await Promise.all([getMembers(), getDashboardSummary()]);
 
   return (
     <div className="animate-fade-in-up">

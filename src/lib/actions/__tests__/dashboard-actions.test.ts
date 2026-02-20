@@ -28,7 +28,7 @@ describe("getDashboardSummary", () => {
   it("counts members needing follow-up (no meeting in 14+ days)", async () => {
     const member1 = await createMember({ name: "Recent" });
     const member2 = await createMember({ name: "Old" });
-    const member3 = await createMember({ name: "Never" });
+    await createMember({ name: "Never" });
 
     // member1: meeting today
     await createMeeting({

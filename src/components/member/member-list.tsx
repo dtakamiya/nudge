@@ -42,12 +42,8 @@ export function MemberList({ members }: Props) {
   }
 
   const sortedMembers = [...members].sort((a, b) => {
-    const dateA = a.meetings[0]?.date
-      ? new Date(a.meetings[0].date).getTime()
-      : 0;
-    const dateB = b.meetings[0]?.date
-      ? new Date(b.meetings[0].date).getTime()
-      : 0;
+    const dateA = a.meetings[0]?.date ? new Date(a.meetings[0].date).getTime() : 0;
+    const dateB = b.meetings[0]?.date ? new Date(b.meetings[0].date).getTime() : 0;
     return dateA - dateB;
   });
 
@@ -81,9 +77,7 @@ export function MemberList({ members }: Props) {
                   </Badge>
                 )}
                 {member._count.actionItems > 0 && (
-                  <Badge variant="status-todo">
-                    未完了 {member._count.actionItems}件
-                  </Badge>
+                  <Badge variant="status-todo">未完了 {member._count.actionItems}件</Badge>
                 )}
               </div>
               <span
