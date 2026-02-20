@@ -6,17 +6,33 @@ import { MeetingForm } from "@/components/meeting/meeting-form";
 import { PreviousMeetingSidebar } from "@/components/meeting/previous-meeting-sidebar";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
 
-export default async function NewMeetingPage({ params }: Props) {
+function parsePreparedTopics(raw: string | string[] | undefined) {
+  if (typeof raw !== "string") return undefined;
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return undefined;
+    return parsed as Array<{ category: string; title: string; notes: string; sortOrder: number }>;
+  } catch {
+    return undefined;
+  }
+}
+
+export default async function NewMeetingPage({ params, searchParams }: Props) {
   const { id } = await params;
   const member = await getMember(id);
   if (!member) {
     notFound();
   }
 
+  const resolvedSearchParams = await searchParams;
   const previousMeeting = await getPreviousMeeting(id);
   const pendingActions = await getPendingActionItems(id);
+  const initialTopics = parsePreparedTopics(resolvedSearchParams.preparedTopics);
 
   return (
     <div className="animate-fade-in-up">
@@ -32,7 +48,7 @@ export default async function NewMeetingPage({ params }: Props) {
       </h1>
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1">
-          <MeetingForm memberId={id} />
+          <MeetingForm memberId={id} initialTopics={initialTopics} />
         </div>
         <div className="w-full lg:w-80 shrink-0">
           <PreviousMeetingSidebar
