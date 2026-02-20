@@ -8,6 +8,9 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: [],
     include: ["src/**/*.test.{ts,tsx}"],
+    env: {
+      DATABASE_URL: "file:./test.db",
+    },
   },
   resolve: {
     alias: {
