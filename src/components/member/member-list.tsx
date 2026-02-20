@@ -10,13 +10,13 @@ import { formatRelativeDate } from "@/lib/format";
 import { ArrowUpDown } from "lucide-react";
 
 type MemberWithStats = {
-  id: string;
-  name: string;
-  department: string | null;
-  position: string | null;
-  _count: { actionItems: number };
-  meetings: { date: Date }[];
-  overdueActionCount: number;
+  readonly id: string;
+  readonly name: string;
+  readonly department: string | null;
+  readonly position: string | null;
+  readonly _count: { readonly actionItems: number };
+  readonly meetings: readonly { readonly date: Date }[];
+  readonly overdueActionCount: number;
 };
 
 type SortKey = "lastMeeting" | "actions";
@@ -38,7 +38,7 @@ function getStatusBadge(days: number): React.ReactNode {
 }
 
 type Props = {
-  members: MemberWithStats[];
+  readonly members: readonly MemberWithStats[];
 };
 
 export function MemberList({ members }: Props) {
@@ -121,7 +121,12 @@ export function MemberList({ members }: Props) {
               <tr
                 key={member.id}
                 onClick={() => router.push(`/members/${member.id}`)}
-                className="border-b last:border-b-0 hover:bg-muted/50 cursor-pointer transition-colors duration-150"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") router.push(`/members/${member.id}`);
+                }}
+                tabIndex={0}
+                role="link"
+                className="border-b last:border-b-0 hover:bg-muted/50 cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
