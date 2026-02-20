@@ -60,7 +60,7 @@ export function MemberList({ members }: Props) {
               <div>
                 <Link
                   href={`/members/${member.id}`}
-                  className="font-heading text-lg text-foreground hover:text-primary transition-colors"
+                  className="text-base font-semibold tracking-tight text-foreground hover:text-primary transition-colors"
                 >
                   {member.name}
                 </Link>

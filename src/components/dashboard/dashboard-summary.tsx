@@ -21,7 +21,7 @@ function SummaryCard({ title, value, unit, icon, colorClass }: SummaryCardProps)
         <div className={`rounded-xl p-2.5 ${colorClass}`}>{icon}</div>
         <div>
           <p className="text-sm text-muted-foreground">{title}</p>
-          <p className="font-heading text-2xl text-foreground">
+          <p className="text-2xl font-semibold tracking-tight text-foreground">
             {value}
             <span className="ml-0.5 text-sm font-normal text-muted-foreground">{unit}</span>
           </p>

@@ -28,7 +28,7 @@ export function MeetingHistory({ meetings, memberId }: Props) {
               <CardContent className="p-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-heading font-medium">{formatDate(meeting.date)}</p>
+                    <p className="font-medium">{formatDate(meeting.date)}</p>
                     <div className="flex gap-1 mt-1 flex-wrap">
                       {meeting.topics.map((topic) => (
                         <Badge key={topic.id} variant="outline" className="text-xs">

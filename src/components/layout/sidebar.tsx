@@ -51,7 +51,7 @@ export function Sidebar() {
         >
           <Menu className="w-5 h-5" />
         </button>
-        <span className="ml-3 font-heading text-xl text-primary">Nudge</span>
+        <span className="ml-3 text-lg font-semibold tracking-tight text-primary">Nudge</span>
       </div>
 
       {/* モバイルオーバーレイ */}
@@ -62,7 +62,7 @@ export function Sidebar() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <Link href="/" className="font-heading text-2xl text-primary">
+              <Link href="/" className="text-2xl font-semibold tracking-tight text-primary">
                 Nudge
               </Link>
               <button
@@ -80,7 +80,7 @@ export function Sidebar() {
 
       {/* デスクトップサイドバー */}
       <aside className="hidden lg:flex w-64 border-r bg-[var(--sidebar)] p-4 flex-col gap-6 shrink-0">
-        <Link href="/" className="font-heading text-2xl text-primary">
+        <Link href="/" className="text-2xl font-semibold tracking-tight text-primary">
           Nudge
         </Link>
         <NavLinks pathname={pathname} />

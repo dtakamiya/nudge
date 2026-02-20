@@ -10,7 +10,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="animate-fade-in-up">
-      <h1 className="font-heading text-3xl mb-6 text-foreground">ダッシュボード</h1>
+      <h1 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">ダッシュボード</h1>
       <DashboardSummary summary={summary} />
       <MemberList members={members} />
     </div>

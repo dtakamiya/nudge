@@ -19,7 +19,9 @@ export default async function NewMeetingPage({ params }: Props) {
 
   return (
     <div className="animate-fade-in-up">
-      <h1 className="font-heading text-3xl mb-6 text-foreground">{member.name}との1on1</h1>
+      <h1 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">
+        {member.name}との1on1
+      </h1>
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1">
           <MeetingForm memberId={id} />

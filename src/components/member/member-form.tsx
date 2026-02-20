@@ -36,7 +36,7 @@ export function MemberForm() {
   return (
     <Card className="max-w-lg">
       <CardHeader>
-        <CardTitle className="font-heading text-xl">メンバー登録</CardTitle>
+        <CardTitle className="text-lg font-semibold tracking-tight">メンバー登録</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
