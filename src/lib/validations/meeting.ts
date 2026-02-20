@@ -1,12 +1,6 @@
 import { z } from "zod";
 
-const topicCategory = z.enum([
-  "WORK_PROGRESS",
-  "CAREER",
-  "ISSUES",
-  "FEEDBACK",
-  "OTHER",
-]);
+const topicCategory = z.enum(["WORK_PROGRESS", "CAREER", "ISSUES", "FEEDBACK", "OTHER"]);
 
 const topicInputSchema = z.object({
   category: topicCategory,

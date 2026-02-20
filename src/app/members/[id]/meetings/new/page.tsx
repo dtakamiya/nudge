@@ -10,7 +10,9 @@ type Props = { params: Promise<{ id: string }> };
 export default async function NewMeetingPage({ params }: Props) {
   const { id } = await params;
   const member = await getMember(id);
-  if (!member) { notFound(); }
+  if (!member) {
+    notFound();
+  }
 
   const previousMeeting = await getPreviousMeeting(id);
   const pendingActions = await getPendingActionItems(id);
@@ -23,7 +25,10 @@ export default async function NewMeetingPage({ params }: Props) {
           <MeetingForm memberId={id} />
         </div>
         <div className="w-80 shrink-0">
-          <PreviousMeetingSidebar previousMeeting={previousMeeting} pendingActions={pendingActions} />
+          <PreviousMeetingSidebar
+            previousMeeting={previousMeeting}
+            pendingActions={pendingActions}
+          />
         </div>
       </div>
     </div>

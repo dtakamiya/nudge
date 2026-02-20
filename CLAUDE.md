@@ -1,88 +1,92 @@
-# Nudge - 1on1 Meeting Tracker
+# Nudge - 1on1 ミーティングトラッカー
 
-## Overview
+## 概要
 
 Nudge は 1on1 ミーティングの記録・管理を行うシングルユーザー向けローカル Web アプリケーション。
 メンバー管理、ミーティング記録（トピック・アクションアイテム）、進捗トラッキングを提供する。
 
-## Tech Stack
+## 技術スタック
 
-- **Framework:** Next.js 16 (App Router) + React 19
-- **Database:** Prisma ORM + SQLite
-- **Styling:** Tailwind CSS 4 + shadcn/ui
-- **Validation:** Zod 4
-- **Testing:** Vitest + Testing Library + jsdom
-- **Language:** TypeScript 5 (strict mode)
+- **フレームワーク:** Next.js 16 (App Router) + React 19
+- **データベース:** Prisma ORM + SQLite
+- **スタイリング:** Tailwind CSS 4 + shadcn/ui
+- **バリデーション:** Zod 4
+- **テスト:** Vitest + Testing Library + jsdom
+- **言語:** TypeScript 5 (strict mode)
 
-## Directory Structure
+## ディレクトリ構成
 
 ```
 src/
-├── app/                    # Next.js App Router pages
-│   ├── actions/            # Action items dashboard
-│   ├── members/            # Member CRUD & meeting pages
-│   └── layout.tsx          # Root layout
+├── app/                    # Next.js App Router ページ
+│   ├── actions/            # アクションアイテム一覧
+│   ├── members/            # メンバー CRUD・ミーティングページ
+│   └── layout.tsx          # ルートレイアウト
 ├── components/
-│   ├── action/             # Action item components
-│   ├── meeting/            # Meeting components
-│   ├── member/             # Member components
-│   └── ui/                 # shadcn/ui base components
-├── generated/prisma/       # Prisma generated client (gitignored)
+│   ├── action/             # アクションアイテム コンポーネント
+│   ├── meeting/            # ミーティング コンポーネント
+│   ├── member/             # メンバー コンポーネント
+│   └── ui/                 # shadcn/ui ベースコンポーネント
+├── generated/prisma/       # Prisma 生成クライアント（gitignore対象）
 └── lib/
-    ├── actions/            # Server Actions (data mutations)
-    ├── validations/        # Zod schemas
-    ├── prisma.ts           # Prisma client singleton
-    ├── constants.ts        # App constants
-    ├── format.ts           # Date formatting utilities
-    └── utils.ts            # General utilities (cn)
+    ├── actions/            # Server Actions（データ変更処理）
+    ├── validations/        # Zod スキーマ
+    ├── prisma.ts           # Prisma クライアント シングルトン
+    ├── constants.ts        # アプリ定数
+    ├── format.ts           # 日付フォーマット ユーティリティ
+    └── utils.ts            # 汎用ユーティリティ（cn）
 prisma/
-├── schema.prisma           # Database schema
-├── seed.ts                 # Seed data
-└── migrations/             # Migration files
+├── schema.prisma           # データベーススキーマ
+├── seed.ts                 # シードデータ
+└── migrations/             # マイグレーションファイル
 ```
 
-## Commands
+## コマンド
 
 ```bash
-npm run dev          # Start dev server
-npm run build        # Production build
-npm run lint         # ESLint check
-npm run format       # Prettier format all files
-npm run format:check # Prettier check (CI)
-npm test             # Run tests (vitest run)
-npm run test:watch   # Run tests in watch mode
+npm run dev          # 開発サーバー起動
+npm run build        # 本番ビルド
+npm run lint         # ESLint チェック
+npm run format       # Prettier で全ファイルフォーマット
+npm run format:check # Prettier チェック（CI用）
+npm test             # テスト実行（vitest run）
+npm run test:watch   # テスト ウォッチモード
 
-# Database
-npx prisma migrate dev   # Run migrations
-npx prisma db seed       # Seed database
-npx prisma generate      # Generate Prisma client
-npx prisma studio        # Open Prisma Studio
+# データベース
+npx prisma migrate dev   # マイグレーション実行
+npx prisma db seed       # シードデータ投入
+npx prisma generate      # Prisma クライアント生成
+npx prisma studio        # Prisma Studio 起動
 ```
 
-## Coding Conventions
+## コーディング規約
 
-### Server Actions Pattern
-- All data mutations use Next.js Server Actions in `src/lib/actions/`
-- Each action validates input with Zod schemas from `src/lib/validations/`
-- Actions use `"use server"` directive
-- Return typed results for error handling
+### Server Actions パターン
 
-### General Rules
-- **Immutability:** Always create new objects, never mutate
-- **TDD:** Write tests first (RED → GREEN → REFACTOR)
-- **UI Text:** Japanese for user-facing text
-- **Primary Keys:** UUID (`@id @default(uuid())`)
-- **Path Alias:** Use `@/*` for imports (maps to `src/*`)
-- **File Size:** Keep files under 400 lines (800 max)
-- **Functions:** Keep under 50 lines
+- データ変更はすべて `src/lib/actions/` の Next.js Server Actions を使用
+- 各アクションは `src/lib/validations/` の Zod スキーマで入力検証
+- `"use server"` ディレクティブ必須
+- 型付きの結果を返してエラーハンドリング
 
-### Database
-- SQLite via Prisma ORM
-- `DATABASE_URL` in `.env` (e.g., `file:./dev.db`)
-- Test DB uses `file:./test.db` (configured in vitest.config.ts)
+### 基本ルール
 
-### Testing
-- Test files: `src/**/*.test.{ts,tsx}` colocated with source in `__tests__/` dirs
-- Minimum 80% coverage target
-- Mock Prisma client in unit tests
-- Use `@testing-library/react` for component tests
+- **イミュータブル:** 既存オブジェクトを変更せず、常に新しいオブジェクトを生成
+- **TDD:** テストを先に書く（RED → GREEN → REFACTOR）
+- **UI テキスト:** ユーザー向けテキストは日本語
+- **主キー:** UUID（`@id @default(uuid())`）
+- **パスエイリアス:** インポートは `@/*` を使用（`src/*` にマッピング）
+- **ファイルサイズ:** 400行以下推奨（最大800行）
+- **関数サイズ:** 50行以下
+
+### データベース
+
+- Prisma ORM 経由で SQLite を使用
+- `DATABASE_URL` は `.env` に設定（例: `file:./dev.db`）
+- テスト用 DB は `file:./test.db`（vitest.config.ts で設定済み）
+
+### テスト
+
+- テストファイル: `src/**/*.test.{ts,tsx}`（ソースと同階層の `__tests__/` ディレクトリに配置）
+- カバレッジ目標: 80% 以上
+- ユニットテストでは Prisma クライアントをモック
+- コンポーネントテストには `@testing-library/react` を使用

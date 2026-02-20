@@ -25,16 +25,11 @@ type ActionItemRow = {
 
 type Props = { actionItems: ActionItemRow[] };
 
-
 export function ActionListFull({ actionItems }: Props) {
   const router = useRouter();
 
   if (actionItems.length === 0) {
-    return (
-      <p className="text-gray-500 py-8 text-center">
-        アクションアイテムはありません
-      </p>
-    );
+    return <p className="text-gray-500 py-8 text-center">アクションアイテムはありません</p>;
   }
 
   async function handleStatusChange(id: string, newStatus: string) {
@@ -52,10 +47,7 @@ export function ActionListFull({ actionItems }: Props) {
         <Card key={item.id}>
           <CardContent className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Select
-                value={item.status}
-                onValueChange={(val) => handleStatusChange(item.id, val)}
-              >
+              <Select value={item.status} onValueChange={(val) => handleStatusChange(item.id, val)}>
                 <SelectTrigger className="w-28">
                   <SelectValue />
                 </SelectTrigger>
@@ -68,10 +60,7 @@ export function ActionListFull({ actionItems }: Props) {
               <div>
                 <p className="font-medium">{item.title}</p>
                 <p className="text-sm text-gray-500">
-                  <Link
-                    href={`/members/${item.member.id}`}
-                    className="hover:underline"
-                  >
+                  <Link href={`/members/${item.member.id}`} className="hover:underline">
                     {item.member.name}
                   </Link>
                   {" ・ "}

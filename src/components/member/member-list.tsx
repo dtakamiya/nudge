@@ -17,7 +17,6 @@ type Props = {
   members: MemberWithStats[];
 };
 
-
 export function MemberList({ members }: Props) {
   if (members.length === 0) {
     return (

@@ -12,7 +12,6 @@ type ActionItem = { id: string; title: string; status: string; dueDate: Date | n
 type MeetingData = { id: string; date: Date; topics: Topic[]; actionItems: ActionItem[] } | null;
 type Props = { previousMeeting: MeetingData; pendingActions: ActionItem[] };
 
-
 export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Props) {
   const router = useRouter();
 
@@ -41,7 +40,9 @@ export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Prop
                   <input type="checkbox" onChange={() => markDone(action.id)} className="rounded" />
                   <span>{action.title}</span>
                   {action.dueDate && (
-                    <span className="text-xs text-gray-400 ml-auto">{formatDate(action.dueDate)}</span>
+                    <span className="text-xs text-gray-400 ml-auto">
+                      {formatDate(action.dueDate)}
+                    </span>
                   )}
                 </div>
               ))}
@@ -64,13 +65,17 @@ export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Prop
               {previousMeeting.topics.map((topic) => (
                 <div key={topic.id}>
                   <div className="flex items-center gap-1">
-                    <Badge variant="outline" className="text-xs">{CATEGORY_LABELS[topic.category] ?? topic.category}</Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {CATEGORY_LABELS[topic.category] ?? topic.category}
+                    </Badge>
                     <span className="text-sm font-medium">{topic.title}</span>
                   </div>
                   {topic.notes && <p className="text-xs text-gray-500 mt-1">{topic.notes}</p>}
                 </div>
               ))}
-              {previousMeeting.topics.length === 0 && <p className="text-sm text-gray-500">話題なし</p>}
+              {previousMeeting.topics.length === 0 && (
+                <p className="text-sm text-gray-500">話題なし</p>
+              )}
             </div>
           )}
         </CardContent>

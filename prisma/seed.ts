@@ -80,8 +80,7 @@ async function main() {
           {
             category: "WORK_PROGRESS",
             title: "新機能のユーザーリサーチ",
-            notes:
-              "5名のインタビュー完了。主要なペインポイントを特定。",
+            notes: "5名のインタビュー完了。主要なペインポイントを特定。",
             sortOrder: 0,
           },
           {
@@ -121,15 +120,13 @@ async function main() {
           {
             category: "WORK_PROGRESS",
             title: "バグ修正タスクの進捗",
-            notes:
-              "3件中2件完了。残り1件は明日完了予定。",
+            notes: "3件中2件完了。残り1件は明日完了予定。",
             sortOrder: 0,
           },
           {
             category: "FEEDBACK",
             title: "ペアプログラミングの効果",
-            notes:
-              "生産性が上がっている。週2回は継続したい。",
+            notes: "生産性が上がっている。週2回は継続したい。",
             sortOrder: 1,
           },
         ],

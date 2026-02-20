@@ -12,20 +12,14 @@ type Props = { searchParams: Promise<{ status?: string; memberId?: string }> };
 export default async function ActionsPage({ searchParams }: Props) {
   const params = await searchParams;
   const filters: { status?: ActionItemStatusType; memberId?: string } = {};
-  if (
-    params.status &&
-    ["TODO", "IN_PROGRESS", "DONE"].includes(params.status)
-  ) {
+  if (params.status && ["TODO", "IN_PROGRESS", "DONE"].includes(params.status)) {
     filters.status = params.status as ActionItemStatusType;
   }
   if (params.memberId) {
     filters.memberId = params.memberId;
   }
 
-  const [actionItems, members] = await Promise.all([
-    getActionItems(filters),
-    getMembers(),
-  ]);
+  const [actionItems, members] = await Promise.all([getActionItems(filters), getMembers()]);
   const memberList = members.map((m) => ({ id: m.id, name: m.name }));
 
   return (

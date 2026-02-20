@@ -27,7 +27,6 @@ type Props = {
   actionItems: ActionItem[];
 };
 
-
 export function MeetingDetail({ date, topics, actionItems }: Props) {
   return (
     <div className="flex flex-col gap-6">
@@ -48,9 +47,7 @@ export function MeetingDetail({ date, topics, actionItems }: Props) {
                     <span className="font-medium">{topic.title}</span>
                   </div>
                   {topic.notes && (
-                    <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">
-                      {topic.notes}
-                    </p>
+                    <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{topic.notes}</p>
                   )}
                 </CardContent>
               </Card>

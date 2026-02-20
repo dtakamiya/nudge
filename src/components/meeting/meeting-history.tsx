@@ -14,7 +14,6 @@ type MeetingSummary = {
 };
 type Props = { meetings: MeetingSummary[]; memberId: string };
 
-
 export function MeetingHistory({ meetings, memberId }: Props) {
   if (meetings.length === 0) {
     return <p className="text-gray-500 py-4">まだ1on1の記録がありません</p>;
