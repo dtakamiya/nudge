@@ -29,9 +29,14 @@ export default async function MemberDetailPage({ params }: Props) {
             </p>
           </div>
         </div>
-        <Link href={`/members/${id}/meetings/new`}>
-          <Button>新規1on1</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href={`/members/${id}/meetings/prepare`}>
+            <Button variant="outline">1on1 を準備</Button>
+          </Link>
+          <Link href={`/members/${id}/meetings/new`}>
+            <Button>新規1on1</Button>
+          </Link>
+        </div>
       </div>
       <h2 className="text-lg font-semibold tracking-tight mb-3 text-foreground">1on1履歴</h2>
       <MeetingHistory meetings={member.meetings} memberId={id} />
