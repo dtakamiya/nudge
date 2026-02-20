@@ -42,6 +42,10 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
 }
 
 :root {
@@ -77,6 +81,10 @@
   --sidebar-accent-foreground: oklch(0.25 0.01 260);
   --sidebar-border: oklch(0.92 0.005 260);
   --sidebar-ring: oklch(0.55 0.2 270);
+  --success: oklch(0.50 0.18 155);
+  --success-foreground: oklch(0.98 0 0);
+  --warning: oklch(0.65 0.15 80);
+  --warning-foreground: oklch(0.25 0 0);
 }
 
 @layer base {
@@ -146,4 +154,26 @@
 }
 .stagger-5 {
   animation-delay: 200ms;
+}
+
+@keyframes pulse-attention {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+.animate-pulse-attention {
+  animation: pulse-attention 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-slide-in,
+  .animate-badge-bounce,
+  .animate-pulse-attention {
+    animation: none;
+  }
 }
