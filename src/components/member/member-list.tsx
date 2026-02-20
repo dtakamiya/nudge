@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
-import { formatDate } from "@/lib/format";
+import { formatRelativeDate } from "@/lib/format";
 
 type MemberWithStats = {
   id: string;
@@ -12,7 +12,18 @@ type MemberWithStats = {
   position: string | null;
   _count: { actionItems: number };
   meetings: { date: Date }[];
+  overdueActionCount: number;
 };
+
+function getLastMeetingColorClass(date: Date | null): string {
+  if (!date) return "text-[#C27549]";
+  const diffDays = Math.floor(
+    (new Date().getTime() - new Date(date).getTime()) / (1000 * 60 * 60 * 24),
+  );
+  if (diffDays >= 14) return "text-[#C27549]";
+  if (diffDays >= 7) return "text-[oklch(0.65_0.17_70)]";
+  return "text-[#6B8F71]";
+}
 
 type Props = {
   members: MemberWithStats[];
@@ -30,9 +41,15 @@ export function MemberList({ members }: Props) {
     );
   }
 
+  const sortedMembers = [...members].sort((a, b) => {
+    const dateA = a.meetings[0]?.date ? new Date(a.meetings[0].date).getTime() : 0;
+    const dateB = b.meetings[0]?.date ? new Date(b.meetings[0].date).getTime() : 0;
+    return dateA - dateB;
+  });
+
   return (
     <div className="grid gap-4">
-      {members.map((member, index) => (
+      {sortedMembers.map((member, index) => (
         <Card
           key={member.id}
           className={`animate-fade-in-up hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(61,46,31,0.10)] stagger-${Math.min(index + 1, 5)}`}
@@ -51,13 +68,22 @@ export function MemberList({ members }: Props) {
                   {[member.department, member.position].filter(Boolean).join(" / ")}
                 </div>
               </div>
-              {member._count.actionItems > 0 && (
-                <Badge variant="status-todo">未完了 {member._count.actionItems}件</Badge>
-              )}
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">
-                {member.meetings[0] ? `最終: ${formatDate(member.meetings[0].date)}` : "未実施"}
+              <div className="flex items-center gap-2">
+                {member.overdueActionCount > 0 && (
+                  <Badge variant="destructive" className="bg-[#C27549]">
+                    期限超過 {member.overdueActionCount}件
+                  </Badge>
+                )}
+                {member._count.actionItems > 0 && (
+                  <Badge variant="status-todo">未完了 {member._count.actionItems}件</Badge>
+                )}
+              </div>
+              <span
+                className={`text-sm ${getLastMeetingColorClass(member.meetings[0]?.date ?? null)}`}
+              >
+                {formatRelativeDate(member.meetings[0]?.date ?? null)}
               </span>
               <Link href={`/members/${member.id}/meetings/new`}>
                 <Button size="sm">新規1on1</Button>
