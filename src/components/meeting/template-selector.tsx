@@ -16,6 +16,7 @@ export function TemplateSelector({ onSelect, selectedId }: Props) {
         <button
           key={template.id}
           type="button"
+          aria-label={template.name}
           onClick={() => onSelect(template)}
           className={cn(
             "text-left rounded-lg border border-transparent transition-colors",
