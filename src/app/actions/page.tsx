@@ -5,6 +5,8 @@ import { ActionListFull } from "@/components/action/action-list-full";
 import { ActionFilters } from "@/components/action/action-filters";
 import type { ActionItemStatusType } from "@/lib/validations/action-item";
 
+export const dynamic = "force-dynamic";
+
 type Props = { searchParams: Promise<{ status?: string; memberId?: string }> };
 
 export default async function ActionsPage({ searchParams }: Props) {
