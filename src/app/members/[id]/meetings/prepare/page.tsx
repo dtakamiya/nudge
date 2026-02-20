@@ -31,7 +31,6 @@ export default async function PrepareMeetingPage({ params }: Props) {
       </h1>
       <MeetingPrepare
         memberId={id}
-        memberName={member.name}
         previousMeeting={previousMeeting}
         pendingActions={pendingActions}
       />

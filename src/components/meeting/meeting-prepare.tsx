@@ -45,7 +45,6 @@ type PendingAction = {
 
 type Props = {
   memberId: string;
-  memberName: string;
   previousMeeting: PreviousMeetingData;
   pendingActions: PendingAction[];
 };
@@ -62,12 +61,7 @@ function createEmptyTopic(sortOrder: number): TopicDraft {
   return { category: "WORK_PROGRESS", title: "", notes: "", sortOrder };
 }
 
-export function MeetingPrepare({
-  memberId,
-  memberName: _memberName,
-  previousMeeting,
-  pendingActions,
-}: Props) {
+export function MeetingPrepare({ memberId, previousMeeting, pendingActions }: Props) {
   const [topics, setTopics] = useState<TopicDraft[]>([createEmptyTopic(0)]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>();
 

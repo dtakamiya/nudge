@@ -42,7 +42,6 @@ describe("MeetingPrepare", () => {
     render(
       <MeetingPrepare
         memberId="m1"
-        memberName="山本 和也"
         previousMeeting={mockPreviousMeeting}
         pendingActions={mockPendingActions}
       />,
@@ -55,7 +54,6 @@ describe("MeetingPrepare", () => {
     render(
       <MeetingPrepare
         memberId="m1"
-        memberName="山本 和也"
         previousMeeting={mockPreviousMeeting}
         pendingActions={mockPendingActions}
       />,
@@ -65,40 +63,19 @@ describe("MeetingPrepare", () => {
   });
 
   it("shows empty state when no previous meeting", () => {
-    render(
-      <MeetingPrepare
-        memberId="m1"
-        memberName="山本 和也"
-        previousMeeting={null}
-        pendingActions={[]}
-      />,
-    );
+    render(<MeetingPrepare memberId="m1" previousMeeting={null} pendingActions={[]} />);
     expect(screen.getByText("前回の記録はありません")).toBeDefined();
   });
 
   it("renders template selector", () => {
-    render(
-      <MeetingPrepare
-        memberId="m1"
-        memberName="山本 和也"
-        previousMeeting={null}
-        pendingActions={[]}
-      />,
-    );
+    render(<MeetingPrepare memberId="m1" previousMeeting={null} pendingActions={[]} />);
     expect(screen.getByText("定期チェックイン")).toBeDefined();
     expect(screen.getByText("キャリア面談")).toBeDefined();
   });
 
   it("populates topics when template is selected", async () => {
     const user = userEvent.setup();
-    render(
-      <MeetingPrepare
-        memberId="m1"
-        memberName="山本 和也"
-        previousMeeting={null}
-        pendingActions={[]}
-      />,
-    );
+    render(<MeetingPrepare memberId="m1" previousMeeting={null} pendingActions={[]} />);
     await user.click(screen.getByRole("button", { name: /定期チェックイン/ }));
     const inputs = screen.getAllByPlaceholderText("話題のタイトル");
     expect(inputs[0]).toHaveProperty("value", "今週の進捗報告");
@@ -107,28 +84,14 @@ describe("MeetingPrepare", () => {
 
   it("can add a topic manually", async () => {
     const user = userEvent.setup();
-    render(
-      <MeetingPrepare
-        memberId="m1"
-        memberName="山本 和也"
-        previousMeeting={null}
-        pendingActions={[]}
-      />,
-    );
+    render(<MeetingPrepare memberId="m1" previousMeeting={null} pendingActions={[]} />);
     await user.click(screen.getByRole("button", { name: /話題を追加/ }));
     const inputs = screen.getAllByPlaceholderText("話題のタイトル");
     expect(inputs.length).toBeGreaterThanOrEqual(2);
   });
 
   it("renders start meeting button", () => {
-    render(
-      <MeetingPrepare
-        memberId="m1"
-        memberName="山本 和也"
-        previousMeeting={null}
-        pendingActions={[]}
-      />,
-    );
+    render(<MeetingPrepare memberId="m1" previousMeeting={null} pendingActions={[]} />);
     expect(screen.getByRole("link", { name: /ミーティングを開始/ })).toBeDefined();
   });
 });
