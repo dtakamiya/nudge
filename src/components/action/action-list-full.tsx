@@ -29,7 +29,7 @@ export function ActionListFull({ actionItems }: Props) {
   const router = useRouter();
 
   if (actionItems.length === 0) {
-    return <p className="text-gray-500 py-8 text-center">アクションアイテムはありません</p>;
+    return <p className="text-muted-foreground py-8 text-center">アクションアイテムはありません</p>;
   }
 
   async function handleStatusChange(id: string, newStatus: string) {
@@ -44,7 +44,10 @@ export function ActionListFull({ actionItems }: Props) {
   return (
     <div className="flex flex-col gap-3">
       {actionItems.map((item) => (
-        <Card key={item.id}>
+        <Card
+          key={item.id}
+          className="hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(61,46,31,0.10)]"
+        >
           <CardContent className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Select value={item.status} onValueChange={(val) => handleStatusChange(item.id, val)}>
@@ -59,7 +62,7 @@ export function ActionListFull({ actionItems }: Props) {
               </Select>
               <div>
                 <p className="font-medium">{item.title}</p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   <Link href={`/members/${item.member.id}`} className="hover:underline">
                     {item.member.name}
                   </Link>
@@ -68,7 +71,7 @@ export function ActionListFull({ actionItems }: Props) {
                 </p>
               </div>
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-muted-foreground">
               {item.dueDate && `期限: ${formatDate(item.dueDate)}`}
             </div>
           </CardContent>

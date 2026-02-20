@@ -18,13 +18,13 @@ export default async function NewMeetingPage({ params }: Props) {
   const pendingActions = await getPendingActionItems(id);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">{member.name}との1on1</h1>
-      <div className="flex gap-8">
+    <div className="animate-fade-in-up">
+      <h1 className="font-heading text-3xl mb-6 text-foreground">{member.name}との1on1</h1>
+      <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1">
           <MeetingForm memberId={id} />
         </div>
-        <div className="w-80 shrink-0">
+        <div className="w-full lg:w-80 shrink-0">
           <PreviousMeetingSidebar
             previousMeeting={previousMeeting}
             pendingActions={pendingActions}

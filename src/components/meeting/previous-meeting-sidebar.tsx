@@ -28,11 +28,11 @@ export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Prop
     <div className="flex flex-col gap-4">
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm">未完了アクション</CardTitle>
+          <CardTitle className="font-heading text-sm">未完了アクション</CardTitle>
         </CardHeader>
         <CardContent>
           {pendingActions.length === 0 ? (
-            <p className="text-sm text-gray-500">なし</p>
+            <p className="text-sm text-muted-foreground">なし</p>
           ) : (
             <div className="flex flex-col gap-2">
               {pendingActions.map((action) => (
@@ -40,7 +40,7 @@ export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Prop
                   <input type="checkbox" onChange={() => markDone(action.id)} className="rounded" />
                   <span>{action.title}</span>
                   {action.dueDate && (
-                    <span className="text-xs text-gray-400 ml-auto">
+                    <span className="text-xs text-muted-foreground ml-auto">
                       {formatDate(action.dueDate)}
                     </span>
                   )}
@@ -53,13 +53,13 @@ export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Prop
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm">
+          <CardTitle className="font-heading text-sm">
             {previousMeeting ? `前回: ${formatDate(previousMeeting.date)}` : "前回の記録"}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {!previousMeeting ? (
-            <p className="text-sm text-gray-500">前回の記録はありません</p>
+            <p className="text-sm text-muted-foreground">前回の記録はありません</p>
           ) : (
             <div className="flex flex-col gap-3">
               {previousMeeting.topics.map((topic) => (
@@ -70,11 +70,13 @@ export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Prop
                     </Badge>
                     <span className="text-sm font-medium">{topic.title}</span>
                   </div>
-                  {topic.notes && <p className="text-xs text-gray-500 mt-1">{topic.notes}</p>}
+                  {topic.notes && (
+                    <p className="text-xs text-muted-foreground mt-1">{topic.notes}</p>
+                  )}
                 </div>
               ))}
               {previousMeeting.topics.length === 0 && (
-                <p className="text-sm text-gray-500">話題なし</p>
+                <p className="text-sm text-muted-foreground">話題なし</p>
               )}
             </div>
           )}

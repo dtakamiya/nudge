@@ -23,8 +23,8 @@ export default async function ActionsPage({ searchParams }: Props) {
   const memberList = members.map((m) => ({ id: m.id, name: m.name }));
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">アクション一覧</h1>
+    <div className="animate-fade-in-up">
+      <h1 className="font-heading text-3xl mb-6 text-foreground">アクション一覧</h1>
       <Suspense>
         <ActionFilters members={memberList} />
       </Suspense>
