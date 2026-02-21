@@ -14,6 +14,7 @@ Nudge は 1on1 ミーティングの記録・管理を行うシングルユー�
 - **テスト:** Vitest + Testing Library + jsdom
 - **デザインシステム:** Slate & Indigo テーマ（OKLch カラーパレット、Geist Sans）
 - **アイコン:** lucide-react
+- **DnD:** @dnd-kit/core + @dnd-kit/sortable
 - **コード品質:** ESLint, Prettier, husky + lint-staged
 - **言語:** TypeScript 5 (strict mode)
 
@@ -24,13 +25,17 @@ src/
 ├── app/                    # Next.js App Router ページ
 │   ├── actions/            # アクションアイテム一覧
 │   ├── members/            # メンバー CRUD・ミーティングページ
+│   │   ├── [id]/           # メンバー詳細・ミーティング管理
+│   │   │   └── meetings/   # ミーティング作成・詳細・準備
+│   │   └── new/            # メンバー新規作成
 │   ├── globals.css         # テーマ変数・アニメーション定義
 │   ├── layout.tsx          # ルートレイアウト（フォント・サイドバー統合）
 │   └── page.tsx            # ダッシュボード
 ├── components/
 │   ├── action/             # アクションアイテム コンポーネント
-│   ├── layout/             # レイアウト コンポーネント（サイドバー）
-│   ├── meeting/            # ミーティング コンポーネント
+│   ├── dashboard/          # ダッシュボード コンポーネント
+│   ├── layout/             # レイアウト コンポーネント（サイドバー・パンくず）
+│   ├── meeting/            # ミーティング コンポーネント（DnD ソート含む）
 │   ├── member/             # メンバー コンポーネント
 │   └── ui/                 # shadcn/ui ベースコンポーネント（avatar-initial 含む）
 ├── generated/prisma/       # Prisma 生成クライアント（gitignore対象）
@@ -38,6 +43,7 @@ src/
     ├── actions/            # Server Actions（データ変更処理）
     ├── validations/        # Zod スキーマ
     ├── avatar.ts           # アバターイニシャル・グラデーション生成
+    ├── meeting-templates.ts # ミーティングテンプレート定義
     ├── prisma.ts           # Prisma クライアント シングルトン
     ├── constants.ts        # アプリ定数
     ├── format.ts           # 日付フォーマット ユーティリティ
