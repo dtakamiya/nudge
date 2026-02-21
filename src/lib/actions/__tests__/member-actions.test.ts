@@ -17,9 +17,16 @@ describe("createMember", () => {
       department: "Engineering",
       position: "Senior",
     });
-    expect(result.id).toBeDefined();
-    expect(result.name).toBe("Tanaka Taro");
-    expect(result.department).toBe("Engineering");
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.id).toBeDefined();
+    expect(result.data.name).toBe("Tanaka Taro");
+    expect(result.data.department).toBe("Engineering");
+  });
+
+  it("returns error for invalid data", async () => {
+    const result = await createMember({ name: "" });
+    expect(result.success).toBe(false);
   });
 });
 
@@ -32,14 +39,15 @@ describe("getMembers", () => {
   });
 
   it("includes overdue action count per member", async () => {
-    const member = await createMember({ name: "Test" });
+    const memberResult = await createMember({ name: "Test" });
+    if (!memberResult.success) throw new Error(memberResult.error);
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     await createMeeting({
-      memberId: member.id,
+      memberId: memberResult.data.id,
       date: new Date().toISOString(),
       topics: [],
       actionItems: [
@@ -57,8 +65,9 @@ describe("getMembers", () => {
 
 describe("getMember", () => {
   it("returns member by id", async () => {
-    const created = await createMember({ name: "Test Member" });
-    const found = await getMember(created.id);
+    const result = await createMember({ name: "Test Member" });
+    if (!result.success) throw new Error(result.error);
+    const found = await getMember(result.data.id);
     expect(found?.name).toBe("Test Member");
   });
   it("returns null for non-existent id", async () => {
@@ -70,16 +79,31 @@ describe("getMember", () => {
 describe("updateMember", () => {
   it("updates member fields", async () => {
     const created = await createMember({ name: "Old Name" });
-    const updated = await updateMember(created.id, { name: "New Name" });
-    expect(updated.name).toBe("New Name");
+    if (!created.success) throw new Error(created.error);
+    const updated = await updateMember(created.data.id, { name: "New Name" });
+    expect(updated.success).toBe(true);
+    if (!updated.success) return;
+    expect(updated.data.name).toBe("New Name");
+  });
+
+  it("returns error for empty id", async () => {
+    const result = await updateMember("", { name: "New" });
+    expect(result.success).toBe(false);
   });
 });
 
 describe("deleteMember", () => {
   it("deletes member by id", async () => {
     const created = await createMember({ name: "To Delete" });
-    await deleteMember(created.id);
-    const found = await getMember(created.id);
+    if (!created.success) throw new Error(created.error);
+    const deleted = await deleteMember(created.data.id);
+    expect(deleted.success).toBe(true);
+    const found = await getMember(created.data.id);
     expect(found).toBeNull();
+  });
+
+  it("returns error for empty id", async () => {
+    const result = await deleteMember("");
+    expect(result.success).toBe(false);
   });
 });

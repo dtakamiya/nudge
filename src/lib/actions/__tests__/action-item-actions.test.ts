@@ -15,8 +15,9 @@ beforeEach(async () => {
   await prisma.topic.deleteMany();
   await prisma.meeting.deleteMany();
   await prisma.member.deleteMany();
-  const member = await createMember({ name: "Test Member" });
-  memberId = member.id;
+  const result = await createMember({ name: "Test Member" });
+  if (!result.success) throw new Error(result.error);
+  memberId = result.data.id;
 });
 
 describe("getActionItems", () => {
@@ -51,7 +52,8 @@ describe("getActionItems", () => {
   });
 
   it("filters by member", async () => {
-    const member2 = await createMember({ name: "Member 2" });
+    const member2Result = await createMember({ name: "Member 2" });
+    if (!member2Result.success) throw new Error(member2Result.error);
     await createMeeting({
       memberId,
       date: new Date().toISOString(),
@@ -59,7 +61,7 @@ describe("getActionItems", () => {
       actionItems: [{ title: "Task A", description: "" }],
     });
     await createMeeting({
-      memberId: member2.id,
+      memberId: member2Result.data.id,
       date: new Date().toISOString(),
       topics: [],
       actionItems: [{ title: "Task B", description: "" }],
@@ -98,9 +100,11 @@ describe("updateActionItemStatus", () => {
       actionItems: [{ title: "Task", description: "" }],
     });
     const items = await getActionItems();
-    const updated = await updateActionItemStatus(items[0].id, "IN_PROGRESS");
-    expect(updated.status).toBe("IN_PROGRESS");
-    expect(updated.completedAt).toBeNull();
+    const result = await updateActionItemStatus(items[0].id, "IN_PROGRESS");
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.status).toBe("IN_PROGRESS");
+    expect(result.data.completedAt).toBeNull();
   });
 
   it("sets completedAt when marking DONE", async () => {
@@ -111,9 +115,11 @@ describe("updateActionItemStatus", () => {
       actionItems: [{ title: "Task", description: "" }],
     });
     const items = await getActionItems();
-    const updated = await updateActionItemStatus(items[0].id, "DONE");
-    expect(updated.status).toBe("DONE");
-    expect(updated.completedAt).not.toBeNull();
+    const result = await updateActionItemStatus(items[0].id, "DONE");
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.status).toBe("DONE");
+    expect(result.data.completedAt).not.toBeNull();
   });
 
   it("clears completedAt when reverting from DONE", async () => {
@@ -125,7 +131,21 @@ describe("updateActionItemStatus", () => {
     });
     const items = await getActionItems();
     await updateActionItemStatus(items[0].id, "DONE");
-    const reverted = await updateActionItemStatus(items[0].id, "TODO");
-    expect(reverted.completedAt).toBeNull();
+    const result = await updateActionItemStatus(items[0].id, "TODO");
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.completedAt).toBeNull();
+  });
+
+  it("returns error for invalid status", async () => {
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "Task", description: "" }],
+    });
+    const items = await getActionItems();
+    const result = await updateActionItemStatus(items[0].id, "INVALID");
+    expect(result.success).toBe(false);
   });
 });

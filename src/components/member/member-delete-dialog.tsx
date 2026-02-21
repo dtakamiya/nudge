@@ -31,7 +31,12 @@ export function MemberDeleteDialog({ memberId, memberName }: Props) {
     setLoading(true);
     setError(null);
     try {
-      await deleteMember(memberId);
+      const result = await deleteMember(memberId);
+      if (!result.success) {
+        setError(result.error);
+        setLoading(false);
+        return;
+      }
       setOpen(false);
       router.push("/");
     } catch {

@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { createMemberSchema, updateMemberSchema } from "@/lib/validations/member";
 import type { CreateMemberInput, UpdateMemberInput } from "@/lib/validations/member";
+import type { Member } from "@/generated/prisma/client";
+import { runAction, type ActionResult } from "./types";
 
 export async function getMembers() {
   const now = new Date();
@@ -45,24 +47,33 @@ export async function getMember(id: string) {
   });
 }
 
-export async function createMember(input: CreateMemberInput) {
-  const validated = createMemberSchema.parse(input);
-  const result = await prisma.member.create({ data: validated });
-  revalidatePath("/", "layout");
-  return result;
+export async function createMember(input: CreateMemberInput): Promise<ActionResult<Member>> {
+  return runAction(async () => {
+    const validated = createMemberSchema.parse(input);
+    const result = await prisma.member.create({ data: validated });
+    revalidatePath("/", "layout");
+    return result;
+  });
 }
 
-export async function updateMember(id: string, input: UpdateMemberInput) {
-  if (!id) throw new Error("Invalid member ID");
-  const validated = updateMemberSchema.parse(input);
-  const result = await prisma.member.update({ where: { id }, data: validated });
-  revalidatePath("/", "layout");
-  return result;
+export async function updateMember(
+  id: string,
+  input: UpdateMemberInput,
+): Promise<ActionResult<Member>> {
+  return runAction(async () => {
+    if (!id) throw new Error("メンバーIDが指定されていません");
+    const validated = updateMemberSchema.parse(input);
+    const result = await prisma.member.update({ where: { id }, data: validated });
+    revalidatePath("/", "layout");
+    return result;
+  });
 }
 
-export async function deleteMember(id: string) {
-  if (!id) throw new Error("Invalid member ID");
-  const result = await prisma.member.delete({ where: { id } });
-  revalidatePath("/", "layout");
-  return result;
+export async function deleteMember(id: string): Promise<ActionResult<Member>> {
+  return runAction(async () => {
+    if (!id) throw new Error("メンバーIDが指定されていません");
+    const result = await prisma.member.delete({ where: { id } });
+    revalidatePath("/", "layout");
+    return result;
+  });
 }

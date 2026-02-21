@@ -67,7 +67,7 @@ describe("ActionListCompact", () => {
     const user = userEvent.setup();
     // サーバーの応答を遅延させる
     mockUpdateActionItemStatus.mockImplementation(
-      () => new Promise((resolve) => setTimeout(resolve, 100)),
+      () => new Promise((resolve) => setTimeout(() => resolve({ success: true, data: {} }), 100)),
     );
 
     render(<ActionListCompact actionItems={baseItems} />);
@@ -83,7 +83,7 @@ describe("ActionListCompact", () => {
 
   it("ステータス変更でサーバーアクションが呼ばれる", async () => {
     const user = userEvent.setup();
-    mockUpdateActionItemStatus.mockResolvedValue({});
+    mockUpdateActionItemStatus.mockResolvedValue({ success: true, data: {} });
 
     render(<ActionListCompact actionItems={baseItems} />);
 
@@ -95,7 +95,7 @@ describe("ActionListCompact", () => {
 
   it("IN_PROGRESS → DONE に遷移する", async () => {
     const user = userEvent.setup();
-    mockUpdateActionItemStatus.mockResolvedValue({});
+    mockUpdateActionItemStatus.mockResolvedValue({ success: true, data: {} });
 
     render(<ActionListCompact actionItems={baseItems} />);
 
@@ -107,7 +107,7 @@ describe("ActionListCompact", () => {
 
   it("サーバーエラー時に router.refresh でロールバックする", async () => {
     const user = userEvent.setup();
-    mockUpdateActionItemStatus.mockRejectedValue(new Error("Server error"));
+    mockUpdateActionItemStatus.mockResolvedValue({ success: false, error: "Server error" });
 
     render(<ActionListCompact actionItems={baseItems} />);
 

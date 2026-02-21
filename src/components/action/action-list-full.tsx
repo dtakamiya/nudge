@@ -42,12 +42,11 @@ export function ActionListFull({ actionItems }: Props) {
   function handleStatusChange(id: string, newStatus: string) {
     startTransition(async () => {
       setOptimisticItems({ id, status: newStatus });
-      try {
-        await updateActionItemStatus(id, newStatus);
-        router.refresh();
-      } catch {
-        router.refresh();
+      const result = await updateActionItemStatus(id, newStatus);
+      if (!result.success) {
+        console.error("ステータス更新に失敗:", result.error);
       }
+      router.refresh();
     });
   }
 

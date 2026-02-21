@@ -47,12 +47,11 @@ export function ActionListCompact({ actionItems }: Props) {
     const next = nextStatus(currentStatus);
     startTransition(async () => {
       setOptimisticItems({ id, status: next });
-      try {
-        await updateActionItemStatus(id, next);
-        router.refresh();
-      } catch {
-        router.refresh();
+      const result = await updateActionItemStatus(id, next);
+      if (!result.success) {
+        console.error("ステータス更新に失敗:", result.error);
       }
+      router.refresh();
     });
   }
 

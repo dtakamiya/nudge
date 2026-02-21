@@ -10,8 +10,9 @@ beforeEach(async () => {
   await prisma.topic.deleteMany();
   await prisma.meeting.deleteMany();
   await prisma.member.deleteMany();
-  const member = await createMember({ name: "Test Member" });
-  memberId = member.id;
+  const result = await createMember({ name: "Test Member" });
+  if (!result.success) throw new Error(result.error);
+  memberId = result.data.id;
 });
 
 describe("createMeeting", () => {
@@ -24,10 +25,12 @@ describe("createMeeting", () => {
       ],
       actionItems: [{ title: "Fix bug #123", description: "Critical bug", dueDate: "2026-03-01" }],
     });
-    expect(result.id).toBeDefined();
-    expect(result.topics).toHaveLength(1);
-    expect(result.actionItems).toHaveLength(1);
-    expect(result.actionItems[0].memberId).toBe(memberId);
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.id).toBeDefined();
+    expect(result.data.topics).toHaveLength(1);
+    expect(result.data.actionItems).toHaveLength(1);
+    expect(result.data.actionItems[0].memberId).toBe(memberId);
   });
 });
 
@@ -39,7 +42,8 @@ describe("getMeeting", () => {
       topics: [{ category: "CAREER", title: "Growth plan", notes: "", sortOrder: 0 }],
       actionItems: [],
     });
-    const found = await getMeeting(created.id);
+    if (!created.success) throw new Error(created.error);
+    const found = await getMeeting(created.data.id);
     expect(found?.topics).toHaveLength(1);
     expect(found?.topics[0].category).toBe("CAREER");
   });

@@ -38,14 +38,22 @@ export function MemberForm({ initialData, onSuccess }: Props) {
 
     try {
       if (isEditing) {
-        await updateMember(initialData.id, { name, department, position });
+        const result = await updateMember(initialData.id, { name, department, position });
+        if (!result.success) {
+          setError(result.error);
+          return;
+        }
         onSuccess?.();
       } else {
-        await createMember({ name, department, position });
+        const result = await createMember({ name, department, position });
+        if (!result.success) {
+          setError(result.error);
+          return;
+        }
         router.push("/");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "エラーが発生しました");
+      setError(err instanceof Error ? err.message : "予期しないエラーが発生しました");
     } finally {
       setIsSubmitting(false);
     }

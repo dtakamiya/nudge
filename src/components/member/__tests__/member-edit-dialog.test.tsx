@@ -59,7 +59,7 @@ describe("MemberEditDialog", () => {
 
   it("更新成功後にダイアログが閉じ、router.refresh が呼ばれる", async () => {
     const user = userEvent.setup();
-    mockUpdateMember.mockResolvedValue({});
+    mockUpdateMember.mockResolvedValue({ success: true, data: {} });
     render(<MemberEditDialog member={member} />);
 
     await user.click(screen.getByRole("button", { name: /編集/ }));

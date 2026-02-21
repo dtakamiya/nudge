@@ -32,7 +32,12 @@ export function MeetingDeleteDialog({ meetingId, memberId, meetingDate }: Props)
     setLoading(true);
     setError(null);
     try {
-      await deleteMeeting(meetingId);
+      const result = await deleteMeeting(meetingId);
+      if (!result.success) {
+        setError(result.error);
+        setLoading(false);
+        return;
+      }
       setOpen(false);
       router.push(`/members/${memberId}`);
     } catch {
