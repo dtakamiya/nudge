@@ -14,7 +14,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import { deleteMeeting } from "@/lib/actions/meeting-actions";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 type Props = {
   readonly meetingId: string;
@@ -35,13 +37,16 @@ export function MeetingDeleteDialog({ meetingId, memberId, meetingDate }: Props)
       const result = await deleteMeeting(meetingId);
       if (!result.success) {
         setError(result.error);
+        toast.error(TOAST_MESSAGES.meeting.deleteError);
         setLoading(false);
         return;
       }
+      toast.success(TOAST_MESSAGES.meeting.deleteSuccess);
       setOpen(false);
       router.push(`/members/${memberId}`);
     } catch {
       setError("削除に失敗しました。もう一度お試しください。");
+      toast.error(TOAST_MESSAGES.meeting.deleteError);
       setLoading(false);
     }
   }

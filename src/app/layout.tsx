@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { Noto_Sans_JP } from "next/font/google";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/layout/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const notoSansJP = Noto_Sans_JP({
@@ -45,6 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <main className="flex-1 overflow-auto p-6 pt-18 lg:p-10 lg:pt-10">
           <div className="max-w-5xl mx-auto">{children}</div>
         </main>
+        <Toaster />
       </body>
     </html>
   );

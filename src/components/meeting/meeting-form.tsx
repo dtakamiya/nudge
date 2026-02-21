@@ -16,7 +16,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 import { createMeeting, updateMeeting } from "@/lib/actions/meeting-actions";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
 import { SortableTopicItem } from "./sortable-topic-item";
 import { SortableActionItem } from "./sortable-action-item";
 
@@ -200,8 +202,10 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
         });
         if (!result.success) {
           setError(result.error);
+          toast.error(TOAST_MESSAGES.meeting.updateError);
           return;
         }
+        toast.success(TOAST_MESSAGES.meeting.updateSuccess);
         onSuccess?.();
       } else {
         const result = await createMeeting({
@@ -221,12 +225,16 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
         });
         if (!result.success) {
           setError(result.error);
+          toast.error(TOAST_MESSAGES.meeting.createError);
           return;
         }
+        toast.success(TOAST_MESSAGES.meeting.createSuccess);
         router.push(`/members/${memberId}`);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "予期しないエラーが発生しました");
+      const message = err instanceof Error ? err.message : "予期しないエラーが発生しました";
+      setError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }

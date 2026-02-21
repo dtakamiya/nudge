@@ -1,7 +1,9 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, cleanup, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { toast } from "sonner";
 import { MeetingDeleteDialog } from "../meeting-delete-dialog";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 const mockPush = vi.fn();
 
@@ -10,6 +12,13 @@ vi.mock("next/navigation", () => ({
     push: mockPush,
     refresh: vi.fn(),
   }),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
 }));
 
 const mockDeleteMeeting = vi.fn();
@@ -68,10 +77,11 @@ describe("MeetingDeleteDialog", () => {
     await user.click(screen.getByRole("button", { name: "削除する" }));
 
     expect(mockDeleteMeeting).toHaveBeenCalledWith("meeting-1");
+    expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.meeting.deleteSuccess);
     expect(mockPush).toHaveBeenCalledWith("/members/member-1");
   });
 
-  it("削除失敗時にエラーメッセージが表示される", async () => {
+  it("削除失敗時にエラーメッセージとトーストが表示される", async () => {
     const user = userEvent.setup();
     mockDeleteMeeting.mockResolvedValue({ success: false, error: "削除エラー" });
     render(<MeetingDeleteDialog {...props} />);
@@ -81,6 +91,7 @@ describe("MeetingDeleteDialog", () => {
 
     await waitFor(() => {
       expect(screen.getByText("削除エラー")).toBeDefined();
+      expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.meeting.deleteError);
     });
   });
 });
