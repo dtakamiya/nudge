@@ -78,7 +78,12 @@ describe("updateMeeting", () => {
       memberId,
       date: "2026-02-20T10:00:00.000Z",
       topics: [
-        { category: "WORK_PROGRESS", title: "Original topic", notes: "Original notes", sortOrder: 0 },
+        {
+          category: "WORK_PROGRESS",
+          title: "Original topic",
+          notes: "Original notes",
+          sortOrder: 0,
+        },
         { category: "CAREER", title: "Career topic", notes: "", sortOrder: 1 },
       ],
       actionItems: [

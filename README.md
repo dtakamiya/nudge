@@ -14,18 +14,18 @@ Nudge は 1on1 ミーティングの記録・管理を行うシングルユー�
 
 ## 技術スタック
 
-| カテゴリ         | 技術                                                 |
-| ---------------- | ---------------------------------------------------- |
-| フレームワーク   | Next.js 16 (App Router) + React 19                   |
-| データベース     | Prisma ORM + SQLite                                  |
-| スタイリング     | Tailwind CSS 4 + shadcn/ui + Radix UI                |
+| カテゴリ         | 技術                                                  |
+| ---------------- | ----------------------------------------------------- |
+| フレームワーク   | Next.js 16 (App Router) + React 19                    |
+| データベース     | Prisma ORM + SQLite                                   |
+| スタイリング     | Tailwind CSS 4 + shadcn/ui + Radix UI                 |
 | デザインシステム | Hearth テーマ（OKLch カラーパレット、Geist フォント） |
-| バリデーション   | Zod 4                                                |
-| テスト           | Vitest + Testing Library + jsdom                     |
-| アイコン         | lucide-react                                         |
-| コード品質       | ESLint, Prettier, husky + lint-staged                |
+| バリデーション   | Zod 4                                                 |
+| テスト           | Vitest + Testing Library + jsdom                      |
+| アイコン         | lucide-react                                          |
+| コード品質       | ESLint, Prettier, husky + lint-staged                 |
 | CI/CD            | GitHub Actions（Lint・TypeCheck・Test・Build）        |
-| 言語             | TypeScript 5 (strict mode)                           |
+| 言語             | TypeScript 5 (strict mode)                            |
 
 ## セットアップ
 

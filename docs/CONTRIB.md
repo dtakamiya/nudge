@@ -36,32 +36,32 @@ npm run dev
 
 ## npm スクリプト一覧
 
-| コマンド | 実行内容 | 説明 |
-|---------|---------|------|
-| `npm run dev` | `next dev` | 開発サーバー起動（ホットリロード付き） |
-| `npm run build` | `next build` | 本番用ビルド |
-| `npm run start` | `next start` | 本番サーバー起動 |
-| `npm run lint` | `eslint` | ESLint による静的解析 |
-| `npm test` | `vitest run` | テスト実行（単発） |
-| `npm run test:watch` | `vitest` | テスト実行（ウォッチモード） |
-| `npm run format` | `prettier --write .` | Prettier で全ファイルフォーマット |
+| コマンド               | 実行内容             | 説明                                   |
+| ---------------------- | -------------------- | -------------------------------------- |
+| `npm run dev`          | `next dev`           | 開発サーバー起動（ホットリロード付き） |
+| `npm run build`        | `next build`         | 本番用ビルド                           |
+| `npm run start`        | `next start`         | 本番サーバー起動                       |
+| `npm run lint`         | `eslint`             | ESLint による静的解析                  |
+| `npm test`             | `vitest run`         | テスト実行（単発）                     |
+| `npm run test:watch`   | `vitest`             | テスト実行（ウォッチモード）           |
+| `npm run format`       | `prettier --write .` | Prettier で全ファイルフォーマット      |
 | `npm run format:check` | `prettier --check .` | Prettier フォーマットチェック（CI 用） |
-| `npm run prepare` | `husky` | Git フック設定（自動実行） |
+| `npm run prepare`      | `husky`              | Git フック設定（自動実行）             |
 
 ## データベースコマンド
 
-| コマンド | 説明 |
-|---------|------|
+| コマンド                 | 説明                             |
+| ------------------------ | -------------------------------- |
 | `npx prisma migrate dev` | マイグレーション実行（開発環境） |
-| `npx prisma db seed` | シードデータ投入 |
-| `npx prisma generate` | Prisma クライアント生成 |
-| `npx prisma studio` | Prisma Studio（DB GUI）起動 |
+| `npx prisma db seed`     | シードデータ投入                 |
+| `npx prisma generate`    | Prisma クライアント生成          |
+| `npx prisma studio`      | Prisma Studio（DB GUI）起動      |
 
 ## 環境変数
 
-| 変数名 | 必須 | 説明 | 例 |
-|--------|------|------|-----|
-| `DATABASE_URL` | Yes | SQLite データベースファイルパス | `file:./dev.db` |
+| 変数名         | 必須 | 説明                            | 例              |
+| -------------- | ---- | ------------------------------- | --------------- |
+| `DATABASE_URL` | Yes  | SQLite データベースファイルパス | `file:./dev.db` |
 
 - テスト環境では `vitest.config.ts` で `DATABASE_URL=file:./test.db` に自動設定される
 
@@ -128,14 +128,14 @@ npm run test:watch
 
 ## 技術スタック
 
-| カテゴリ | 技術 |
-|---------|------|
-| フレームワーク | Next.js 16 (App Router) + React 19 |
-| データベース | Prisma ORM + SQLite |
-| スタイリング | Tailwind CSS 4 + shadcn/ui |
-| バリデーション | Zod 4 |
-| テスト | Vitest + Testing Library + jsdom |
-| アイコン | lucide-react |
-| DnD | @dnd-kit/core + @dnd-kit/sortable |
-| コード品質 | ESLint, Prettier, husky + lint-staged |
-| 言語 | TypeScript 5 (strict mode) |
+| カテゴリ       | 技術                                  |
+| -------------- | ------------------------------------- |
+| フレームワーク | Next.js 16 (App Router) + React 19    |
+| データベース   | Prisma ORM + SQLite                   |
+| スタイリング   | Tailwind CSS 4 + shadcn/ui            |
+| バリデーション | Zod 4                                 |
+| テスト         | Vitest + Testing Library + jsdom      |
+| アイコン       | lucide-react                          |
+| DnD            | @dnd-kit/core + @dnd-kit/sortable     |
+| コード品質     | ESLint, Prettier, husky + lint-staged |
+| 言語           | TypeScript 5 (strict mode)            |

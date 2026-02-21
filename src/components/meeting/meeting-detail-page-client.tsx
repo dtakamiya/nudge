@@ -32,13 +32,7 @@ type Props = {
   readonly actionItems: ReadonlyArray<ActionItem>;
 };
 
-export function MeetingDetailPageClient({
-  meetingId,
-  memberId,
-  date,
-  topics,
-  actionItems,
-}: Props) {
+export function MeetingDetailPageClient({ meetingId, memberId, date, topics, actionItems }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
 

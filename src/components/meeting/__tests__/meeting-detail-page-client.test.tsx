@@ -64,7 +64,13 @@ const defaultProps = {
   memberId: "member-1",
   date: new Date("2026-02-20T10:00:00.000Z"),
   topics: [
-    { id: "topic-1", category: "WORK_PROGRESS", title: "Sprint review", notes: "Good", sortOrder: 0 },
+    {
+      id: "topic-1",
+      category: "WORK_PROGRESS",
+      title: "Sprint review",
+      notes: "Good",
+      sortOrder: 0,
+    },
   ],
   actionItems: [
     {

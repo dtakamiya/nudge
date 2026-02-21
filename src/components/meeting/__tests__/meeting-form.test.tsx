@@ -96,11 +96,23 @@ describe("MeetingForm (edit mode)", () => {
     meetingId: "meeting-1",
     date: "2026-02-20T10:00:00.000Z",
     topics: [
-      { id: "topic-1", category: "WORK_PROGRESS", title: "Existing topic", notes: "Some notes", sortOrder: 0 },
+      {
+        id: "topic-1",
+        category: "WORK_PROGRESS",
+        title: "Existing topic",
+        notes: "Some notes",
+        sortOrder: 0,
+      },
       { id: "topic-2", category: "CAREER", title: "Career talk", notes: "", sortOrder: 1 },
     ],
     actionItems: [
-      { id: "action-1", title: "Existing action", description: "Desc", dueDate: "2026-03-01", status: "TODO" },
+      {
+        id: "action-1",
+        title: "Existing action",
+        description: "Desc",
+        dueDate: "2026-03-01",
+        status: "TODO",
+      },
     ],
   };
 

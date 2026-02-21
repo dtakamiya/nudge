@@ -182,8 +182,7 @@ describe("updateMeetingSchema", () => {
   });
 
   it("defaults deletedTopicIds and deletedActionItemIds to empty arrays", () => {
-    const { deletedTopicIds: _, deletedActionItemIds: __, ...withoutDeleted } =
-      validInput;
+    const { deletedTopicIds: _, deletedActionItemIds: __, ...withoutDeleted } = validInput;
     const result = updateMeetingSchema.safeParse(withoutDeleted);
     expect(result.success).toBe(true);
     if (result.success) {
