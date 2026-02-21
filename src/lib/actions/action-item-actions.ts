@@ -2,8 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { updateActionItemStatusSchema } from "@/lib/validations/action-item";
-import type { ActionItemStatusType } from "@/lib/validations/action-item";
+import {
+  updateActionItemStatusSchema,
+  updateActionItemSchema,
+} from "@/lib/validations/action-item";
+import type { ActionItemStatusType, UpdateActionItemInput } from "@/lib/validations/action-item";
 import type { Prisma, ActionItem } from "@/generated/prisma/client";
 import { runAction, type ActionResult } from "./types";
 
@@ -45,6 +48,27 @@ export async function updateActionItemStatus(
     const result = await prisma.actionItem.update({
       where: { id },
       data: { status: validatedStatus, completedAt },
+    });
+    revalidatePath("/", "layout");
+    return result;
+  });
+}
+
+export async function updateActionItem(
+  id: string,
+  input: UpdateActionItemInput,
+): Promise<ActionResult<ActionItem>> {
+  return runAction(async () => {
+    const validated = updateActionItemSchema.parse(input);
+    if (!id) throw new Error("アクションアイテムIDが指定されていません");
+    const dueDate = validated.dueDate ? new Date(validated.dueDate) : null;
+    const result = await prisma.actionItem.update({
+      where: { id },
+      data: {
+        title: validated.title,
+        description: validated.description,
+        dueDate,
+      },
     });
     revalidatePath("/", "layout");
     return result;

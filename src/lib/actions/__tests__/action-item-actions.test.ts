@@ -4,6 +4,7 @@ import {
   getActionItems,
   getPendingActionItems,
   updateActionItemStatus,
+  updateActionItem,
 } from "../action-item-actions";
 import { createMember } from "../member-actions";
 import { createMeeting } from "../meeting-actions";
@@ -146,6 +147,85 @@ describe("updateActionItemStatus", () => {
     });
     const items = await getActionItems();
     const result = await updateActionItemStatus(items[0].id, "INVALID");
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("updateActionItem", () => {
+  it("タイトルを更新できる", async () => {
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "Original", description: "" }],
+    });
+    const items = await getActionItems();
+    const result = await updateActionItem(items[0].id, {
+      title: "Updated",
+      description: "",
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.title).toBe("Updated");
+  });
+
+  it("説明と期限日を更新できる", async () => {
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "Task", description: "" }],
+    });
+    const items = await getActionItems();
+    const result = await updateActionItem(items[0].id, {
+      title: "Task",
+      description: "Added desc",
+      dueDate: "2026-03-15",
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.description).toBe("Added desc");
+    expect(result.data.dueDate).not.toBeNull();
+  });
+
+  it("空のタイトルはバリデーションエラーになる", async () => {
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "Task", description: "" }],
+    });
+    const items = await getActionItems();
+    const result = await updateActionItem(items[0].id, {
+      title: "",
+      description: "",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("空文字の dueDate は null として保存される", async () => {
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "Task", description: "", dueDate: "2026-03-01" }],
+    });
+    const items = await getActionItems();
+    const result = await updateActionItem(items[0].id, {
+      title: "Task",
+      description: "",
+      dueDate: "",
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.dueDate).toBeNull();
+  });
+
+  it("存在しないIDはエラーになる", async () => {
+    const result = await updateActionItem("nonexistent-id", {
+      title: "Task",
+      description: "",
+    });
     expect(result.success).toBe(false);
   });
 });
