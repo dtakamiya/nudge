@@ -4,6 +4,7 @@ import { getMeeting } from "@/lib/actions/meeting-actions";
 import { formatDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { MeetingDetail } from "@/components/meeting/meeting-detail";
+import { MeetingDeleteDialog } from "@/components/meeting/meeting-delete-dialog";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 
 type Props = { params: Promise<{ id: string; meetingId: string }> };
@@ -33,9 +34,16 @@ export default async function MeetingDetailPage({ params }: Props) {
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           {meeting.member.name}との1on1
         </h1>
-        <Link href={`/members/${id}`}>
-          <Button variant="outline">戻る</Button>
-        </Link>
+        <div className="flex gap-2">
+          <MeetingDeleteDialog
+            meetingId={meetingId}
+            memberId={id}
+            meetingDate={formatDate(meeting.date)}
+          />
+          <Link href={`/members/${id}`}>
+            <Button variant="outline">戻る</Button>
+          </Link>
+        </div>
       </div>
       <MeetingDetail
         date={meeting.date}

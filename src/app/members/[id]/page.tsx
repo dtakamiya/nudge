@@ -8,6 +8,7 @@ import { MeetingHistory } from "@/components/meeting/meeting-history";
 import { ActionListCompact } from "@/components/action/action-list-compact";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { MemberEditDialog } from "@/components/member/member-edit-dialog";
+import { MemberDeleteDialog } from "@/components/member/member-delete-dialog";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -31,6 +32,7 @@ export default async function MemberDetailPage({ params }: Props) {
           </div>
         </div>
         <div className="flex gap-2">
+          <MemberDeleteDialog memberId={member.id} memberName={member.name} />
           <MemberEditDialog
             member={{
               id: member.id,
