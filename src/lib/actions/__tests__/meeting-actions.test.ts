@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { createMeeting, getMeeting, getPreviousMeeting } from "../meeting-actions";
+import { createMeeting, getMeeting, getPreviousMeeting, updateMeeting } from "../meeting-actions";
 import { createMember } from "../member-actions";
 
 let memberId: string;
@@ -69,5 +69,319 @@ describe("getPreviousMeeting", () => {
   it("returns null when no meetings exist", async () => {
     const previous = await getPreviousMeeting(memberId);
     expect(previous).toBeNull();
+  });
+});
+
+describe("updateMeeting", () => {
+  async function createTestMeeting() {
+    const result = await createMeeting({
+      memberId,
+      date: "2026-02-20T10:00:00.000Z",
+      topics: [
+        {
+          category: "WORK_PROGRESS",
+          title: "Original topic",
+          notes: "Original notes",
+          sortOrder: 0,
+        },
+        { category: "CAREER", title: "Career topic", notes: "", sortOrder: 1 },
+      ],
+      actionItems: [
+        { title: "Original action", description: "Original desc", dueDate: "2026-03-01" },
+      ],
+    });
+    if (!result.success) throw new Error(result.error);
+    return result.data;
+  }
+
+  it("updates meeting date", async () => {
+    const meeting = await createTestMeeting();
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: "2026-03-15T10:00:00.000Z",
+      topics: meeting.topics.map((t) => ({
+        id: t.id,
+        category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
+        title: t.title,
+        notes: t.notes,
+        sortOrder: t.sortOrder,
+      })),
+      actionItems: meeting.actionItems.map((a) => ({
+        id: a.id,
+        title: a.title,
+        description: a.description,
+        dueDate: a.dueDate?.toISOString().split("T")[0],
+      })),
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.date.toISOString()).toBe("2026-03-15T10:00:00.000Z");
+  });
+
+  it("updates existing topic content", async () => {
+    const meeting = await createTestMeeting();
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: [
+        {
+          id: meeting.topics[0].id,
+          category: "ISSUES",
+          title: "Updated topic title",
+          notes: "Updated notes",
+          sortOrder: 0,
+        },
+        {
+          id: meeting.topics[1].id,
+          category: meeting.topics[1].category as "CAREER",
+          title: meeting.topics[1].title,
+          notes: meeting.topics[1].notes,
+          sortOrder: 1,
+        },
+      ],
+      actionItems: meeting.actionItems.map((a) => ({
+        id: a.id,
+        title: a.title,
+        description: a.description,
+      })),
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.topics[0].title).toBe("Updated topic title");
+    expect(result.data.topics[0].category).toBe("ISSUES");
+    expect(result.data.topics[0].notes).toBe("Updated notes");
+  });
+
+  it("adds a new topic", async () => {
+    const meeting = await createTestMeeting();
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: [
+        ...meeting.topics.map((t) => ({
+          id: t.id,
+          category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
+          title: t.title,
+          notes: t.notes,
+          sortOrder: t.sortOrder,
+        })),
+        { category: "FEEDBACK" as const, title: "New topic", notes: "New notes", sortOrder: 2 },
+      ],
+      actionItems: meeting.actionItems.map((a) => ({
+        id: a.id,
+        title: a.title,
+        description: a.description,
+      })),
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.topics).toHaveLength(3);
+    expect(result.data.topics[2].title).toBe("New topic");
+  });
+
+  it("deletes an existing topic", async () => {
+    const meeting = await createTestMeeting();
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: [
+        {
+          id: meeting.topics[0].id,
+          category: meeting.topics[0].category as "WORK_PROGRESS",
+          title: meeting.topics[0].title,
+          notes: meeting.topics[0].notes,
+          sortOrder: 0,
+        },
+      ],
+      actionItems: meeting.actionItems.map((a) => ({
+        id: a.id,
+        title: a.title,
+        description: a.description,
+      })),
+      deletedTopicIds: [meeting.topics[1].id],
+      deletedActionItemIds: [],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.topics).toHaveLength(1);
+  });
+
+  it("updates existing action item content", async () => {
+    const meeting = await createTestMeeting();
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: meeting.topics.map((t) => ({
+        id: t.id,
+        category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
+        title: t.title,
+        notes: t.notes,
+        sortOrder: t.sortOrder,
+      })),
+      actionItems: [
+        {
+          id: meeting.actionItems[0].id,
+          title: "Updated action",
+          description: "Updated desc",
+          dueDate: "2026-04-01",
+        },
+      ],
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.actionItems[0].title).toBe("Updated action");
+    expect(result.data.actionItems[0].description).toBe("Updated desc");
+  });
+
+  it("adds a new action item", async () => {
+    const meeting = await createTestMeeting();
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: meeting.topics.map((t) => ({
+        id: t.id,
+        category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
+        title: t.title,
+        notes: t.notes,
+        sortOrder: t.sortOrder,
+      })),
+      actionItems: [
+        ...meeting.actionItems.map((a) => ({
+          id: a.id,
+          title: a.title,
+          description: a.description,
+        })),
+        { title: "New action", description: "New desc", dueDate: "2026-05-01" },
+      ],
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.actionItems).toHaveLength(2);
+    const newAction = result.data.actionItems.find((a) => a.title === "New action");
+    expect(newAction).toBeDefined();
+    expect(newAction?.memberId).toBe(memberId);
+  });
+
+  it("deletes an existing action item", async () => {
+    const meeting = await createTestMeeting();
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: meeting.topics.map((t) => ({
+        id: t.id,
+        category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
+        title: t.title,
+        notes: t.notes,
+        sortOrder: t.sortOrder,
+      })),
+      actionItems: [],
+      deletedTopicIds: [],
+      deletedActionItemIds: [meeting.actionItems[0].id],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.actionItems).toHaveLength(0);
+  });
+
+  it("updates topic sortOrder correctly", async () => {
+    const meeting = await createTestMeeting();
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: [
+        {
+          id: meeting.topics[1].id,
+          category: meeting.topics[1].category as "CAREER",
+          title: meeting.topics[1].title,
+          notes: meeting.topics[1].notes,
+          sortOrder: 0,
+        },
+        {
+          id: meeting.topics[0].id,
+          category: meeting.topics[0].category as "WORK_PROGRESS",
+          title: meeting.topics[0].title,
+          notes: meeting.topics[0].notes,
+          sortOrder: 1,
+        },
+      ],
+      actionItems: meeting.actionItems.map((a) => ({
+        id: a.id,
+        title: a.title,
+        description: a.description,
+      })),
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.topics[0].title).toBe("Career topic");
+    expect(result.data.topics[1].title).toBe("Original topic");
+  });
+
+  it("returns error for non-existent meetingId", async () => {
+    const result = await updateMeeting({
+      meetingId: "non-existent-id",
+      date: "2026-03-15T10:00:00.000Z",
+      topics: [],
+      actionItems: [],
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("returns error for invalid input", async () => {
+    const result = await updateMeeting({
+      meetingId: "",
+      date: "",
+      topics: [],
+      actionItems: [],
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("does not change action item status", async () => {
+    const meeting = await createTestMeeting();
+    // Change status via direct update
+    await prisma.actionItem.update({
+      where: { id: meeting.actionItems[0].id },
+      data: { status: "IN_PROGRESS" },
+    });
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: meeting.topics.map((t) => ({
+        id: t.id,
+        category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
+        title: t.title,
+        notes: t.notes,
+        sortOrder: t.sortOrder,
+      })),
+      actionItems: [
+        {
+          id: meeting.actionItems[0].id,
+          title: "Updated title only",
+          description: meeting.actionItems[0].description,
+        },
+      ],
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.actionItems[0].status).toBe("IN_PROGRESS");
+    expect(result.data.actionItems[0].title).toBe("Updated title only");
   });
 });

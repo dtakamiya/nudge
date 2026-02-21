@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getMeeting } from "@/lib/actions/meeting-actions";
 import { formatDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
-import { MeetingDetail } from "@/components/meeting/meeting-detail";
+import { MeetingDetailPageClient } from "@/components/meeting/meeting-detail-page-client";
 import { MeetingDeleteDialog } from "@/components/meeting/meeting-delete-dialog";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 
@@ -15,11 +15,6 @@ export default async function MeetingDetailPage({ params }: Props) {
   if (!meeting) {
     notFound();
   }
-
-  const actionItemsWithMeeting = meeting.actionItems.map((a) => ({
-    ...a,
-    meeting: { date: meeting.date },
-  }));
 
   return (
     <div className="animate-fade-in-up">
@@ -45,10 +40,15 @@ export default async function MeetingDetailPage({ params }: Props) {
           </Link>
         </div>
       </div>
-      <MeetingDetail
+      <MeetingDetailPageClient
+        meetingId={meetingId}
+        memberId={id}
         date={meeting.date}
         topics={meeting.topics}
-        actionItems={actionItemsWithMeeting}
+        actionItems={meeting.actionItems.map((a) => ({
+          ...a,
+          meeting: { date: meeting.date },
+        }))}
       />
     </div>
   );

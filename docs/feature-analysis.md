@@ -55,7 +55,7 @@ Member (1) ──< (N) Meeting (1) ──< (N) Topic
 - [x] ~~**メンバー編集 UI の欠如**: `updateMember` Server Action は実装済みだが、呼び出す UI が存在しない~~ → `MemberEditDialog` として実装済み
 - [x] ~~**削除確認ダイアログの欠如**: UI 上に削除ボタン・確認ダイアログがない~~ → `MeetingDeleteDialog` / `MemberDeleteDialog` として実装済み
 - [ ] **ActionItem の並び順が未永続化**: フォーム上では dnd-kit による並び替え UI が存在するが、`ActionItem` モデルに `sortOrder` フィールドがなく、DB には順序が保存されない。保存後は `dueDate asc, createdAt desc` で表示される
-- [ ] **ミーティング編集不可**: 作成後の修正・追記ができない。`updateMeeting` Server Action が存在しない
+- [x] ~~**ミーティング編集不可**: 作成後の修正・追記ができない。`updateMeeting` Server Action が存在しない~~ → `updateMeeting` Server Action + `MeetingDetailPageClient` 編集モードとして実装済み
 - [x] ~~**サイレントエラー**: 一部の Server Action で `catch` ブロックがエラーを握りつぶしており、ユーザーにフィードバックがない~~ → `ActionResult<T>` パターンで統一、エラーを UI にフィードバック
 - [x] ~~**エラー境界が未設定**: `error.tsx` / `not-found.tsx` がなく、ランタイムエラー時のフォールバック UI がない~~ → `error.tsx` / `not-found.tsx` を追加
 - [ ] **操作フィードバックの不足**: トースト通知等がなく、保存成功・失敗のフィードバックが `router.push` によるページ遷移のみ
@@ -68,17 +68,10 @@ Member (1) ──< (N) Meeting (1) ──< (N) Topic
 
 #### 2.1.1 ミーティングの編集機能 — 優先度: 高
 
-- [ ] ミーティング詳細画面に「編集」ボタンを追加
-- [ ] 話題の追加・削除・内容修正、アクションアイテムの追加・削除・内容修正を可能に
-- [ ] `updateMeeting` Server Action と `updateMeetingSchema` バリデーションの追加
-- [ ] 話題のノートのインライン編集
-
-**影響範囲:**
-
-- `src/lib/actions/meeting-actions.ts` — `updateMeeting` 関数の追加
-- `src/lib/validations/meeting.ts` — `updateMeetingSchema` の追加
-- `src/components/meeting/meeting-detail.tsx` — 編集モードの追加
-- `src/app/members/[id]/meetings/[meetingId]/page.tsx` — 編集 UI の統合
+- [x] ミーティング詳細画面に「編集」ボタンを追加 → `MeetingDetailPageClient` として実装済み
+- [x] 話題の追加・削除・内容修正、アクションアイテムの追加・削除・内容修正を可能に → `MeetingForm` の `initialData` prop で対応
+- [x] `updateMeeting` Server Action と `updateMeetingSchema` バリデーションの追加
+- [x] 話題のノートのインライン編集 → `MeetingForm` 編集モードで対応
 
 #### 2.1.2 メンバーの編集機能 — 優先度: 高
 
@@ -273,7 +266,7 @@ Member (1) ──< (N) Meeting (1) ──< (N) Topic
 
 | 優先度         | 機能                     | カテゴリ   | 状態     |
 | -------------- | ------------------------ | ---------- | -------- |
-| **P0（必須）** | ミーティング編集         | データ管理 | 未着手   |
+| **P0（必須）** | ミーティング編集         | データ管理 | **完了** |
 | **P0（必須）** | メンバー編集 UI          | データ管理 | **完了** |
 | **P0（必須）** | 楽観的更新               | 技術改善   | **完了** |
 | **P1（重要）** | 検索機能                 | UX         | 未着手   |
@@ -303,7 +296,7 @@ Member (1) ──< (N) Meeting (1) ──< (N) Topic
 
 ### Phase 1: 基盤整備
 
-- [ ] ミーティング編集機能
+- [x] ミーティング編集機能
 - [x] メンバー編集 UI
 - [x] 削除確認ダイアログ
 - [x] エラーハンドリングの統一（error.tsx / not-found.tsx / ActionResult パターン）

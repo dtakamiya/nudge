@@ -163,9 +163,7 @@ export function MemberList({ members }: Props) {
                       <span className="text-muted-foreground">—</span>
                     )}
                     {member.overdueActionCount > 0 && (
-                      <p className="text-destructive text-xs">
-                        {member.overdueActionCount}件超過
-                      </p>
+                      <p className="text-destructive text-xs">{member.overdueActionCount}件超過</p>
                     )}
                   </div>
                 </TableCell>
