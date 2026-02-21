@@ -1,0 +1,21 @@
+import { describe, it, expect, afterEach } from "vitest";
+import { render, screen, cleanup } from "@testing-library/react";
+import NotFoundPage from "../not-found";
+
+afterEach(() => cleanup());
+
+describe("NotFoundPage", () => {
+  it("404 メッセージを表示する", () => {
+    render(<NotFoundPage />);
+    expect(screen.getByText("ページが見つかりません")).toBeDefined();
+    expect(
+      screen.getByText("お探しのページは存在しないか、移動した可能性があります。"),
+    ).toBeDefined();
+  });
+
+  it("ダッシュボードへのリンクを表示する", () => {
+    render(<NotFoundPage />);
+    const link = screen.getByRole("link", { name: "ダッシュボードに戻る" });
+    expect(link.getAttribute("href")).toBe("/");
+  });
+});

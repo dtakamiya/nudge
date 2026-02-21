@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { updateActionItemStatusSchema } from "@/lib/validations/action-item";
 import type { ActionItemStatusType } from "@/lib/validations/action-item";
-import type { Prisma } from "@/generated/prisma/client";
+import type { Prisma, ActionItem } from "@/generated/prisma/client";
+import { runAction, type ActionResult } from "./types";
 
 type ActionItemFilters = {
   status?: ActionItemStatusType;
@@ -33,14 +34,19 @@ export async function getPendingActionItems(memberId: string) {
   });
 }
 
-export async function updateActionItemStatus(id: string, status: string) {
-  const { status: validatedStatus } = updateActionItemStatusSchema.parse({ status });
-  if (!id) throw new Error("Invalid action item ID");
-  const completedAt = validatedStatus === "DONE" ? new Date() : null;
-  const result = await prisma.actionItem.update({
-    where: { id },
-    data: { status: validatedStatus, completedAt },
+export async function updateActionItemStatus(
+  id: string,
+  status: string,
+): Promise<ActionResult<ActionItem>> {
+  return runAction(async () => {
+    const { status: validatedStatus } = updateActionItemStatusSchema.parse({ status });
+    if (!id) throw new Error("アクションアイテムIDが指定されていません");
+    const completedAt = validatedStatus === "DONE" ? new Date() : null;
+    const result = await prisma.actionItem.update({
+      where: { id },
+      data: { status: validatedStatus, completedAt },
+    });
+    revalidatePath("/", "layout");
+    return result;
   });
-  revalidatePath("/", "layout");
-  return result;
 }

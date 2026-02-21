@@ -49,7 +49,7 @@ describe("MemberForm - 新規作成モード", () => {
 
   it("送信時に createMember が呼ばれる", async () => {
     const user = userEvent.setup();
-    mockCreateMember.mockResolvedValue({});
+    mockCreateMember.mockResolvedValue({ success: true, data: {} });
     render(<MemberForm />);
 
     await user.type(screen.getByLabelText("名前 *"), "山田花子");
@@ -66,7 +66,7 @@ describe("MemberForm - 新規作成モード", () => {
 
   it("エラー時にエラーメッセージが表示される", async () => {
     const user = userEvent.setup();
-    mockCreateMember.mockRejectedValue(new Error("登録に失敗しました"));
+    mockCreateMember.mockResolvedValue({ success: false, error: "登録に失敗しました" });
     render(<MemberForm />);
 
     await user.type(screen.getByLabelText("名前 *"), "テスト");
@@ -107,7 +107,7 @@ describe("MemberForm - 編集モード", () => {
   it("送信時に updateMember が呼ばれる", async () => {
     const user = userEvent.setup();
     const onSuccess = vi.fn();
-    mockUpdateMember.mockResolvedValue({});
+    mockUpdateMember.mockResolvedValue({ success: true, data: {} });
     render(<MemberForm initialData={initialData} onSuccess={onSuccess} />);
 
     const nameInput = screen.getByLabelText("名前 *");
@@ -125,7 +125,7 @@ describe("MemberForm - 編集モード", () => {
 
   it("エラー時にエラーメッセージが表示される", async () => {
     const user = userEvent.setup();
-    mockUpdateMember.mockRejectedValue(new Error("更新に失敗しました"));
+    mockUpdateMember.mockResolvedValue({ success: false, error: "更新に失敗しました" });
     render(<MemberForm initialData={initialData} />);
 
     await user.click(screen.getByRole("button", { name: "更新する" }));

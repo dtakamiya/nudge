@@ -82,7 +82,7 @@ describe("PreviousMeetingSidebar", () => {
   it("チェックボックスクリックで楽観的にUIが更新される", async () => {
     const user = userEvent.setup();
     mockUpdateActionItemStatus.mockImplementation(
-      () => new Promise((resolve) => setTimeout(resolve, 100)),
+      () => new Promise((resolve) => setTimeout(() => resolve({ success: true, data: {} }), 100)),
     );
 
     render(
@@ -98,7 +98,7 @@ describe("PreviousMeetingSidebar", () => {
 
   it("チェックボックスクリックでサーバーアクションが呼ばれる", async () => {
     const user = userEvent.setup();
-    mockUpdateActionItemStatus.mockResolvedValue({});
+    mockUpdateActionItemStatus.mockResolvedValue({ success: true, data: {} });
 
     render(
       <PreviousMeetingSidebar previousMeeting={previousMeeting} pendingActions={pendingActions} />,
@@ -121,7 +121,7 @@ describe("PreviousMeetingSidebar", () => {
 
   it("サーバーエラー時に router.refresh でロールバックする", async () => {
     const user = userEvent.setup();
-    mockUpdateActionItemStatus.mockRejectedValue(new Error("Server error"));
+    mockUpdateActionItemStatus.mockResolvedValue({ success: false, error: "Server error" });
 
     render(
       <PreviousMeetingSidebar previousMeeting={previousMeeting} pendingActions={pendingActions} />,

@@ -25,12 +25,11 @@ export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Prop
   function markDone(id: string) {
     startTransition(async () => {
       setOptimisticActions({ id });
-      try {
-        await updateActionItemStatus(id, "DONE");
-        router.refresh();
-      } catch {
-        router.refresh();
+      const result = await updateActionItemStatus(id, "DONE");
+      if (!result.success) {
+        console.error("ステータス更新に失敗:", result.error);
       }
+      router.refresh();
     });
   }
 

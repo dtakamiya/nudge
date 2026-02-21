@@ -105,7 +105,7 @@ export function MeetingForm({ memberId, initialTopics }: Props) {
     const validActions = actionItems.filter((a) => a.title.trim() !== "");
 
     try {
-      await createMeeting({
+      const result = await createMeeting({
         memberId,
         date: new Date(date).toISOString(),
         topics: validTopics.map((t) => ({
@@ -120,9 +120,13 @@ export function MeetingForm({ memberId, initialTopics }: Props) {
           dueDate: a.dueDate || undefined,
         })),
       });
+      if (!result.success) {
+        setError(result.error);
+        return;
+      }
       router.push(`/members/${memberId}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "エラーが発生しました");
+      setError(err instanceof Error ? err.message : "予期しないエラーが発生しました");
     } finally {
       setIsSubmitting(false);
     }

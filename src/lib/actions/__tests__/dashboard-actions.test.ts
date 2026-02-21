@@ -26,13 +26,15 @@ describe("getDashboardSummary", () => {
   });
 
   it("counts members needing follow-up (no meeting in 14+ days)", async () => {
-    const member1 = await createMember({ name: "Recent" });
-    const member2 = await createMember({ name: "Old" });
+    const member1Result = await createMember({ name: "Recent" });
+    const member2Result = await createMember({ name: "Old" });
     await createMember({ name: "Never" });
+    if (!member1Result.success) throw new Error(member1Result.error);
+    if (!member2Result.success) throw new Error(member2Result.error);
 
     // member1: meeting today
     await createMeeting({
-      memberId: member1.id,
+      memberId: member1Result.data.id,
       date: new Date().toISOString(),
       topics: [],
       actionItems: [],
@@ -42,7 +44,7 @@ describe("getDashboardSummary", () => {
     const oldDate = new Date();
     oldDate.setDate(oldDate.getDate() - 15);
     await createMeeting({
-      memberId: member2.id,
+      memberId: member2Result.data.id,
       date: oldDate.toISOString(),
       topics: [],
       actionItems: [],
@@ -55,9 +57,10 @@ describe("getDashboardSummary", () => {
   });
 
   it("calculates action completion rate", async () => {
-    const member = await createMember({ name: "Test" });
+    const memberResult = await createMember({ name: "Test" });
+    if (!memberResult.success) throw new Error(memberResult.error);
     await createMeeting({
-      memberId: member.id,
+      memberId: memberResult.data.id,
       date: new Date().toISOString(),
       topics: [],
       actionItems: [
@@ -78,11 +81,12 @@ describe("getDashboardSummary", () => {
   });
 
   it("counts meetings this month", async () => {
-    const member = await createMember({ name: "Test" });
+    const memberResult = await createMember({ name: "Test" });
+    if (!memberResult.success) throw new Error(memberResult.error);
 
     // This month
     await createMeeting({
-      memberId: member.id,
+      memberId: memberResult.data.id,
       date: new Date().toISOString(),
       topics: [],
       actionItems: [],
@@ -92,7 +96,7 @@ describe("getDashboardSummary", () => {
     const lastMonth = new Date();
     lastMonth.setMonth(lastMonth.getMonth() - 1);
     await createMeeting({
-      memberId: member.id,
+      memberId: memberResult.data.id,
       date: lastMonth.toISOString(),
       topics: [],
       actionItems: [],
@@ -103,14 +107,15 @@ describe("getDashboardSummary", () => {
   });
 
   it("counts overdue actions", async () => {
-    const member = await createMember({ name: "Test" });
+    const memberResult = await createMember({ name: "Test" });
+    if (!memberResult.success) throw new Error(memberResult.error);
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     await createMeeting({
-      memberId: member.id,
+      memberId: memberResult.data.id,
       date: new Date().toISOString(),
       topics: [],
       actionItems: [
@@ -125,12 +130,13 @@ describe("getDashboardSummary", () => {
   });
 
   it("does not count completed items as overdue", async () => {
-    const member = await createMember({ name: "Test" });
+    const memberResult = await createMember({ name: "Test" });
+    if (!memberResult.success) throw new Error(memberResult.error);
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
     await createMeeting({
-      memberId: member.id,
+      memberId: memberResult.data.id,
       date: new Date().toISOString(),
       topics: [],
       actionItems: [

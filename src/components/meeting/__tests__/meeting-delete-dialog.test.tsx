@@ -61,7 +61,7 @@ describe("MeetingDeleteDialog", () => {
 
   it("削除成功後にメンバー詳細ページへ遷移する", async () => {
     const user = userEvent.setup();
-    mockDeleteMeeting.mockResolvedValue({});
+    mockDeleteMeeting.mockResolvedValue({ success: true, data: {} });
     render(<MeetingDeleteDialog {...props} />);
 
     await user.click(screen.getByRole("button", { name: /削除/ }));
@@ -73,14 +73,14 @@ describe("MeetingDeleteDialog", () => {
 
   it("削除失敗時にエラーメッセージが表示される", async () => {
     const user = userEvent.setup();
-    mockDeleteMeeting.mockRejectedValue(new Error("Server error"));
+    mockDeleteMeeting.mockResolvedValue({ success: false, error: "削除エラー" });
     render(<MeetingDeleteDialog {...props} />);
 
     await user.click(screen.getByRole("button", { name: /削除/ }));
     await user.click(screen.getByRole("button", { name: "削除する" }));
 
     await waitFor(() => {
-      expect(screen.getByText("削除に失敗しました。もう一度お試しください。")).toBeDefined();
+      expect(screen.getByText("削除エラー")).toBeDefined();
     });
   });
 });
