@@ -226,10 +226,10 @@ Member (1) ──< (N) Meeting (1) ──< (N) Topic
 
 #### 2.5.5 アクセシビリティ改善 — 優先度: 中
 
-- [ ] `action-list-compact.tsx` の `<button>` に適切な `aria-label` を追加
-- [ ] `previous-meeting-sidebar.tsx` の `<input type="checkbox">` に `aria-label` 追加
-- [ ] ドラッグ&ドロップ操作のスクリーンリーダー向け説明の追加
-- [ ] カラーコントラストの WCAG 2.1 AA 準拠確認
+- [x] `action-list-compact.tsx` の `<button>` に適切な `aria-label` を追加 → 「{アイテム名}のステータスを{次のステータス}に変更」形式で実装済み
+- [x] `previous-meeting-sidebar.tsx` の `<input type="checkbox">` に `aria-label` 追加 → 既に実装済みであることを確認
+- [x] ドラッグ&ドロップ操作のスクリーンリーダー向け説明の追加 → `dnd-accessibility.ts` で日本語アナウンスメント実装、ドラッグハンドルに `aria-label` / `aria-roledescription` 追加
+- [x] カラーコントラストの WCAG 2.1 AA 準拠確認 → 全色ペア（muted-fg:4.65, primary-fg:4.83, destructive:5.38, status-done:9.38 等）が AA 基準（4.5:1）を満たすことを確認
 
 #### 2.5.6 ダークモード対応 — 優先度: 低
 
@@ -279,7 +279,7 @@ Member (1) ──< (N) Meeting (1) ──< (N) Topic
 | **P2（推奨）** | ミーティング頻度の可視化 | 分析       | 未着手   |
 | **P2（推奨）** | アクションアイテム編集   | データ管理 | **完了** |
 | **P2（推奨）** | テストカバレッジ拡充     | 技術改善   | 一部完了 |
-| **P2（推奨）** | アクセシビリティ改善     | 技術改善   | 未着手   |
+| **P2（推奨）** | アクセシビリティ改善     | 技術改善   | **完了** |
 | **P2（推奨）** | ダッシュボード強化       | UX         | 未着手   |
 | **P2（推奨）** | 準備画面の改善           | UX         | 未着手   |
 | **P3（将来）** | 話題カテゴリの傾向分析   | 分析       | 未着手   |
