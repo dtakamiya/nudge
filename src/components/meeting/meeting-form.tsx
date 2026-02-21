@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   DndContext,
   closestCenter,
@@ -21,6 +21,7 @@ import { createMeeting, updateMeeting } from "@/lib/actions/meeting-actions";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 import { SortableTopicItem } from "./sortable-topic-item";
 import { SortableActionItem } from "./sortable-action-item";
+import { screenReaderInstructions, createAnnouncements } from "@/lib/dnd-accessibility";
 
 type TopicFormData = {
   id?: string;
@@ -112,6 +113,8 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor));
+  const topicAnnouncements = useMemo(() => createAnnouncements("話題"), []);
+  const actionAnnouncements = useMemo(() => createAnnouncements("アクション"), []);
 
   function addTopic() {
     setTopics((prev) => [...prev, createEmptyTopic(prev.length)]);
@@ -270,6 +273,10 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleTopicDragEnd}
+            accessibility={{
+              announcements: topicAnnouncements,
+              screenReaderInstructions,
+            }}
           >
             <SortableContext items={topicIds} strategy={verticalListSortingStrategy}>
               {topics.map((topic, index) => (
@@ -307,6 +314,10 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleActionDragEnd}
+            accessibility={{
+              announcements: actionAnnouncements,
+              screenReaderInstructions,
+            }}
           >
             <SortableContext items={actionIds} strategy={verticalListSortingStrategy}>
               {actionItems.map((action, index) => (

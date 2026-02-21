@@ -52,6 +52,8 @@ export function SortableActionItem({
           className="cursor-grab touch-none text-muted-foreground hover:text-foreground self-center"
           {...attributes}
           {...listeners}
+          aria-label={`${title || "アクションアイテム"}を並び替え`}
+          aria-roledescription="並び替え可能"
         >
           <GripVertical className="w-4 h-4" />
         </button>

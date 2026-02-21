@@ -139,7 +139,10 @@ export function ActionListCompact({ actionItems }: Props) {
         ) : (
           <div key={item.id} className="flex items-center justify-between p-2 border rounded">
             <div className="flex items-center gap-2">
-              <button onClick={() => cycleStatus(item.id, item.status)}>
+              <button
+                onClick={() => cycleStatus(item.id, item.status)}
+                aria-label={`${item.title}のステータスを${statusLabels[nextStatus(item.status)]}に変更`}
+              >
                 <Badge variant={statusColors[item.status]}>{statusLabels[item.status]}</Badge>
               </button>
               <span className="text-sm">{item.title}</span>

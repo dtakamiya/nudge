@@ -41,6 +41,16 @@ describe("SortableTopicItem", () => {
     expect(screen.getByRole("button", { name: "削除" })).toBeTruthy();
   });
 
+  it("ドラッグハンドルに aria-label が設定されている", () => {
+    render(<SortableTopicItem {...defaultProps} />);
+    expect(screen.getByRole("button", { name: "進捗報告を並び替え" })).toBeTruthy();
+  });
+
+  it("タイトルが空のときドラッグハンドルに fallback aria-label が設定される", () => {
+    render(<SortableTopicItem {...defaultProps} title="" />);
+    expect(screen.getByRole("button", { name: "話題を並び替え" })).toBeTruthy();
+  });
+
   it("hides delete button when showDelete is false", () => {
     render(<SortableTopicItem {...defaultProps} showDelete={false} />);
     expect(screen.queryByRole("button", { name: "削除" })).toBeNull();
