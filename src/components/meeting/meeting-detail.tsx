@@ -16,6 +16,7 @@ type Topic = {
 type ActionItem = {
   id: string;
   title: string;
+  description: string;
   status: string;
   dueDate: Date | null;
   meeting: { date: Date };

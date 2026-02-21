@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { ActionItemEditDialog } from "@/components/action/action-item-edit-dialog";
 import { updateActionItemStatus } from "@/lib/actions/action-item-actions";
 import { formatDate } from "@/lib/format";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
@@ -79,8 +80,19 @@ export function ActionListFull({ actionItems }: Props) {
                 </p>
               </div>
             </div>
-            <div className="text-sm text-muted-foreground">
-              {item.dueDate && `期限: ${formatDate(item.dueDate)}`}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                {item.dueDate && `期限: ${formatDate(item.dueDate)}`}
+              </span>
+              <ActionItemEditDialog
+                actionItem={{
+                  id: item.id,
+                  title: item.title,
+                  description: item.description,
+                  status: item.status as "TODO" | "IN_PROGRESS" | "DONE",
+                  dueDate: item.dueDate,
+                }}
+              />
             </div>
           </CardContent>
         </Card>

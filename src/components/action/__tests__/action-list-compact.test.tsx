@@ -25,6 +25,7 @@ const mockUpdateActionItemStatus = vi.fn();
 
 vi.mock("@/lib/actions/action-item-actions", () => ({
   updateActionItemStatus: (...args: unknown[]) => mockUpdateActionItemStatus(...args),
+  updateActionItem: vi.fn().mockResolvedValue({ success: true, data: {} }),
 }));
 
 afterEach(() => {
@@ -36,6 +37,7 @@ const baseItems = [
   {
     id: "action-1",
     title: "テストタスク1",
+    description: "",
     status: "TODO",
     dueDate: new Date("2026-03-01"),
     meeting: { date: new Date("2026-02-15") },
@@ -43,6 +45,7 @@ const baseItems = [
   {
     id: "action-2",
     title: "テストタスク2",
+    description: "",
     status: "IN_PROGRESS",
     dueDate: null,
     meeting: { date: new Date("2026-02-10") },

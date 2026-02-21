@@ -3,6 +3,7 @@
 import { useOptimistic, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { ActionItemEditDialog } from "@/components/action/action-item-edit-dialog";
 import { updateActionItemStatus } from "@/lib/actions/action-item-actions";
 import { formatDate } from "@/lib/format";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
@@ -11,6 +12,7 @@ import { useRouter } from "next/navigation";
 type ActionItemRow = {
   id: string;
   title: string;
+  description: string;
   status: string;
   dueDate: Date | null;
   meeting: { date: Date };
@@ -67,9 +69,22 @@ export function ActionListCompact({ actionItems }: Props) {
             </button>
             <span className="text-sm">{item.title}</span>
           </div>
-          {item.dueDate && (
-            <span className="text-xs text-muted-foreground">期限: {formatDate(item.dueDate)}</span>
-          )}
+          <div className="flex items-center gap-1">
+            {item.dueDate && (
+              <span className="text-xs text-muted-foreground">
+                期限: {formatDate(item.dueDate)}
+              </span>
+            )}
+            <ActionItemEditDialog
+              actionItem={{
+                id: item.id,
+                title: item.title,
+                description: item.description,
+                status: item.status as "TODO" | "IN_PROGRESS" | "DONE",
+                dueDate: item.dueDate,
+              }}
+            />
+          </div>
         </div>
       ))}
     </div>

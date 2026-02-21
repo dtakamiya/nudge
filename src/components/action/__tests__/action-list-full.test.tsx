@@ -25,6 +25,7 @@ const mockUpdateActionItemStatus = vi.fn();
 
 vi.mock("@/lib/actions/action-item-actions", () => ({
   updateActionItemStatus: (...args: unknown[]) => mockUpdateActionItemStatus(...args),
+  updateActionItem: vi.fn().mockResolvedValue({ success: true, data: {} }),
 }));
 
 afterEach(() => {
