@@ -12,18 +12,22 @@ import {
 type Member = { id: string; name: string };
 type Props = { members: Member[] };
 
+export function buildFilterUrl(currentParams: string, key: string, value: string): string {
+  const params = new URLSearchParams(currentParams);
+  if (value === "all") {
+    params.delete(key);
+  } else {
+    params.set(key, value);
+  }
+  return `/actions?${params.toString()}`;
+}
+
 export function ActionFilters({ members }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   function updateFilter(key: string, value: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value === "all") {
-      params.delete(key);
-    } else {
-      params.set(key, value);
-    }
-    router.push(`/actions?${params.toString()}`);
+    router.push(buildFilterUrl(searchParams.toString(), key, value));
   }
 
   return (
