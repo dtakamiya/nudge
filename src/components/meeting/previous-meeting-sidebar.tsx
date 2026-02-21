@@ -1,5 +1,6 @@
 "use client";
 
+import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,14 +15,23 @@ type Props = { previousMeeting: MeetingData; pendingActions: ActionItem[] };
 
 export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Props) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [optimisticActions, setOptimisticActions] = useOptimistic(
+    pendingActions,
+    (currentActions, { id }: { id: string }) =>
+      currentActions.map((action) => (action.id === id ? { ...action, status: "DONE" } : action)),
+  );
 
-  async function markDone(id: string) {
-    try {
-      await updateActionItemStatus(id, "DONE");
-      router.refresh();
-    } catch {
-      // Silently fail
-    }
+  function markDone(id: string) {
+    startTransition(async () => {
+      setOptimisticActions({ id });
+      try {
+        await updateActionItemStatus(id, "DONE");
+        router.refresh();
+      } catch {
+        router.refresh();
+      }
+    });
   }
 
   return (
@@ -31,13 +41,22 @@ export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Prop
           <CardTitle className="text-sm font-medium">未完了アクション</CardTitle>
         </CardHeader>
         <CardContent>
-          {pendingActions.length === 0 ? (
+          {optimisticActions.length === 0 ? (
             <p className="text-sm text-muted-foreground">なし</p>
           ) : (
-            <div className="flex flex-col gap-2">
-              {pendingActions.map((action) => (
-                <div key={action.id} className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" onChange={() => markDone(action.id)} className="rounded" />
+            <div className={`flex flex-col gap-2 ${isPending ? "opacity-80" : ""}`}>
+              {optimisticActions.map((action) => (
+                <div
+                  key={action.id}
+                  className={`flex items-center gap-2 text-sm ${action.status === "DONE" ? "line-through text-muted-foreground" : ""}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={action.status === "DONE"}
+                    onChange={() => markDone(action.id)}
+                    className="rounded"
+                    aria-label={`${action.title}を完了にする`}
+                  />
                   <span>{action.title}</span>
                   {action.dueDate && (
                     <span className="text-xs text-muted-foreground ml-auto">

@@ -1,5 +1,6 @@
 "use client";
 
+import { useOptimistic, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { updateActionItemStatus } from "@/lib/actions/action-item-actions";
 import { formatDate } from "@/lib/format";
@@ -25,24 +26,39 @@ const statusColors: Record<string, "status-done" | "status-progress" | "status-t
   DONE: "status-done",
 };
 
+function nextStatus(current: string): string {
+  return current === "TODO" ? "IN_PROGRESS" : current === "IN_PROGRESS" ? "DONE" : "TODO";
+}
+
 export function ActionListCompact({ actionItems }: Props) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [optimisticItems, setOptimisticItems] = useOptimistic(
+    actionItems,
+    (currentItems, { id, status }: { id: string; status: string }) =>
+      currentItems.map((item) => (item.id === id ? { ...item, status } : item)),
+  );
+
   if (actionItems.length === 0) {
     return <p className="text-muted-foreground py-4">アクションアイテムはありません</p>;
   }
-  async function cycleStatus(id: string, currentStatus: string) {
-    const next =
-      currentStatus === "TODO" ? "IN_PROGRESS" : currentStatus === "IN_PROGRESS" ? "DONE" : "TODO";
-    try {
-      await updateActionItemStatus(id, next);
-      router.refresh();
-    } catch {
-      // Silently fail - status will remain unchanged in UI
-    }
+
+  function cycleStatus(id: string, currentStatus: string) {
+    const next = nextStatus(currentStatus);
+    startTransition(async () => {
+      setOptimisticItems({ id, status: next });
+      try {
+        await updateActionItemStatus(id, next);
+        router.refresh();
+      } catch {
+        router.refresh();
+      }
+    });
   }
+
   return (
-    <div className="flex flex-col gap-2">
-      {actionItems.map((item) => (
+    <div className={`flex flex-col gap-2 ${isPending ? "opacity-80" : ""}`}>
+      {optimisticItems.map((item) => (
         <div key={item.id} className="flex items-center justify-between p-2 border rounded">
           <div className="flex items-center gap-2">
             <button onClick={() => cycleStatus(item.id, item.status)}>
