@@ -220,7 +220,7 @@ Member (1) ──< (N) Meeting (1) ──< (N) Topic
 - [x] `member-form` のテスト追加
 - [x] `action-filters` のテスト追加
 - [x] `sidebar` のテスト追加
-- [ ] `breadcrumb` のテスト追加
+- [x] `breadcrumb` のテスト追加
 - [ ] Playwright による E2E テストの導入
 - [ ] カバレッジの CI 自動測定
 
