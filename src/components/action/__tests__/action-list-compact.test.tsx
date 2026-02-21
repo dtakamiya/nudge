@@ -22,9 +22,11 @@ vi.mock("sonner", () => ({
 }));
 
 const mockUpdateActionItemStatus = vi.fn();
+const mockUpdateActionItem = vi.fn();
 
 vi.mock("@/lib/actions/action-item-actions", () => ({
   updateActionItemStatus: (...args: unknown[]) => mockUpdateActionItemStatus(...args),
+  updateActionItem: (...args: unknown[]) => mockUpdateActionItem(...args),
 }));
 
 afterEach(() => {
@@ -36,6 +38,7 @@ const baseItems = [
   {
     id: "action-1",
     title: "テストタスク1",
+    description: "説明1",
     status: "TODO",
     dueDate: new Date("2026-03-01"),
     meeting: { date: new Date("2026-02-15") },
@@ -43,6 +46,7 @@ const baseItems = [
   {
     id: "action-2",
     title: "テストタスク2",
+    description: "",
     status: "IN_PROGRESS",
     dueDate: null,
     meeting: { date: new Date("2026-02-10") },
@@ -125,5 +129,73 @@ describe("ActionListCompact", () => {
 
     expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.actionItem.statusChangeError);
     expect(mockRefresh).toHaveBeenCalled();
+  });
+
+  it("編集ボタンが各行に表示される", () => {
+    render(<ActionListCompact actionItems={baseItems} />);
+    const editButtons = screen.getAllByRole("button", { name: /編集/ });
+    expect(editButtons.length).toBe(2);
+  });
+
+  it("編集ボタンクリックで編集フォームが表示される", async () => {
+    const user = userEvent.setup();
+    render(<ActionListCompact actionItems={baseItems} />);
+    const editButtons = screen.getAllByRole("button", { name: /編集/ });
+    await user.click(editButtons[0]);
+    expect(screen.getByDisplayValue("テストタスク1")).toBeDefined();
+    expect(screen.getByRole("button", { name: /保存/ })).toBeDefined();
+    expect(screen.getByRole("button", { name: /キャンセル/ })).toBeDefined();
+  });
+
+  it("キャンセルボタンで編集モードを終了する", async () => {
+    const user = userEvent.setup();
+    render(<ActionListCompact actionItems={baseItems} />);
+    const editButtons = screen.getAllByRole("button", { name: /編集/ });
+    await user.click(editButtons[0]);
+    const cancelBtn = screen.getByRole("button", { name: /キャンセル/ });
+    await user.click(cancelBtn);
+    expect(screen.queryByDisplayValue("テストタスク1")).toBeNull();
+  });
+
+  it("保存ボタンクリックで updateActionItem が呼ばれる", async () => {
+    const user = userEvent.setup();
+    mockUpdateActionItem.mockResolvedValue({ success: true, data: {} });
+    render(<ActionListCompact actionItems={baseItems} />);
+    const editButtons = screen.getAllByRole("button", { name: /編集/ });
+    await user.click(editButtons[0]);
+
+    const titleInput = screen.getByDisplayValue("テストタスク1");
+    await user.clear(titleInput);
+    await user.type(titleInput, "更新タイトル");
+
+    const saveBtn = screen.getByRole("button", { name: /保存/ });
+    await user.click(saveBtn);
+
+    expect(mockUpdateActionItem).toHaveBeenCalledWith(
+      "action-1",
+      expect.objectContaining({ title: "更新タイトル" }),
+    );
+  });
+
+  it("保存成功時にトーストが表示される", async () => {
+    const user = userEvent.setup();
+    mockUpdateActionItem.mockResolvedValue({ success: true, data: {} });
+    render(<ActionListCompact actionItems={baseItems} />);
+    const editButtons = screen.getAllByRole("button", { name: /編集/ });
+    await user.click(editButtons[0]);
+    const saveBtn = screen.getByRole("button", { name: /保存/ });
+    await user.click(saveBtn);
+    expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.actionItem.updateSuccess);
+  });
+
+  it("保存失敗時にエラートーストが表示される", async () => {
+    const user = userEvent.setup();
+    mockUpdateActionItem.mockResolvedValue({ success: false, error: "Error" });
+    render(<ActionListCompact actionItems={baseItems} />);
+    const editButtons = screen.getAllByRole("button", { name: /編集/ });
+    await user.click(editButtons[0]);
+    const saveBtn = screen.getByRole("button", { name: /保存/ });
+    await user.click(saveBtn);
+    expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.actionItem.updateError);
   });
 });
