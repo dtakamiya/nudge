@@ -1,7 +1,9 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { toast } from "sonner";
 import { ActionListCompact } from "../action-list-compact";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 const mockRefresh = vi.fn();
 
@@ -10,6 +12,13 @@ vi.mock("next/navigation", () => ({
     push: vi.fn(),
     refresh: mockRefresh,
   }),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
 }));
 
 const mockUpdateActionItemStatus = vi.fn();
@@ -105,7 +114,7 @@ describe("ActionListCompact", () => {
     expect(mockUpdateActionItemStatus).toHaveBeenCalledWith("action-2", "DONE");
   });
 
-  it("サーバーエラー時に router.refresh でロールバックする", async () => {
+  it("サーバーエラー時にエラートーストが表示され router.refresh でロールバックする", async () => {
     const user = userEvent.setup();
     mockUpdateActionItemStatus.mockResolvedValue({ success: false, error: "Server error" });
 
@@ -114,6 +123,7 @@ describe("ActionListCompact", () => {
     const todoButton = screen.getByText("未着手").closest("button")!;
     await user.click(todoButton);
 
+    expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.actionItem.statusChangeError);
     expect(mockRefresh).toHaveBeenCalled();
   });
 });

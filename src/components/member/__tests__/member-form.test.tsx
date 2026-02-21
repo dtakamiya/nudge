@@ -1,7 +1,9 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { toast } from "sonner";
 import { MemberForm } from "../member-form";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 const mockPush = vi.fn();
 const mockRefresh = vi.fn();
@@ -11,6 +13,13 @@ vi.mock("next/navigation", () => ({
     push: mockPush,
     refresh: mockRefresh,
   }),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
 }));
 
 const mockCreateMember = vi.fn();
@@ -61,10 +70,11 @@ describe("MemberForm - 新規作成モード", () => {
       department: "デザイン",
       position: undefined,
     });
+    expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.member.createSuccess);
     expect(mockPush).toHaveBeenCalledWith("/");
   });
 
-  it("エラー時にエラーメッセージが表示される", async () => {
+  it("エラー時にエラーメッセージとトーストが表示される", async () => {
     const user = userEvent.setup();
     mockCreateMember.mockResolvedValue({ success: false, error: "登録に失敗しました" });
     render(<MemberForm />);
@@ -73,6 +83,7 @@ describe("MemberForm - 新規作成モード", () => {
     await user.click(screen.getByRole("button", { name: "登録する" }));
 
     expect(screen.getByText("登録に失敗しました")).toBeDefined();
+    expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.member.createError);
   });
 });
 
@@ -120,10 +131,11 @@ describe("MemberForm - 編集モード", () => {
       department: "エンジニアリング",
       position: "シニアエンジニア",
     });
+    expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.member.updateSuccess);
     expect(onSuccess).toHaveBeenCalled();
   });
 
-  it("エラー時にエラーメッセージが表示される", async () => {
+  it("エラー時にエラーメッセージとトーストが表示される", async () => {
     const user = userEvent.setup();
     mockUpdateMember.mockResolvedValue({ success: false, error: "更新に失敗しました" });
     render(<MemberForm initialData={initialData} />);
@@ -131,6 +143,7 @@ describe("MemberForm - 編集モード", () => {
     await user.click(screen.getByRole("button", { name: "更新する" }));
 
     expect(screen.getByText("更新に失敗しました")).toBeDefined();
+    expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.member.updateError);
   });
 
   it("初期値の department が null の場合、空文字で表示される", () => {

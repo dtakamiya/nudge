@@ -14,7 +14,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import { deleteMember } from "@/lib/actions/member-actions";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 type Props = {
   readonly memberId: string;
@@ -34,13 +36,16 @@ export function MemberDeleteDialog({ memberId, memberName }: Props) {
       const result = await deleteMember(memberId);
       if (!result.success) {
         setError(result.error);
+        toast.error(TOAST_MESSAGES.member.deleteError);
         setLoading(false);
         return;
       }
+      toast.success(TOAST_MESSAGES.member.deleteSuccess);
       setOpen(false);
       router.push("/");
     } catch {
       setError("削除に失敗しました。もう一度お試しください。");
+      toast.error(TOAST_MESSAGES.member.deleteError);
       setLoading(false);
     }
   }

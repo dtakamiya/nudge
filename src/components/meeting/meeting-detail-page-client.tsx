@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil } from "lucide-react";
+import { toast } from "sonner";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
 import { Button } from "@/components/ui/button";
 import { MeetingDetail } from "./meeting-detail";
 import { MeetingForm } from "./meeting-form";
@@ -38,6 +40,7 @@ export function MeetingDetailPageClient({ meetingId, memberId, date, topics, act
 
   function handleEditSuccess() {
     setIsEditing(false);
+    toast.success(TOAST_MESSAGES.meeting.updateSuccess);
     router.refresh();
   }
 

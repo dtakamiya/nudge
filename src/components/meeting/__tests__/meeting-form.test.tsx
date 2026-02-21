@@ -1,10 +1,21 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { toast } from "sonner";
 import { MeetingForm } from "../meeting-form";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
+
+const mockPush = vi.fn();
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: mockPush }),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
 }));
 
 vi.mock("@/lib/actions/meeting-actions", () => ({
@@ -79,6 +90,37 @@ describe("MeetingForm", () => {
     await user.click(screen.getByRole("button", { name: /話題を追加/ }));
     const inputs = screen.getAllByPlaceholderText("話題のタイトル");
     expect(inputs).toHaveLength(2);
+  });
+
+  it("shows success toast on create", async () => {
+    const { createMeeting } = await import("@/lib/actions/meeting-actions");
+    const mockCreate = vi.mocked(createMeeting);
+    mockCreate.mockResolvedValue({ success: true, data: {} as never });
+
+    const user = userEvent.setup();
+    render(<MeetingForm memberId="m1" />);
+
+    const titleInput = screen.getByPlaceholderText("話題のタイトル");
+    await user.type(titleInput, "テスト話題");
+    await user.click(screen.getByRole("button", { name: "1on1を保存" }));
+
+    expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.meeting.createSuccess);
+    expect(mockPush).toHaveBeenCalledWith("/members/m1");
+  });
+
+  it("shows error toast on create failure", async () => {
+    const { createMeeting } = await import("@/lib/actions/meeting-actions");
+    const mockCreate = vi.mocked(createMeeting);
+    mockCreate.mockResolvedValue({ success: false, error: "保存エラー" });
+
+    const user = userEvent.setup();
+    render(<MeetingForm memberId="m1" />);
+
+    const titleInput = screen.getByPlaceholderText("話題のタイトル");
+    await user.type(titleInput, "テスト話題");
+    await user.click(screen.getByRole("button", { name: "1on1を保存" }));
+
+    expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.meeting.createError);
   });
 
   it("renders drag handles for action items after adding", async () => {
@@ -156,7 +198,7 @@ describe("MeetingForm (edit mode)", () => {
     );
   });
 
-  it("calls onSuccess after successful update", async () => {
+  it("calls onSuccess and shows toast after successful update", async () => {
     const { updateMeeting } = await import("@/lib/actions/meeting-actions");
     const mockUpdate = vi.mocked(updateMeeting);
     mockUpdate.mockResolvedValue({ success: true, data: {} as never });
@@ -167,6 +209,19 @@ describe("MeetingForm (edit mode)", () => {
 
     await user.click(screen.getByRole("button", { name: "1on1を更新" }));
     expect(onSuccess).toHaveBeenCalledTimes(1);
+    expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.meeting.updateSuccess);
+  });
+
+  it("shows error toast when update fails", async () => {
+    const { updateMeeting } = await import("@/lib/actions/meeting-actions");
+    const mockUpdate = vi.mocked(updateMeeting);
+    mockUpdate.mockResolvedValue({ success: false, error: "更新エラー" });
+
+    const user = userEvent.setup();
+    render(<MeetingForm memberId="m1" initialData={mockInitialData} />);
+
+    await user.click(screen.getByRole("button", { name: "1on1を更新" }));
+    expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.meeting.updateError);
   });
 
   it("adds new topic in edit mode", async () => {

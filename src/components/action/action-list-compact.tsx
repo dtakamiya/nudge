@@ -2,8 +2,10 @@
 
 import { useOptimistic, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { updateActionItemStatus } from "@/lib/actions/action-item-actions";
 import { formatDate } from "@/lib/format";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
 import { useRouter } from "next/navigation";
 
 type ActionItemRow = {
@@ -49,7 +51,7 @@ export function ActionListCompact({ actionItems }: Props) {
       setOptimisticItems({ id, status: next });
       const result = await updateActionItemStatus(id, next);
       if (!result.success) {
-        console.error("ステータス更新に失敗:", result.error);
+        toast.error(TOAST_MESSAGES.actionItem.statusChangeError);
       }
       router.refresh();
     });

@@ -1,6 +1,9 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { toast } from "sonner";
 import { ActionListFull } from "../action-list-full";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 const mockRefresh = vi.fn();
 
@@ -9,6 +12,13 @@ vi.mock("next/navigation", () => ({
     push: vi.fn(),
     refresh: mockRefresh,
   }),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
 }));
 
 const mockUpdateActionItemStatus = vi.fn();
@@ -73,4 +83,8 @@ describe("ActionListFull", () => {
     const link = screen.getByText("田中太郎");
     expect(link.closest("a")?.getAttribute("href")).toBe("/members/member-1");
   });
+
+  // Note: Radix UI Select の onValueChange テストは jsdom 環境では
+  // hasPointerCapture 非対応のため実行不可。
+  // トースト通知のロジックは action-list-compact テストで検証している。
 });

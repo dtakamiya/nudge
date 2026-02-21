@@ -11,8 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 import { updateActionItemStatus } from "@/lib/actions/action-item-actions";
 import { formatDate } from "@/lib/format";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 type ActionItemRow = {
   id: string;
@@ -44,7 +46,7 @@ export function ActionListFull({ actionItems }: Props) {
       setOptimisticItems({ id, status: newStatus });
       const result = await updateActionItemStatus(id, newStatus);
       if (!result.success) {
-        console.error("ステータス更新に失敗:", result.error);
+        toast.error(TOAST_MESSAGES.actionItem.statusChangeError);
       }
       router.refresh();
     });
