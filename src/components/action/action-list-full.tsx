@@ -1,5 +1,6 @@
 "use client";
 
+import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,23 +28,32 @@ type Props = { actionItems: ActionItemRow[] };
 
 export function ActionListFull({ actionItems }: Props) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [optimisticItems, setOptimisticItems] = useOptimistic(
+    actionItems,
+    (currentItems, { id, status }: { id: string; status: string }) =>
+      currentItems.map((item) => (item.id === id ? { ...item, status } : item)),
+  );
 
   if (actionItems.length === 0) {
     return <p className="text-muted-foreground py-8 text-center">アクションアイテムはありません</p>;
   }
 
-  async function handleStatusChange(id: string, newStatus: string) {
-    try {
-      await updateActionItemStatus(id, newStatus);
-      router.refresh();
-    } catch {
-      // Silently fail - status will remain unchanged in UI
-    }
+  function handleStatusChange(id: string, newStatus: string) {
+    startTransition(async () => {
+      setOptimisticItems({ id, status: newStatus });
+      try {
+        await updateActionItemStatus(id, newStatus);
+        router.refresh();
+      } catch {
+        router.refresh();
+      }
+    });
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {actionItems.map((item) => (
+    <div className={`flex flex-col gap-3 ${isPending ? "opacity-80" : ""}`}>
+      {optimisticItems.map((item) => (
         <Card key={item.id} className="hover:shadow-sm hover:border-[oklch(0.88_0.008_260)]">
           <CardContent className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
