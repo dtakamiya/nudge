@@ -2,30 +2,26 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createMeeting } from "@/lib/actions/meeting-actions";
+import { SortableTopicItem } from "./sortable-topic-item";
+import { SortableActionItem } from "./sortable-action-item";
 
 type TopicFormData = { category: string; title: string; notes: string; sortOrder: number };
 type ActionFormData = { title: string; description: string; dueDate: string };
-
-const categoryOptions = [
-  { value: "WORK_PROGRESS", label: "業務進捗" },
-  { value: "CAREER", label: "キャリア" },
-  { value: "ISSUES", label: "課題・相談" },
-  { value: "FEEDBACK", label: "フィードバック" },
-  { value: "OTHER", label: "その他" },
-];
 
 type Props = {
   memberId: string;
@@ -52,6 +48,8 @@ export function MeetingForm({ memberId, initialTopics }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor));
+
   function addTopic() {
     setTopics((prev) => [...prev, createEmptyTopic(prev.length)]);
   }
@@ -60,8 +58,19 @@ export function MeetingForm({ memberId, initialTopics }: Props) {
     setTopics((prev) => prev.filter((_, i) => i !== index).map((t, i) => ({ ...t, sortOrder: i })));
   }
 
-  function updateTopic(index: number, field: keyof TopicFormData, value: string | number) {
+  function updateTopic(index: number, field: "category" | "title" | "notes", value: string) {
     setTopics((prev) => prev.map((t, i) => (i === index ? { ...t, [field]: value } : t)));
+  }
+
+  function handleTopicDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setTopics((prev) => {
+      const oldIndex = prev.findIndex((_, i) => `topic-${i}` === active.id);
+      const newIndex = prev.findIndex((_, i) => `topic-${i}` === over.id);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex).map((t, i) => ({ ...t, sortOrder: i }));
+    });
   }
 
   function addAction() {
@@ -72,8 +81,19 @@ export function MeetingForm({ memberId, initialTopics }: Props) {
     setActionItems((prev) => prev.filter((_, i) => i !== index));
   }
 
-  function updateAction(index: number, field: keyof ActionFormData, value: string) {
+  function updateAction(index: number, field: "title" | "description" | "dueDate", value: string) {
     setActionItems((prev) => prev.map((a, i) => (i === index ? { ...a, [field]: value } : a)));
+  }
+
+  function handleActionDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setActionItems((prev) => {
+      const oldIndex = prev.findIndex((_, i) => `action-${i}` === active.id);
+      const newIndex = prev.findIndex((_, i) => `action-${i}` === over.id);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -108,6 +128,9 @@ export function MeetingForm({ memberId, initialTopics }: Props) {
     }
   }
 
+  const topicIds = topics.map((_, i) => `topic-${i}`);
+  const actionIds = actionItems.map((_, i) => `action-${i}`);
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
@@ -131,57 +154,27 @@ export function MeetingForm({ memberId, initialTopics }: Props) {
           </div>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          {topics.map((topic, index) => (
-            <div key={index} className="border rounded p-3 flex flex-col gap-2">
-              <div className="flex gap-2 items-end">
-                <div className="flex-1">
-                  <Label>カテゴリ</Label>
-                  <Select
-                    value={topic.category}
-                    onValueChange={(val) => updateTopic(index, "category", val)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categoryOptions.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex-[2]">
-                  <Label>タイトル</Label>
-                  <Input
-                    value={topic.title}
-                    onChange={(e) => updateTopic(index, "title", e.target.value)}
-                    placeholder="話題のタイトル"
-                  />
-                </div>
-                {topics.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeTopic(index)}
-                  >
-                    削除
-                  </Button>
-                )}
-              </div>
-              <div>
-                <Label>メモ</Label>
-                <Textarea
-                  value={topic.notes}
-                  onChange={(e) => updateTopic(index, "notes", e.target.value)}
-                  placeholder="詳細メモ"
-                  rows={2}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleTopicDragEnd}
+          >
+            <SortableContext items={topicIds} strategy={verticalListSortingStrategy}>
+              {topics.map((topic, index) => (
+                <SortableTopicItem
+                  key={`topic-${index}`}
+                  id={`topic-${index}`}
+                  category={topic.category}
+                  title={topic.title}
+                  notes={topic.notes}
+                  index={index}
+                  showDelete={topics.length > 1}
+                  onUpdate={updateTopic}
+                  onRemove={removeTopic}
                 />
-              </div>
-            </div>
-          ))}
+              ))}
+            </SortableContext>
+          </DndContext>
         </CardContent>
       </Card>
 
@@ -198,39 +191,26 @@ export function MeetingForm({ memberId, initialTopics }: Props) {
           {actionItems.length === 0 && (
             <p className="text-sm text-muted-foreground">アクションはまだありません</p>
           )}
-          {actionItems.map((action, index) => (
-            <div key={index} className="border rounded p-3 flex flex-col gap-2">
-              <div className="flex gap-2 items-end">
-                <div className="flex-[2]">
-                  <Label>タイトル</Label>
-                  <Input
-                    value={action.title}
-                    onChange={(e) => updateAction(index, "title", e.target.value)}
-                    placeholder="アクションのタイトル"
-                  />
-                </div>
-                <div className="flex-1">
-                  <Label>期限</Label>
-                  <Input
-                    type="date"
-                    value={action.dueDate}
-                    onChange={(e) => updateAction(index, "dueDate", e.target.value)}
-                  />
-                </div>
-                <Button type="button" variant="ghost" size="sm" onClick={() => removeAction(index)}>
-                  削除
-                </Button>
-              </div>
-              <div>
-                <Label>説明</Label>
-                <Input
-                  value={action.description}
-                  onChange={(e) => updateAction(index, "description", e.target.value)}
-                  placeholder="詳細（任意）"
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleActionDragEnd}
+          >
+            <SortableContext items={actionIds} strategy={verticalListSortingStrategy}>
+              {actionItems.map((action, index) => (
+                <SortableActionItem
+                  key={`action-${index}`}
+                  id={`action-${index}`}
+                  title={action.title}
+                  description={action.description}
+                  dueDate={action.dueDate}
+                  index={index}
+                  onUpdate={updateAction}
+                  onRemove={removeAction}
                 />
-              </div>
-            </div>
-          ))}
+              ))}
+            </SortableContext>
+          </DndContext>
         </CardContent>
       </Card>
 
