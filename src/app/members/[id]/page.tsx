@@ -7,6 +7,7 @@ import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { MeetingHistory } from "@/components/meeting/meeting-history";
 import { ActionListCompact } from "@/components/action/action-list-compact";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { MemberEditDialog } from "@/components/member/member-edit-dialog";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -30,6 +31,14 @@ export default async function MemberDetailPage({ params }: Props) {
           </div>
         </div>
         <div className="flex gap-2">
+          <MemberEditDialog
+            member={{
+              id: member.id,
+              name: member.name,
+              department: member.department,
+              position: member.position,
+            }}
+          />
           <Link href={`/members/${id}/meetings/prepare`}>
             <Button variant="outline">1on1 を準備</Button>
           </Link>
