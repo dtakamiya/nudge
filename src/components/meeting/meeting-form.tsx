@@ -11,11 +11,7 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  arrayMove,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,9 +55,7 @@ export function MeetingForm({ memberId, initialTopics }: Props) {
   }
 
   function removeTopic(index: number) {
-    setTopics((prev) =>
-      prev.filter((_, i) => i !== index).map((t, i) => ({ ...t, sortOrder: i })),
-    );
+    setTopics((prev) => prev.filter((_, i) => i !== index).map((t, i) => ({ ...t, sortOrder: i })));
   }
 
   function updateTopic(index: number, field: "category" | "title" | "notes", value: string) {

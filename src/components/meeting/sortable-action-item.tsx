@@ -30,14 +30,9 @@ export function SortableActionItem({
   onUpdate,
   onRemove,
 }: Props) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -76,12 +71,7 @@ export function SortableActionItem({
             onChange={(e) => onUpdate(index, "dueDate", e.target.value)}
           />
         </div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => onRemove(index)}
-        >
+        <Button type="button" variant="ghost" size="sm" onClick={() => onRemove(index)}>
           削除
         </Button>
       </div>

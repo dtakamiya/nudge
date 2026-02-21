@@ -56,11 +56,7 @@ describe("SortableActionItem", () => {
     render(<SortableActionItem {...defaultProps} />);
     const input = screen.getByDisplayValue("PRレビューをする");
     await user.type(input, "X");
-    expect(defaultProps.onUpdate).toHaveBeenCalledWith(
-      0,
-      "description",
-      "PRレビューをするX",
-    );
+    expect(defaultProps.onUpdate).toHaveBeenCalledWith(0, "description", "PRレビューをするX");
   });
 
   it("calls onUpdate when dueDate changes", () => {

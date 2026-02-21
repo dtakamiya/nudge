@@ -30,11 +30,7 @@ type Props = {
   readonly notes: string;
   readonly index: number;
   readonly showDelete: boolean;
-  readonly onUpdate: (
-    index: number,
-    field: "category" | "title" | "notes",
-    value: string,
-  ) => void;
+  readonly onUpdate: (index: number, field: "category" | "title" | "notes", value: string) => void;
   readonly onRemove: (index: number) => void;
 };
 
@@ -48,14 +44,9 @@ export function SortableTopicItem({
   onUpdate,
   onRemove,
 }: Props) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -80,10 +71,7 @@ export function SortableTopicItem({
         </button>
         <div className="flex-1">
           <Label>カテゴリ</Label>
-          <Select
-            value={category}
-            onValueChange={(val) => onUpdate(index, "category", val)}
-          >
+          <Select value={category} onValueChange={(val) => onUpdate(index, "category", val)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -105,12 +93,7 @@ export function SortableTopicItem({
           />
         </div>
         {showDelete && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => onRemove(index)}
-          >
+          <Button type="button" variant="ghost" size="sm" onClick={() => onRemove(index)}>
             削除
           </Button>
         )}
