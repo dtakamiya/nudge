@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createMeetingSchema } from "../meeting";
+import { createMeetingSchema, updateMeetingSchema } from "../meeting";
 
 describe("createMeetingSchema", () => {
   it("accepts valid input with topics and actions", () => {
@@ -68,5 +68,178 @@ describe("createMeetingSchema", () => {
       actionItems: [],
     });
     expect(result.success).toBe(true);
+  });
+});
+
+describe("updateMeetingSchema", () => {
+  const validInput = {
+    meetingId: "meeting-uuid",
+    date: "2026-02-20T10:00:00.000Z",
+    topics: [
+      {
+        id: "topic-uuid",
+        category: "WORK_PROGRESS" as const,
+        title: "Sprint progress",
+        notes: "On track",
+        sortOrder: 0,
+      },
+    ],
+    actionItems: [
+      {
+        id: "action-uuid",
+        title: "Review PR",
+        description: "",
+        dueDate: "2026-02-25",
+      },
+    ],
+    deletedTopicIds: [],
+    deletedActionItemIds: [],
+  };
+
+  it("accepts valid input with existing topics and action items", () => {
+    const result = updateMeetingSchema.safeParse(validInput);
+    expect(result.success).toBe(true);
+  });
+
+  it("requires meetingId", () => {
+    const { meetingId: _, ...withoutId } = validInput;
+    const result = updateMeetingSchema.safeParse(withoutId);
+    expect(result.success).toBe(false);
+  });
+
+  it("requires date", () => {
+    const { date: _, ...withoutDate } = validInput;
+    const result = updateMeetingSchema.safeParse(withoutDate);
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts existing topic update with id", () => {
+    const result = updateMeetingSchema.safeParse({
+      ...validInput,
+      topics: [
+        {
+          id: "existing-topic-id",
+          category: "CAREER",
+          title: "Updated title",
+          notes: "Updated notes",
+          sortOrder: 0,
+        },
+      ],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts new topic without id", () => {
+    const result = updateMeetingSchema.safeParse({
+      ...validInput,
+      topics: [
+        {
+          category: "ISSUES",
+          title: "New topic",
+          notes: "",
+          sortOrder: 0,
+        },
+      ],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts existing action item update with id", () => {
+    const result = updateMeetingSchema.safeParse({
+      ...validInput,
+      actionItems: [
+        {
+          id: "existing-action-id",
+          title: "Updated action",
+          description: "Details",
+          dueDate: "2026-03-01",
+        },
+      ],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts new action item without id", () => {
+    const result = updateMeetingSchema.safeParse({
+      ...validInput,
+      actionItems: [
+        {
+          title: "New action",
+          description: "",
+        },
+      ],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts deletedTopicIds and deletedActionItemIds", () => {
+    const result = updateMeetingSchema.safeParse({
+      ...validInput,
+      deletedTopicIds: ["topic-to-delete-1", "topic-to-delete-2"],
+      deletedActionItemIds: ["action-to-delete-1"],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("defaults deletedTopicIds and deletedActionItemIds to empty arrays", () => {
+    const { deletedTopicIds: _, deletedActionItemIds: __, ...withoutDeleted } =
+      validInput;
+    const result = updateMeetingSchema.safeParse(withoutDeleted);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.deletedTopicIds).toEqual([]);
+      expect(result.data.deletedActionItemIds).toEqual([]);
+    }
+  });
+
+  it("validates topic category enum", () => {
+    const result = updateMeetingSchema.safeParse({
+      ...validInput,
+      topics: [
+        {
+          category: "INVALID_CATEGORY",
+          title: "Test",
+          notes: "",
+          sortOrder: 0,
+        },
+      ],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects empty meetingId", () => {
+    const result = updateMeetingSchema.safeParse({
+      ...validInput,
+      meetingId: "",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects topic with empty title", () => {
+    const result = updateMeetingSchema.safeParse({
+      ...validInput,
+      topics: [
+        {
+          category: "WORK_PROGRESS",
+          title: "",
+          notes: "",
+          sortOrder: 0,
+        },
+      ],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects action item with empty title", () => {
+    const result = updateMeetingSchema.safeParse({
+      ...validInput,
+      actionItems: [
+        {
+          title: "",
+          description: "",
+        },
+      ],
+    });
+    expect(result.success).toBe(false);
   });
 });

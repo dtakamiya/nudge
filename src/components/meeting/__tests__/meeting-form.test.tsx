@@ -9,6 +9,7 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("@/lib/actions/meeting-actions", () => ({
   createMeeting: vi.fn(),
+  updateMeeting: vi.fn(),
 }));
 
 // Mock dnd-kit to avoid jsdom DnD issues
@@ -85,5 +86,103 @@ describe("MeetingForm", () => {
     render(<MeetingForm memberId="m1" />);
     await user.click(screen.getByRole("button", { name: /アクション追加/ }));
     expect(screen.getByTestId("drag-handle-action-0")).toBeTruthy();
+  });
+});
+
+describe("MeetingForm (edit mode)", () => {
+  afterEach(() => cleanup());
+
+  const mockInitialData = {
+    meetingId: "meeting-1",
+    date: "2026-02-20T10:00:00.000Z",
+    topics: [
+      { id: "topic-1", category: "WORK_PROGRESS", title: "Existing topic", notes: "Some notes", sortOrder: 0 },
+      { id: "topic-2", category: "CAREER", title: "Career talk", notes: "", sortOrder: 1 },
+    ],
+    actionItems: [
+      { id: "action-1", title: "Existing action", description: "Desc", dueDate: "2026-03-01", status: "TODO" },
+    ],
+  };
+
+  it("pre-fills form with initialData", () => {
+    render(<MeetingForm memberId="m1" initialData={mockInitialData} />);
+    const titleInputs = screen.getAllByPlaceholderText("話題のタイトル");
+    expect(titleInputs).toHaveLength(2);
+    expect(titleInputs[0]).toHaveProperty("value", "Existing topic");
+    expect(titleInputs[1]).toHaveProperty("value", "Career talk");
+
+    const actionInputs = screen.getAllByPlaceholderText("アクションのタイトル");
+    expect(actionInputs).toHaveLength(1);
+    expect(actionInputs[0]).toHaveProperty("value", "Existing action");
+  });
+
+  it("shows update button text in edit mode", () => {
+    render(<MeetingForm memberId="m1" initialData={mockInitialData} />);
+    expect(screen.getByRole("button", { name: "1on1を更新" })).toBeTruthy();
+  });
+
+  it("shows save button text in create mode", () => {
+    render(<MeetingForm memberId="m1" />);
+    expect(screen.getByRole("button", { name: "1on1を保存" })).toBeTruthy();
+  });
+
+  it("calls updateMeeting on form submit in edit mode", async () => {
+    const { updateMeeting } = await import("@/lib/actions/meeting-actions");
+    const mockUpdate = vi.mocked(updateMeeting);
+    mockUpdate.mockResolvedValue({ success: true, data: {} as never });
+
+    const onSuccess = vi.fn();
+    const user = userEvent.setup();
+    render(<MeetingForm memberId="m1" initialData={mockInitialData} onSuccess={onSuccess} />);
+
+    await user.click(screen.getByRole("button", { name: "1on1を更新" }));
+    expect(mockUpdate).toHaveBeenCalledTimes(1);
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        meetingId: "meeting-1",
+      }),
+    );
+  });
+
+  it("calls onSuccess after successful update", async () => {
+    const { updateMeeting } = await import("@/lib/actions/meeting-actions");
+    const mockUpdate = vi.mocked(updateMeeting);
+    mockUpdate.mockResolvedValue({ success: true, data: {} as never });
+
+    const onSuccess = vi.fn();
+    const user = userEvent.setup();
+    render(<MeetingForm memberId="m1" initialData={mockInitialData} onSuccess={onSuccess} />);
+
+    await user.click(screen.getByRole("button", { name: "1on1を更新" }));
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  it("adds new topic in edit mode", async () => {
+    const user = userEvent.setup();
+    render(<MeetingForm memberId="m1" initialData={mockInitialData} />);
+    await user.click(screen.getByRole("button", { name: /話題を追加/ }));
+    const titleInputs = screen.getAllByPlaceholderText("話題のタイトル");
+    expect(titleInputs).toHaveLength(3);
+  });
+
+  it("tracks deleted topic ids when removing existing topics", async () => {
+    const { updateMeeting } = await import("@/lib/actions/meeting-actions");
+    const mockUpdate = vi.mocked(updateMeeting);
+    mockUpdate.mockResolvedValue({ success: true, data: {} as never });
+
+    const user = userEvent.setup();
+    render(<MeetingForm memberId="m1" initialData={mockInitialData} onSuccess={vi.fn()} />);
+
+    // Remove the second topic (Career talk)
+    const deleteButtons = screen.getAllByRole("button", { name: /削除/ });
+    // Find the delete button for topics (not actions)
+    await user.click(deleteButtons[1]); // second topic delete button
+
+    await user.click(screen.getByRole("button", { name: "1on1を更新" }));
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        deletedTopicIds: ["topic-2"],
+      }),
+    );
   });
 });

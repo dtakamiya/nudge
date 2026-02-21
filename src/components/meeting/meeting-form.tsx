@@ -16,16 +16,49 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { createMeeting } from "@/lib/actions/meeting-actions";
+import { createMeeting, updateMeeting } from "@/lib/actions/meeting-actions";
 import { SortableTopicItem } from "./sortable-topic-item";
 import { SortableActionItem } from "./sortable-action-item";
 
-type TopicFormData = { category: string; title: string; notes: string; sortOrder: number };
-type ActionFormData = { title: string; description: string; dueDate: string };
+type TopicFormData = {
+  id?: string;
+  category: string;
+  title: string;
+  notes: string;
+  sortOrder: number;
+};
+
+type ActionFormData = {
+  id?: string;
+  title: string;
+  description: string;
+  dueDate: string;
+};
+
+type MeetingInitialData = {
+  readonly meetingId: string;
+  readonly date: string;
+  readonly topics: ReadonlyArray<{
+    readonly id: string;
+    readonly category: string;
+    readonly title: string;
+    readonly notes: string;
+    readonly sortOrder: number;
+  }>;
+  readonly actionItems: ReadonlyArray<{
+    readonly id: string;
+    readonly title: string;
+    readonly description: string;
+    readonly dueDate: string;
+    readonly status: string;
+  }>;
+};
 
 type Props = {
   memberId: string;
   initialTopics?: Array<{ category: string; title: string; notes: string; sortOrder: number }>;
+  initialData?: MeetingInitialData;
+  onSuccess?: () => void;
 };
 
 function createEmptyTopic(sortOrder: number): TopicFormData {
@@ -36,15 +69,43 @@ function createEmptyAction(): ActionFormData {
   return { title: "", description: "", dueDate: "" };
 }
 
-export function MeetingForm({ memberId, initialTopics }: Props) {
+export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }: Props) {
   const router = useRouter();
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [topics, setTopics] = useState<TopicFormData[]>(
-    initialTopics && initialTopics.length > 0
-      ? initialTopics.map((t) => ({ ...t, sortOrder: t.sortOrder }))
-      : [createEmptyTopic(0)],
+  const isEditing = !!initialData;
+
+  const [date, setDate] = useState(
+    initialData
+      ? new Date(initialData.date).toISOString().split("T")[0]
+      : new Date().toISOString().split("T")[0],
   );
-  const [actionItems, setActionItems] = useState<ActionFormData[]>([]);
+
+  const [topics, setTopics] = useState<TopicFormData[]>(
+    initialData
+      ? initialData.topics.map((t) => ({
+          id: t.id,
+          category: t.category,
+          title: t.title,
+          notes: t.notes,
+          sortOrder: t.sortOrder,
+        }))
+      : initialTopics && initialTopics.length > 0
+        ? initialTopics.map((t) => ({ ...t }))
+        : [createEmptyTopic(0)],
+  );
+
+  const [actionItems, setActionItems] = useState<ActionFormData[]>(
+    initialData
+      ? initialData.actionItems.map((a) => ({
+          id: a.id,
+          title: a.title,
+          description: a.description,
+          dueDate: a.dueDate,
+        }))
+      : [],
+  );
+
+  const [deletedTopicIds, setDeletedTopicIds] = useState<string[]>([]);
+  const [deletedActionItemIds, setDeletedActionItemIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -55,7 +116,13 @@ export function MeetingForm({ memberId, initialTopics }: Props) {
   }
 
   function removeTopic(index: number) {
-    setTopics((prev) => prev.filter((_, i) => i !== index).map((t, i) => ({ ...t, sortOrder: i })));
+    setTopics((prev) => {
+      const removed = prev[index];
+      if (removed.id) {
+        setDeletedTopicIds((ids) => [...ids, removed.id!]);
+      }
+      return prev.filter((_, i) => i !== index).map((t, i) => ({ ...t, sortOrder: i }));
+    });
   }
 
   function updateTopic(index: number, field: "category" | "title" | "notes", value: string) {
@@ -78,7 +145,13 @@ export function MeetingForm({ memberId, initialTopics }: Props) {
   }
 
   function removeAction(index: number) {
-    setActionItems((prev) => prev.filter((_, i) => i !== index));
+    setActionItems((prev) => {
+      const removed = prev[index];
+      if (removed.id) {
+        setDeletedActionItemIds((ids) => [...ids, removed.id!]);
+      }
+      return prev.filter((_, i) => i !== index);
+    });
   }
 
   function updateAction(index: number, field: "title" | "description" | "dueDate", value: string) {
@@ -105,26 +178,53 @@ export function MeetingForm({ memberId, initialTopics }: Props) {
     const validActions = actionItems.filter((a) => a.title.trim() !== "");
 
     try {
-      const result = await createMeeting({
-        memberId,
-        date: new Date(date).toISOString(),
-        topics: validTopics.map((t) => ({
-          category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
-          title: t.title,
-          notes: t.notes,
-          sortOrder: t.sortOrder,
-        })),
-        actionItems: validActions.map((a) => ({
-          title: a.title,
-          description: a.description,
-          dueDate: a.dueDate || undefined,
-        })),
-      });
-      if (!result.success) {
-        setError(result.error);
-        return;
+      if (isEditing) {
+        const result = await updateMeeting({
+          meetingId: initialData!.meetingId,
+          date: new Date(date).toISOString(),
+          topics: validTopics.map((t) => ({
+            id: t.id,
+            category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
+            title: t.title,
+            notes: t.notes,
+            sortOrder: t.sortOrder,
+          })),
+          actionItems: validActions.map((a) => ({
+            id: a.id,
+            title: a.title,
+            description: a.description,
+            dueDate: a.dueDate || undefined,
+          })),
+          deletedTopicIds,
+          deletedActionItemIds,
+        });
+        if (!result.success) {
+          setError(result.error);
+          return;
+        }
+        onSuccess?.();
+      } else {
+        const result = await createMeeting({
+          memberId,
+          date: new Date(date).toISOString(),
+          topics: validTopics.map((t) => ({
+            category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
+            title: t.title,
+            notes: t.notes,
+            sortOrder: t.sortOrder,
+          })),
+          actionItems: validActions.map((a) => ({
+            title: a.title,
+            description: a.description,
+            dueDate: a.dueDate || undefined,
+          })),
+        });
+        if (!result.success) {
+          setError(result.error);
+          return;
+        }
+        router.push(`/members/${memberId}`);
       }
-      router.push(`/members/${memberId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "予期しないエラーが発生しました");
     } finally {
@@ -220,7 +320,13 @@ export function MeetingForm({ memberId, initialTopics }: Props) {
 
       {error && <p className="text-sm text-destructive">{error}</p>}
       <Button type="submit" disabled={isSubmitting} className="self-start">
-        {isSubmitting ? "保存中..." : "1on1を保存"}
+        {isSubmitting
+          ? isEditing
+            ? "更新中..."
+            : "保存中..."
+          : isEditing
+            ? "1on1を更新"
+            : "1on1を保存"}
       </Button>
     </form>
   );
