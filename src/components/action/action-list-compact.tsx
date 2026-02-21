@@ -1,20 +1,31 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
+import { useState, useOptimistic, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { updateActionItemStatus } from "@/lib/actions/action-item-actions";
+import { updateActionItemStatus, updateActionItem } from "@/lib/actions/action-item-actions";
 import { formatDate } from "@/lib/format";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
-import { useRouter } from "next/navigation";
 
 type ActionItemRow = {
   id: string;
   title: string;
+  description: string;
   status: string;
   dueDate: Date | null;
   meeting: { date: Date };
 };
+
+type EditFormState = {
+  title: string;
+  description: string;
+  dueDate: string;
+};
+
 type Props = { actionItems: ActionItemRow[] };
 
 const statusLabels: Record<string, string> = {
@@ -35,6 +46,12 @@ function nextStatus(current: string): string {
 export function ActionListCompact({ actionItems }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<EditFormState>({
+    title: "",
+    description: "",
+    dueDate: "",
+  });
   const [optimisticItems, setOptimisticItems] = useOptimistic(
     actionItems,
     (currentItems, { id, status }: { id: string; status: string }) =>
@@ -57,21 +74,94 @@ export function ActionListCompact({ actionItems }: Props) {
     });
   }
 
+  function handleEdit(item: ActionItemRow) {
+    setEditingId(item.id);
+    setEditForm({
+      title: item.title,
+      description: item.description,
+      dueDate: item.dueDate ? new Date(item.dueDate).toISOString().split("T")[0] : "",
+    });
+  }
+
+  function handleCancel() {
+    setEditingId(null);
+  }
+
+  function handleSave() {
+    if (!editingId) return;
+    startTransition(async () => {
+      const result = await updateActionItem(editingId, {
+        title: editForm.title,
+        description: editForm.description,
+        dueDate: editForm.dueDate || undefined,
+      });
+      if (result.success) {
+        toast.success(TOAST_MESSAGES.actionItem.updateSuccess);
+        setEditingId(null);
+        router.refresh();
+      } else {
+        toast.error(TOAST_MESSAGES.actionItem.updateError);
+      }
+    });
+  }
+
   return (
     <div className={`flex flex-col gap-2 ${isPending ? "opacity-80" : ""}`}>
-      {optimisticItems.map((item) => (
-        <div key={item.id} className="flex items-center justify-between p-2 border rounded">
-          <div className="flex items-center gap-2">
-            <button onClick={() => cycleStatus(item.id, item.status)}>
-              <Badge variant={statusColors[item.status]}>{statusLabels[item.status]}</Badge>
-            </button>
-            <span className="text-sm">{item.title}</span>
+      {optimisticItems.map((item) =>
+        editingId === item.id ? (
+          <div key={item.id} className="flex flex-col gap-2 p-2 border rounded">
+            <div className="flex flex-col gap-2">
+              <Input
+                value={editForm.title}
+                onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                placeholder="タイトル"
+              />
+              <Input
+                value={editForm.description}
+                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                placeholder="説明"
+              />
+              <Input
+                type="date"
+                value={editForm.dueDate}
+                onChange={(e) => setEditForm({ ...editForm, dueDate: e.target.value })}
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" size="sm" onClick={handleCancel}>
+                キャンセル
+              </Button>
+              <Button size="sm" onClick={handleSave} disabled={!editForm.title.trim()}>
+                保存
+              </Button>
+            </div>
           </div>
-          {item.dueDate && (
-            <span className="text-xs text-muted-foreground">期限: {formatDate(item.dueDate)}</span>
-          )}
-        </div>
-      ))}
+        ) : (
+          <div key={item.id} className="flex items-center justify-between p-2 border rounded">
+            <div className="flex items-center gap-2">
+              <button onClick={() => cycleStatus(item.id, item.status)}>
+                <Badge variant={statusColors[item.status]}>{statusLabels[item.status]}</Badge>
+              </button>
+              <span className="text-sm">{item.title}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {item.dueDate && (
+                <span className="text-xs text-muted-foreground">
+                  期限: {formatDate(item.dueDate)}
+                </span>
+              )}
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                aria-label="編集"
+                onClick={() => handleEdit(item)}
+              >
+                <Pencil />
+              </Button>
+            </div>
+          </div>
+        ),
+      )}
     </div>
   );
 }

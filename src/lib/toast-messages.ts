@@ -18,5 +18,7 @@ export const TOAST_MESSAGES = {
   actionItem: {
     statusChangeSuccess: "ステータスを更新しました",
     statusChangeError: "ステータスの更新に失敗しました",
+    updateSuccess: "アクションアイテムを更新しました",
+    updateError: "アクションアイテムの更新に失敗しました",
   },
 } as const;
