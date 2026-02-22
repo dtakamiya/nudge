@@ -137,3 +137,77 @@ export async function getMemberActionTrends(memberId: string): Promise<ActionTre
     monthlyTrends,
   };
 }
+
+export type MeetingFrequencyMonth = {
+  month: string;
+  count: number;
+};
+
+export async function getMeetingFrequencyByMonth(): Promise<MeetingFrequencyMonth[]> {
+  const twelveMonthsAgo = new Date();
+  twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+
+  const meetings = await prisma.meeting.findMany({
+    where: { date: { gte: twelveMonthsAgo } },
+    select: { date: true },
+    orderBy: { date: "asc" },
+  });
+
+  const monthMap = new Map<string, number>();
+  for (const meeting of meetings) {
+    const d = new Date(meeting.date);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    monthMap.set(key, (monthMap.get(key) ?? 0) + 1);
+  }
+
+  return Array.from(monthMap.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([month, count]) => ({ month, count }));
+}
+
+export type RecommendedMeeting = {
+  id: string;
+  name: string;
+  department: string | null;
+  position: string | null;
+  daysSinceLast: number;
+  lastMeetingDate: Date | null;
+};
+
+export async function getRecommendedMeetings(): Promise<RecommendedMeeting[]> {
+  const fourteenDaysAgo = new Date();
+  fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+  const now = new Date();
+
+  const members = await prisma.member.findMany({
+    include: {
+      meetings: {
+        orderBy: { date: "desc" },
+        take: 1,
+        select: { date: true },
+      },
+    },
+  });
+
+  return members
+    .filter((m) => {
+      const lastDate = m.meetings[0]?.date ?? null;
+      if (!lastDate) return true;
+      return new Date(lastDate) < fourteenDaysAgo;
+    })
+    .map((m) => {
+      const lastDate = m.meetings[0]?.date ?? null;
+      const daysSinceLast = lastDate
+        ? Math.floor((now.getTime() - new Date(lastDate).getTime()) / (1000 * 60 * 60 * 24))
+        : 9999;
+      return {
+        id: m.id,
+        name: m.name,
+        department: m.department,
+        position: m.position,
+        daysSinceLast,
+        lastMeetingDate: lastDate ? new Date(lastDate) : null,
+      };
+    })
+    .sort((a, b) => b.daysSinceLast - a.daysSinceLast);
+}

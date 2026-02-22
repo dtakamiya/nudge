@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { getMemberActionTrends } from "../analytics-actions";
+import {
+  getMemberActionTrends,
+  getMeetingFrequencyByMonth,
+  getRecommendedMeetings,
+} from "../analytics-actions";
 import { createMember } from "../member-actions";
 
 beforeEach(async () => {
@@ -135,5 +139,82 @@ describe("getMemberActionTrends", () => {
     const febData = result.monthlyTrends.find((m) => m.month === "2026-02");
     expect(febData?.created).toBe(3);
     expect(febData?.completed).toBe(2);
+  });
+});
+
+describe("getMeetingFrequencyByMonth", () => {
+  it("returns empty array when no meetings exist", async () => {
+    const result = await getMeetingFrequencyByMonth();
+    expect(result).toEqual([]);
+  });
+
+  it("aggregates meeting counts by month", async () => {
+    const member = await createMember({ name: "Test", department: undefined, position: undefined });
+    if (!member.success) throw new Error("Member creation failed");
+
+    await prisma.meeting.createMany({
+      data: [
+        { memberId: member.data.id, date: new Date("2026-01-10T10:00:00Z") },
+        { memberId: member.data.id, date: new Date("2026-01-20T10:00:00Z") },
+        { memberId: member.data.id, date: new Date("2026-02-05T10:00:00Z") },
+      ],
+    });
+
+    const result = await getMeetingFrequencyByMonth();
+    const jan = result.find((r) => r.month === "2026-01");
+    const feb = result.find((r) => r.month === "2026-02");
+    expect(jan?.count).toBe(2);
+    expect(feb?.count).toBe(1);
+  });
+});
+
+describe("getRecommendedMeetings", () => {
+  it("returns members with no meetings", async () => {
+    const member = await createMember({
+      name: "NoMeeting",
+      department: undefined,
+      position: undefined,
+    });
+    if (!member.success) throw new Error();
+
+    const result = await getRecommendedMeetings();
+    const found = result.find((r) => r.id === member.data.id);
+    expect(found).toBeDefined();
+    expect(found?.lastMeetingDate).toBeNull();
+  });
+
+  it("returns members whose last meeting was over 14 days ago", async () => {
+    const member = await createMember({
+      name: "OldMeeting",
+      department: undefined,
+      position: undefined,
+    });
+    if (!member.success) throw new Error();
+
+    const oldDate = new Date();
+    oldDate.setDate(oldDate.getDate() - 20);
+    await prisma.meeting.create({ data: { memberId: member.data.id, date: oldDate } });
+
+    const result = await getRecommendedMeetings();
+    const found = result.find((r) => r.id === member.data.id);
+    expect(found).toBeDefined();
+    expect(found!.daysSinceLast).toBeGreaterThanOrEqual(20);
+  });
+
+  it("excludes members with recent meetings (within 14 days)", async () => {
+    const member = await createMember({
+      name: "RecentMeeting",
+      department: undefined,
+      position: undefined,
+    });
+    if (!member.success) throw new Error();
+
+    const recentDate = new Date();
+    recentDate.setDate(recentDate.getDate() - 5);
+    await prisma.meeting.create({ data: { memberId: member.data.id, date: recentDate } });
+
+    const result = await getRecommendedMeetings();
+    const found = result.find((r) => r.id === member.data.id);
+    expect(found).toBeUndefined();
   });
 });
