@@ -5,23 +5,27 @@ import {
   getUpcomingActions,
 } from "@/lib/actions/dashboard-actions";
 import { getRecommendedMeetings } from "@/lib/actions/analytics-actions";
+import { getOverdueReminders } from "@/lib/actions/reminder-actions";
 import { MemberList } from "@/components/member/member-list";
 import { DashboardSummary } from "@/components/dashboard/dashboard-summary";
 import { RecentActivityFeed } from "@/components/dashboard/recent-activity-feed";
 import { UpcomingActionsSection } from "@/components/dashboard/upcoming-actions-section";
 import { RecommendedMeetingsSection } from "@/components/dashboard/recommended-meetings-section";
+import { ReminderAlertBanner } from "@/components/dashboard/reminder-alert-banner";
+import { BrowserNotification } from "@/components/dashboard/browser-notification";
 import { OnboardingCard } from "@/components/dashboard/onboarding-card";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const [members, summary, recentActivity, upcomingActions, recommendedMeetings] =
+  const [members, summary, recentActivity, upcomingActions, recommendedMeetings, overdueReminders] =
     await Promise.all([
       getMembers(),
       getDashboardSummary(),
       getRecentActivity(),
       getUpcomingActions(),
       getRecommendedMeetings(),
+      getOverdueReminders(),
     ]);
 
   const isFirstTime = members.length === 0;
@@ -29,6 +33,9 @@ export default async function DashboardPage() {
   return (
     <div className="animate-fade-in-up">
       <h1 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">ダッシュボード</h1>
+
+      {!isFirstTime && <ReminderAlertBanner reminders={overdueReminders} />}
+      {!isFirstTime && <BrowserNotification reminders={overdueReminders} />}
 
       {isFirstTime ? <OnboardingCard /> : <DashboardSummary summary={summary} />}
 
