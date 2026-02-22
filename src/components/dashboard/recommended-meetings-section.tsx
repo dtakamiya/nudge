@@ -1,12 +1,19 @@
 import Link from "next/link";
+import { Heart } from "lucide-react";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { RecommendedMeeting } from "@/lib/actions/analytics-actions";
 
 export function RecommendedMeetingsSection({ members }: { members: RecommendedMeeting[] }) {
   if (members.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground text-center py-6">全員と最近1on1を実施済みです</p>
+      <EmptyState
+        icon={Heart}
+        title="全員と最近1on1を実施済みです"
+        description="引き続き定期的な1on1でチームをサポートしましょう"
+        size="compact"
+      />
     );
   }
 

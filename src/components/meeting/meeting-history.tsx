@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { CATEGORY_LABELS } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 
@@ -16,7 +18,14 @@ type Props = { meetings: MeetingSummary[]; memberId: string };
 
 export function MeetingHistory({ meetings, memberId }: Props) {
   if (meetings.length === 0) {
-    return <p className="text-muted-foreground py-4">まだ1on1の記録がありません</p>;
+    return (
+      <EmptyState
+        icon={MessageSquare}
+        title="まだ1on1の記録がありません"
+        description="最初の1on1を記録して、継続的なフォローアップを始めましょう"
+        action={{ label: "1on1を記録する", href: `/members/${memberId}/meetings/new` }}
+      />
+    );
   }
   return (
     <div className="flex flex-col gap-3">

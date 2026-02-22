@@ -1,6 +1,7 @@
 "use client";
 
-import { Copy } from "lucide-react";
+import { CalendarDays, Copy } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +23,9 @@ type Props = {
 
 export function PastMeetingsAccordion({ meetings, onCopyTopic }: Props) {
   if (meetings.length === 0) {
-    return <p className="text-sm text-muted-foreground">過去のミーティング記録はありません</p>;
+    return (
+      <EmptyState icon={CalendarDays} title="過去のミーティング記録はありません" size="compact" />
+    );
   }
 
   return (

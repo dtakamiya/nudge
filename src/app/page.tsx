@@ -10,6 +10,7 @@ import { DashboardSummary } from "@/components/dashboard/dashboard-summary";
 import { RecentActivityFeed } from "@/components/dashboard/recent-activity-feed";
 import { UpcomingActionsSection } from "@/components/dashboard/upcoming-actions-section";
 import { RecommendedMeetingsSection } from "@/components/dashboard/recommended-meetings-section";
+import { OnboardingCard } from "@/components/dashboard/onboarding-card";
 
 export const dynamic = "force-dynamic";
 
@@ -23,10 +24,13 @@ export default async function DashboardPage() {
       getRecommendedMeetings(),
     ]);
 
+  const isFirstTime = members.length === 0;
+
   return (
     <div className="animate-fade-in-up">
       <h1 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">ダッシュボード</h1>
-      <DashboardSummary summary={summary} />
+
+      {isFirstTime ? <OnboardingCard /> : <DashboardSummary summary={summary} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div className="lg:col-span-2 rounded-xl border bg-card p-5">

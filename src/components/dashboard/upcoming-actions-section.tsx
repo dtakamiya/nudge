@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Clock, AlertCircle } from "lucide-react";
+import { CalendarCheck, Clock, AlertCircle } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Badge } from "@/components/ui/badge";
 import type { ActionItemWithMember } from "@/lib/actions/dashboard-actions";
 import { formatDate } from "@/lib/format";
@@ -48,9 +49,7 @@ export function UpcomingActionsSection({ today, thisWeek }: Props) {
 
   if (!hasAny) {
     return (
-      <p className="text-sm text-muted-foreground text-center py-6">
-        今週の期限アクションはありません
-      </p>
+      <EmptyState icon={CalendarCheck} title="今週の期限アクションはありません" size="compact" />
     );
   }
 
