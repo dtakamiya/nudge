@@ -1,3 +1,5 @@
+export const MEETINGS_PAGE_SIZE = 10;
+
 export const CATEGORY_LABELS: Record<string, string> = {
   WORK_PROGRESS: "業務進捗",
   CAREER: "キャリア",
