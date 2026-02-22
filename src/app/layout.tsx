@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { Noto_Sans_JP } from "next/font/google";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/layout/sidebar";
+import { KeyboardShortcutProvider } from "@/components/layout/keyboard-shortcut-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -47,6 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="max-w-5xl mx-auto">{children}</div>
         </main>
         <Toaster />
+        <KeyboardShortcutProvider members={members} />
       </body>
     </html>
   );
