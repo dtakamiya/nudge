@@ -11,6 +11,8 @@ import { MemberEditDialog } from "@/components/member/member-edit-dialog";
 import { MemberDeleteDialog } from "@/components/member/member-delete-dialog";
 import { TopicAnalyticsSection } from "@/components/analytics/topic-analytics-section";
 import { ActionAnalyticsSection } from "@/components/analytics/action-analytics-section";
+import { MemberStatsBar } from "@/components/member/member-stats-bar";
+import { MemberQuickActions } from "@/components/member/member-quick-actions";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -20,6 +22,11 @@ export default async function MemberDetailPage({ params }: Props) {
   if (!member) {
     notFound();
   }
+
+  const lastMeetingDate = member.meetings[0]?.date ?? null;
+  const totalMeetingCount = member.meetings.length;
+  const pendingActionItems = member.actionItems.filter((a) => a.status !== "DONE");
+
   return (
     <div className="animate-fade-in-up">
       <Breadcrumb items={[{ label: "ダッシュボード", href: "/" }, { label: member.name }]} />
@@ -52,8 +59,16 @@ export default async function MemberDetailPage({ params }: Props) {
         </div>
       </div>
 
+      <MemberStatsBar
+        lastMeetingDate={lastMeetingDate}
+        totalMeetingCount={totalMeetingCount}
+        pendingActionCount={pendingActionItems.length}
+      />
+
       <TopicAnalyticsSection memberId={id} />
       <ActionAnalyticsSection memberId={id} />
+
+      <MemberQuickActions pendingActionItems={pendingActionItems} />
 
       <h2 className="text-lg font-semibold tracking-tight mb-3 text-foreground mt-8">1on1履歴</h2>
       <MeetingHistory meetings={member.meetings} memberId={id} />
