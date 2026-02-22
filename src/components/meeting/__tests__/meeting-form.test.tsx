@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -54,6 +54,16 @@ vi.mock("@dnd-kit/sortable", () => ({
   }),
 }));
 
+// Mock IcebreakerCard to avoid random messages in tests
+vi.mock("../icebreaker-card", () => ({
+  IcebreakerCard: () => <div data-testid="icebreaker-card">Icebreaker</div>,
+}));
+
+// Mock checkin-messages to return deterministic value
+vi.mock("@/lib/checkin-messages", () => ({
+  getRandomCheckinMessage: () => "今日の調子はどうですか？",
+}));
+
 describe("MeetingForm", () => {
   afterEach(() => cleanup());
 
@@ -94,7 +104,34 @@ describe("MeetingForm", () => {
     expect(inputs).toHaveLength(2);
   });
 
-  it("shows success toast on create", async () => {
+  it("renders CheckinSection in the form", () => {
+    render(<MeetingForm memberId="m1" />);
+    expect(screen.getByText("チェックイン")).toBeTruthy();
+    expect(screen.getByTestId("icebreaker-card")).toBeTruthy();
+  });
+
+  it("renders condition selector buttons in CheckinSection", () => {
+    render(<MeetingForm memberId="m1" />);
+    // Condition selector has buttons with aria-label for each axis
+    const healthButtons = screen.getAllByRole("button", { name: /体調:/ });
+    expect(healthButtons.length).toBeGreaterThan(0);
+  });
+
+  it("shows ClosingDialog when form is submitted", async () => {
+    const user = userEvent.setup();
+    render(<MeetingForm memberId="m1" />);
+
+    const titleInput = screen.getByPlaceholderText("話題のタイトル");
+    await user.type(titleInput, "テスト話題");
+    await user.click(screen.getByRole("button", { name: "1on1を保存" }));
+
+    // ClosingDialog should appear
+    await waitFor(() => {
+      expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
+    });
+  });
+
+  it("calls createMeeting when ClosingDialog confirm button is clicked", async () => {
     const { createMeeting } = await import("@/lib/actions/meeting-actions");
     const mockCreate = vi.mocked(createMeeting);
     mockCreate.mockResolvedValue({ success: true, data: {} as never });
@@ -106,11 +143,46 @@ describe("MeetingForm", () => {
     await user.type(titleInput, "テスト話題");
     await user.click(screen.getByRole("button", { name: "1on1を保存" }));
 
-    expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.meeting.createSuccess);
+    // Wait for dialog to appear
+    await waitFor(() => {
+      expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
+    });
+
+    // Click save button in dialog (アクション未設定時は「このまま保存」)
+    const saveButton = screen.getByRole("button", { name: /このまま保存|保存する/ });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(mockCreate).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("shows success toast on create after ClosingDialog confirm", async () => {
+    const { createMeeting } = await import("@/lib/actions/meeting-actions");
+    const mockCreate = vi.mocked(createMeeting);
+    mockCreate.mockResolvedValue({ success: true, data: {} as never });
+
+    const user = userEvent.setup();
+    render(<MeetingForm memberId="m1" />);
+
+    const titleInput = screen.getByPlaceholderText("話題のタイトル");
+    await user.type(titleInput, "テスト話題");
+    await user.click(screen.getByRole("button", { name: "1on1を保存" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
+    });
+
+    const saveButton = screen.getByRole("button", { name: /このまま保存|保存する/ });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.meeting.createSuccess);
+    });
     expect(mockPush).toHaveBeenCalledWith("/members/m1");
   });
 
-  it("shows error toast on create failure", async () => {
+  it("shows error toast on create failure after ClosingDialog confirm", async () => {
     const { createMeeting } = await import("@/lib/actions/meeting-actions");
     const mockCreate = vi.mocked(createMeeting);
     mockCreate.mockResolvedValue({ success: false, error: "保存エラー" });
@@ -122,7 +194,16 @@ describe("MeetingForm", () => {
     await user.type(titleInput, "テスト話題");
     await user.click(screen.getByRole("button", { name: "1on1を保存" }));
 
-    expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.meeting.createError);
+    await waitFor(() => {
+      expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
+    });
+
+    const saveButton = screen.getByRole("button", { name: /このまま保存|保存する/ });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.meeting.createError);
+    });
   });
 
   it("renders drag handles for action items after adding", async () => {
@@ -139,6 +220,10 @@ describe("MeetingForm (edit mode)", () => {
   const mockInitialData = {
     meetingId: "meeting-1",
     date: "2026-02-20T10:00:00.000Z",
+    conditionHealth: 4,
+    conditionMood: 3,
+    conditionWorkload: 2,
+    checkinNote: "体調良好",
     topics: [
       {
         id: "topic-1",
@@ -183,7 +268,23 @@ describe("MeetingForm (edit mode)", () => {
     expect(screen.getByRole("button", { name: "1on1を保存" })).toBeTruthy();
   });
 
-  it("calls updateMeeting on form submit in edit mode", async () => {
+  it("pre-fills checkinNote from initialData", () => {
+    render(<MeetingForm memberId="m1" initialData={mockInitialData} />);
+    const textarea = screen.getByPlaceholderText("気になることや共有したいことを入力...");
+    expect(textarea).toHaveProperty("value", "体調良好");
+  });
+
+  it("shows ClosingDialog when update form is submitted", async () => {
+    const user = userEvent.setup();
+    render(<MeetingForm memberId="m1" initialData={mockInitialData} />);
+    await user.click(screen.getByRole("button", { name: "1on1を更新" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
+    });
+  });
+
+  it("calls updateMeeting after ClosingDialog confirm in edit mode", async () => {
     const { updateMeeting } = await import("@/lib/actions/meeting-actions");
     const mockUpdate = vi.mocked(updateMeeting);
     mockUpdate.mockResolvedValue({ success: true, data: {} as never });
@@ -193,15 +294,29 @@ describe("MeetingForm (edit mode)", () => {
     render(<MeetingForm memberId="m1" initialData={mockInitialData} onSuccess={onSuccess} />);
 
     await user.click(screen.getByRole("button", { name: "1on1を更新" }));
-    expect(mockUpdate).toHaveBeenCalledTimes(1);
+
+    await waitFor(() => {
+      expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
+    });
+
+    const saveButton = screen.getByRole("button", { name: /保存する/ });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(mockUpdate).toHaveBeenCalledTimes(1);
+    });
     expect(mockUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
         meetingId: "meeting-1",
+        conditionHealth: 4,
+        conditionMood: 3,
+        conditionWorkload: 2,
+        checkinNote: "体調良好",
       }),
     );
   });
 
-  it("calls onSuccess and shows toast after successful update", async () => {
+  it("calls onSuccess and shows toast after successful update via ClosingDialog", async () => {
     const { updateMeeting } = await import("@/lib/actions/meeting-actions");
     const mockUpdate = vi.mocked(updateMeeting);
     mockUpdate.mockResolvedValue({ success: true, data: {} as never });
@@ -211,11 +326,21 @@ describe("MeetingForm (edit mode)", () => {
     render(<MeetingForm memberId="m1" initialData={mockInitialData} onSuccess={onSuccess} />);
 
     await user.click(screen.getByRole("button", { name: "1on1を更新" }));
-    expect(onSuccess).toHaveBeenCalledTimes(1);
+
+    await waitFor(() => {
+      expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
+    });
+
+    const saveButton = screen.getByRole("button", { name: /保存する/ });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalledTimes(1);
+    });
     expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.meeting.updateSuccess);
   });
 
-  it("shows error toast when update fails", async () => {
+  it("shows error toast when update fails via ClosingDialog", async () => {
     const { updateMeeting } = await import("@/lib/actions/meeting-actions");
     const mockUpdate = vi.mocked(updateMeeting);
     mockUpdate.mockResolvedValue({ success: false, error: "更新エラー" });
@@ -224,7 +349,17 @@ describe("MeetingForm (edit mode)", () => {
     render(<MeetingForm memberId="m1" initialData={mockInitialData} />);
 
     await user.click(screen.getByRole("button", { name: "1on1を更新" }));
-    expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.meeting.updateError);
+
+    await waitFor(() => {
+      expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
+    });
+
+    const saveButton = screen.getByRole("button", { name: /保存する/ });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.meeting.updateError);
+    });
   });
 
   it("adds new topic in edit mode", async () => {
@@ -249,10 +384,20 @@ describe("MeetingForm (edit mode)", () => {
     await user.click(deleteButtons[1]); // second topic delete button
 
     await user.click(screen.getByRole("button", { name: "1on1を更新" }));
-    expect(mockUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        deletedTopicIds: ["topic-2"],
-      }),
-    );
+
+    await waitFor(() => {
+      expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
+    });
+
+    const saveButton = screen.getByRole("button", { name: /保存する/ });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(mockUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          deletedTopicIds: ["topic-2"],
+        }),
+      );
+    });
   });
 });

@@ -22,6 +22,9 @@ import { createMeeting, updateMeeting } from "@/lib/actions/meeting-actions";
 import { createAnnouncements, screenReaderInstructions } from "@/lib/dnd-accessibility";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
+import { CheckinSection } from "./checkin-section";
+import { ClosingDialog } from "./closing-dialog";
+import { type ConditionField } from "./condition-selector";
 import { MoodSelector } from "./mood-selector";
 import type { TagData } from "./sortable-action-item";
 import { SortableActionItem } from "./sortable-action-item";
@@ -49,6 +52,10 @@ type MeetingInitialData = {
   readonly meetingId: string;
   readonly date: string;
   readonly mood?: number | null;
+  readonly conditionHealth?: number | null;
+  readonly conditionMood?: number | null;
+  readonly conditionWorkload?: number | null;
+  readonly checkinNote?: string;
   readonly topics: ReadonlyArray<{
     readonly id: string;
     readonly category: string;
@@ -81,6 +88,12 @@ function createEmptyTopic(sortOrder: number): TopicFormData {
 
 function createEmptyAction(sortOrder: number): ActionFormData {
   return { title: "", description: "", sortOrder, dueDate: "", tags: [] };
+}
+
+function buildTagParams(tags: TagData[]) {
+  const tagIds = tags.filter((t) => t.id).map((t) => t.id!);
+  const newTagNames = tags.filter((t) => !t.id).map((t) => t.name);
+  return { tagIds, newTagNames };
 }
 
 export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }: Props) {
@@ -122,14 +135,32 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
   );
 
   const [mood, setMood] = useState<number | null>(initialData?.mood ?? null);
+  const [conditionHealth, setConditionHealth] = useState<number | null>(
+    initialData?.conditionHealth ?? null,
+  );
+  const [conditionMood, setConditionMood] = useState<number | null>(
+    initialData?.conditionMood ?? null,
+  );
+  const [conditionWorkload, setConditionWorkload] = useState<number | null>(
+    initialData?.conditionWorkload ?? null,
+  );
+  const [checkinNote, setCheckinNote] = useState(initialData?.checkinNote ?? "");
+
   const [deletedTopicIds, setDeletedTopicIds] = useState<string[]>([]);
   const [deletedActionItemIds, setDeletedActionItemIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showClosingDialog, setShowClosingDialog] = useState(false);
 
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor));
   const topicAnnouncements = useMemo(() => createAnnouncements("話題"), []);
   const actionAnnouncements = useMemo(() => createAnnouncements("アクション"), []);
+
+  function handleConditionChange(field: ConditionField, value: number | null) {
+    if (field === "conditionHealth") setConditionHealth(value);
+    else if (field === "conditionMood") setConditionMood(value);
+    else setConditionWorkload(value);
+  }
 
   function addTopic() {
     setTopics((prev) => [...prev, createEmptyTopic(prev.length)]);
@@ -197,14 +228,7 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
     });
   }
 
-  function buildTagParams(tags: TagData[]) {
-    const tagIds = tags.filter((t) => t.id).map((t) => t.id!);
-    const newTagNames = tags.filter((t) => !t.id).map((t) => t.name);
-    return { tagIds, newTagNames };
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function executeSave() {
     setError(null);
     setIsSubmitting(true);
 
@@ -217,6 +241,10 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
           meetingId: initialData!.meetingId,
           date: new Date(date).toISOString(),
           mood,
+          conditionHealth,
+          conditionMood,
+          conditionWorkload,
+          checkinNote,
           topics: validTopics.map((t) => ({
             id: t.id,
             category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
@@ -248,6 +276,10 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
           memberId,
           date: new Date(date).toISOString(),
           mood,
+          conditionHealth,
+          conditionMood,
+          conditionWorkload,
+          checkinNote,
           topics: validTopics.map((t) => ({
             category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
             title: t.title,
@@ -280,122 +312,163 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
     }
   }
 
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setShowClosingDialog(true);
+  }
+
+  async function handleClosingConfirm() {
+    setShowClosingDialog(false);
+    await executeSave();
+  }
+
   const topicIds = topics.map((_, i) => `topic-${i}`);
   const actionIds = actionItems.map((_, i) => `action-${i}`);
 
+  const validTopicCount = topics.filter((t) => t.title.trim() !== "").length;
+  const validActionCount = actionItems.filter((a) => a.title.trim() !== "").length;
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="date">日付 *</Label>
-        <Input
-          id="date"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
+    <>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="date">日付 *</Label>
+          <Input
+            id="date"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
+        </div>
+
+        <CheckinSection
+          conditionHealth={conditionHealth}
+          conditionMood={conditionMood}
+          conditionWorkload={conditionWorkload}
+          checkinNote={checkinNote}
+          onConditionChange={handleConditionChange}
+          onCheckinNoteChange={setCheckinNote}
         />
-      </div>
 
-      <div className="flex flex-col gap-2">
-        <Label>ミーティングの雰囲気</Label>
-        <MoodSelector value={mood} onChange={setMood} />
-        {mood && (
-          <p className="text-xs text-muted-foreground">選択をもう一度クリックすると解除できます</p>
-        )}
-      </div>
-
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-sm font-medium">話題</CardTitle>
-            <Button type="button" variant="outline" size="sm" onClick={addTopic}>
-              + 話題を追加
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleTopicDragEnd}
-            accessibility={{
-              announcements: topicAnnouncements,
-              screenReaderInstructions,
-            }}
-          >
-            <SortableContext items={topicIds} strategy={verticalListSortingStrategy}>
-              {topics.map((topic, index) => (
-                <SortableTopicItem
-                  key={`topic-${index}`}
-                  id={`topic-${index}`}
-                  category={topic.category}
-                  title={topic.title}
-                  notes={topic.notes}
-                  index={index}
-                  showDelete={topics.length > 1}
-                  tags={topic.tags}
-                  onTagsChange={updateTopicTags}
-                  onUpdate={updateTopic}
-                  onRemove={removeTopic}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-sm font-medium">アクションアイテム</CardTitle>
-            <Button type="button" variant="outline" size="sm" onClick={addAction}>
-              + アクション追加
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          {actionItems.length === 0 && (
-            <p className="text-sm text-muted-foreground">アクションはまだありません</p>
+        <div className="flex flex-col gap-2">
+          <Label>ミーティングの雰囲気</Label>
+          <MoodSelector value={mood} onChange={setMood} />
+          {mood && (
+            <p className="text-xs text-muted-foreground">
+              選択をもう一度クリックすると解除できます
+            </p>
           )}
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleActionDragEnd}
-            accessibility={{
-              announcements: actionAnnouncements,
-              screenReaderInstructions,
-            }}
-          >
-            <SortableContext items={actionIds} strategy={verticalListSortingStrategy}>
-              {actionItems.map((action, index) => (
-                <SortableActionItem
-                  key={`action-${index}`}
-                  id={`action-${index}`}
-                  title={action.title}
-                  description={action.description}
-                  dueDate={action.dueDate}
-                  index={index}
-                  tags={action.tags}
-                  onTagsChange={updateActionTags}
-                  onUpdate={updateAction}
-                  onRemove={removeAction}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
-        </CardContent>
-      </Card>
+        </div>
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" disabled={isSubmitting} className="self-start">
-        {isSubmitting
-          ? isEditing
-            ? "更新中..."
-            : "保存中..."
-          : isEditing
-            ? "1on1を更新"
-            : "1on1を保存"}
-      </Button>
-    </form>
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-sm font-medium">話題</CardTitle>
+              <Button type="button" variant="outline" size="sm" onClick={addTopic}>
+                + 話題を追加
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleTopicDragEnd}
+              accessibility={{
+                announcements: topicAnnouncements,
+                screenReaderInstructions,
+              }}
+            >
+              <SortableContext items={topicIds} strategy={verticalListSortingStrategy}>
+                {topics.map((topic, index) => (
+                  <SortableTopicItem
+                    key={`topic-${index}`}
+                    id={`topic-${index}`}
+                    category={topic.category}
+                    title={topic.title}
+                    notes={topic.notes}
+                    index={index}
+                    showDelete={topics.length > 1}
+                    tags={topic.tags}
+                    onTagsChange={updateTopicTags}
+                    onUpdate={updateTopic}
+                    onRemove={removeTopic}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-sm font-medium">アクションアイテム</CardTitle>
+              <Button type="button" variant="outline" size="sm" onClick={addAction}>
+                + アクション追加
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            {actionItems.length === 0 && (
+              <p className="text-sm text-muted-foreground">アクションはまだありません</p>
+            )}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleActionDragEnd}
+              accessibility={{
+                announcements: actionAnnouncements,
+                screenReaderInstructions,
+              }}
+            >
+              <SortableContext items={actionIds} strategy={verticalListSortingStrategy}>
+                {actionItems.map((action, index) => (
+                  <SortableActionItem
+                    key={`action-${index}`}
+                    id={`action-${index}`}
+                    title={action.title}
+                    description={action.description}
+                    dueDate={action.dueDate}
+                    index={index}
+                    tags={action.tags}
+                    onTagsChange={updateActionTags}
+                    onUpdate={updateAction}
+                    onRemove={removeAction}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          </CardContent>
+        </Card>
+
+        {error && <p className="text-sm text-destructive">{error}</p>}
+        <Button type="submit" disabled={isSubmitting} className="self-start">
+          {isSubmitting
+            ? isEditing
+              ? "更新中..."
+              : "保存中..."
+            : isEditing
+              ? "1on1を更新"
+              : "1on1を保存"}
+        </Button>
+      </form>
+
+      <ClosingDialog
+        open={showClosingDialog}
+        onOpenChange={setShowClosingDialog}
+        onConfirm={handleClosingConfirm}
+        summaryProps={{
+          date,
+          conditionHealth,
+          conditionMood,
+          conditionWorkload,
+          checkinNote,
+          topicCount: validTopicCount,
+          actionItemCount: validActionCount,
+        }}
+      />
+    </>
   );
 }

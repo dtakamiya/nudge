@@ -26,12 +26,40 @@ type ActionItem = {
 type Props = {
   date: Date;
   mood?: number | null;
+  conditionHealth?: number | null;
+  conditionMood?: number | null;
+  conditionWorkload?: number | null;
+  checkinNote?: string | null;
   topics: Topic[];
   actionItems: ActionItem[];
 };
 
-export function MeetingDetail({ date, mood, topics, actionItems }: Props) {
+const MAX_CONDITION = 5;
+
+function ConditionBar({ value }: { value: number }) {
+  const filled = "●".repeat(value);
+  const empty = "○".repeat(MAX_CONDITION - value);
+  return (
+    <span className="font-mono text-sm">
+      {filled}
+      {empty}（{value}/{MAX_CONDITION}）
+    </span>
+  );
+}
+
+export function MeetingDetail({
+  date,
+  mood,
+  conditionHealth,
+  conditionMood,
+  conditionWorkload,
+  checkinNote,
+  topics,
+  actionItems,
+}: Props) {
   const moodOption = getMoodOption(mood);
+  const hasAnyCondition =
+    conditionHealth != null || conditionMood != null || conditionWorkload != null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -47,6 +75,41 @@ export function MeetingDetail({ date, mood, topics, actionItems }: Props) {
           </span>
         )}
       </div>
+
+      {(hasAnyCondition || checkinNote) && (
+        <div className="flex flex-col gap-2">
+          <h2 className="text-lg font-semibold tracking-tight">チェックイン</h2>
+          {hasAnyCondition && (
+            <div className="flex flex-col gap-1 text-sm">
+              {conditionHealth != null && (
+                <div className="flex items-center gap-2">
+                  <span className="w-20 text-muted-foreground">体調🏥:</span>
+                  <ConditionBar value={conditionHealth} />
+                </div>
+              )}
+              {conditionMood != null && (
+                <div className="flex items-center gap-2">
+                  <span className="w-20 text-muted-foreground">気分😊:</span>
+                  <ConditionBar value={conditionMood} />
+                </div>
+              )}
+              {conditionWorkload != null && (
+                <div className="flex items-center gap-2">
+                  <span className="w-20 text-muted-foreground">業務量📋:</span>
+                  <ConditionBar value={conditionWorkload} />
+                </div>
+              )}
+            </div>
+          )}
+          {checkinNote && (
+            <div className="flex flex-col gap-1">
+              <p className="text-sm text-muted-foreground">チェックインメモ</p>
+              <p className="text-sm whitespace-pre-wrap">{checkinNote}</p>
+            </div>
+          )}
+        </div>
+      )}
+
       <div>
         <h2 className="text-lg font-semibold tracking-tight mb-3">話題</h2>
         {topics.length === 0 ? (

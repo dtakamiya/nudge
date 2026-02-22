@@ -42,6 +42,10 @@ type Props = {
   readonly memberId: string;
   readonly date: Date;
   readonly mood?: number | null;
+  readonly conditionHealth?: number | null;
+  readonly conditionMood?: number | null;
+  readonly conditionWorkload?: number | null;
+  readonly checkinNote?: string | null;
   readonly topics: ReadonlyArray<Topic>;
   readonly actionItems: ReadonlyArray<ActionItem>;
 };
@@ -51,6 +55,10 @@ export function MeetingDetailPageClient({
   memberId,
   date,
   mood,
+  conditionHealth,
+  conditionMood,
+  conditionWorkload,
+  checkinNote,
   topics,
   actionItems,
 }: Props) {
@@ -77,6 +85,10 @@ export function MeetingDetailPageClient({
             meetingId,
             date: date.toISOString(),
             mood,
+            conditionHealth,
+            conditionMood,
+            conditionWorkload,
+            checkinNote: checkinNote ?? "",
             topics: topics.map((t) => ({
               id: t.id,
               category: t.category,
@@ -109,7 +121,16 @@ export function MeetingDetailPageClient({
           編集
         </Button>
       </div>
-      <MeetingDetail date={date} mood={mood} topics={[...topics]} actionItems={[...actionItems]} />
+      <MeetingDetail
+        date={date}
+        mood={mood}
+        conditionHealth={conditionHealth}
+        conditionMood={conditionMood}
+        conditionWorkload={conditionWorkload}
+        checkinNote={checkinNote}
+        topics={[...topics]}
+        actionItems={[...actionItems]}
+      />
     </div>
   );
 }
