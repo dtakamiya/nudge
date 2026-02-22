@@ -20,6 +20,7 @@ export async function createMeeting(
       data: {
         memberId: validated.memberId,
         date: new Date(validated.date),
+        mood: validated.mood ?? null,
         topics: {
           create: validated.topics.map((topic) => ({
             category: topic.category,
@@ -83,10 +84,10 @@ export async function updateMeeting(
     const validated = updateMeetingSchema.parse(input);
 
     const result = await prisma.$transaction(async (tx) => {
-      // 1. Verify meeting exists, update date, and get memberId
+      // 1. Verify meeting exists, update date/mood, and get memberId
       const meeting = await tx.meeting.update({
         where: { id: validated.meetingId },
-        data: { date: new Date(validated.date) },
+        data: { date: new Date(validated.date), mood: validated.mood ?? null },
         select: { memberId: true },
       });
 
@@ -168,6 +169,26 @@ export async function updateMeeting(
     revalidatePath("/", "layout");
     return result;
   });
+}
+
+export type MoodTrendEntry = {
+  date: Date;
+  mood: number;
+};
+
+export async function getMoodTrend(
+  memberId: string,
+  limit: number = 10,
+): Promise<MoodTrendEntry[]> {
+  const meetings = await prisma.meeting.findMany({
+    where: { memberId, mood: { not: null } },
+    orderBy: { date: "asc" },
+    take: limit,
+    select: { date: true, mood: true },
+  });
+  return meetings
+    .filter((m): m is { date: Date; mood: number } => m.mood !== null)
+    .map((m) => ({ date: m.date, mood: m.mood }));
 }
 
 export async function deleteMeeting(id: string): Promise<ActionResult<Meeting>> {

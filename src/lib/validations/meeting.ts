@@ -19,6 +19,7 @@ const actionItemInputSchema = z.object({
 export const createMeetingSchema = z.object({
   memberId: z.string().min(1, "メンバーIDは必須です"),
   date: z.string().min(1, "日付は必須です"),
+  mood: z.number().int().min(1).max(5).nullable().optional(),
   topics: z.array(topicInputSchema),
   actionItems: z.array(actionItemInputSchema),
 });
@@ -42,6 +43,7 @@ const updateActionItemInputSchema = z.object({
 export const updateMeetingSchema = z.object({
   meetingId: z.string().min(1, "ミーティングIDは必須です"),
   date: z.string().min(1, "日付は必須です"),
+  mood: z.number().int().min(1).max(5).nullable().optional(),
   topics: z.array(updateTopicInputSchema),
   actionItems: z.array(updateActionItemInputSchema),
   deletedTopicIds: z.array(z.string()).default([]),
