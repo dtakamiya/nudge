@@ -11,12 +11,19 @@ import { TOAST_MESSAGES } from "@/lib/toast-messages";
 import { MeetingDetail } from "./meeting-detail";
 import { MeetingForm } from "./meeting-form";
 
+type TagData = {
+  readonly id?: string;
+  readonly name: string;
+  readonly color?: string;
+};
+
 type Topic = {
   readonly id: string;
   readonly category: string;
   readonly title: string;
   readonly notes: string;
   readonly sortOrder: number;
+  readonly tags?: ReadonlyArray<TagData>;
 };
 
 type ActionItem = {
@@ -27,6 +34,7 @@ type ActionItem = {
   readonly status: string;
   readonly dueDate: Date | null;
   readonly meeting: { readonly date: Date };
+  readonly tags?: ReadonlyArray<TagData>;
 };
 
 type Props = {
@@ -75,6 +83,7 @@ export function MeetingDetailPageClient({
               title: t.title,
               notes: t.notes,
               sortOrder: t.sortOrder,
+              tags: t.tags ? [...t.tags] : [],
             })),
             actionItems: actionItems.map((a) => ({
               id: a.id,
@@ -83,6 +92,7 @@ export function MeetingDetailPageClient({
               sortOrder: a.sortOrder,
               dueDate: a.dueDate ? new Date(a.dueDate).toISOString().split("T")[0] : "",
               status: a.status,
+              tags: a.tags ? [...a.tags] : [],
             })),
           }}
           onSuccess={handleEditSuccess}

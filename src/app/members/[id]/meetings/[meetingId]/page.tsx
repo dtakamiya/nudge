@@ -46,10 +46,31 @@ export default async function MeetingDetailPage({ params }: Props) {
         memberId={id}
         date={meeting.date}
         mood={meeting.mood}
-        topics={meeting.topics}
+        topics={meeting.topics.map((t) => ({
+          id: t.id,
+          category: t.category,
+          title: t.title,
+          notes: t.notes,
+          sortOrder: t.sortOrder,
+          tags: t.tags.map((tt) => ({
+            id: tt.tag.id,
+            name: tt.tag.name,
+            color: tt.tag.color,
+          })),
+        }))}
         actionItems={meeting.actionItems.map((a) => ({
-          ...a,
+          id: a.id,
+          title: a.title,
+          description: a.description,
+          sortOrder: a.sortOrder,
+          status: a.status,
+          dueDate: a.dueDate,
           meeting: { date: meeting.date },
+          tags: a.tags.map((at) => ({
+            id: at.tag.id,
+            name: at.tag.name,
+            color: at.tag.color,
+          })),
         }))}
       />
     </div>

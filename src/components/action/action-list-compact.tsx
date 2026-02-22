@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 
+import { TagBadge } from "@/components/tag/tag-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -13,6 +14,12 @@ import { updateActionItem, updateActionItemStatus } from "@/lib/actions/action-i
 import { formatDate } from "@/lib/format";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
+type TagData = {
+  id: string;
+  name: string;
+  color: string;
+};
+
 type ActionItemRow = {
   id: string;
   title: string;
@@ -20,6 +27,7 @@ type ActionItemRow = {
   status: string;
   dueDate: Date | null;
   meeting: { date: Date } | null;
+  tags?: TagData[];
 };
 
 type EditFormState = {
@@ -140,16 +148,25 @@ export function ActionListCompact({ actionItems }: Props) {
           </div>
         ) : (
           <div key={item.id} className="flex items-center justify-between p-2 border rounded">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
               <button
                 onClick={() => cycleStatus(item.id, item.status)}
                 aria-label={`${item.title}のステータスを${statusLabels[nextStatus(item.status)]}に変更`}
               >
                 <Badge variant={statusColors[item.status]}>{statusLabels[item.status]}</Badge>
               </button>
-              <span className="text-sm">{item.title}</span>
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm">{item.title}</span>
+                {item.tags && item.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-0.5">
+                    {item.tags.map((tag) => (
+                      <TagBadge key={tag.id} name={tag.name} color={tag.color} size="sm" />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               {item.dueDate && (
                 <span className="text-xs text-muted-foreground">
                   期限: {formatDate(item.dueDate)}

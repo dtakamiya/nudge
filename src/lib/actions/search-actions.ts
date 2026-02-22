@@ -32,10 +32,17 @@ export type ActionItemSearchResult = {
   meetingId: string | null;
 };
 
+export type TagSearchResult = {
+  id: string;
+  name: string;
+  color: string;
+};
+
 export type SearchResults = {
   members: MemberSearchResult[];
   topics: TopicSearchResult[];
   actionItems: ActionItemSearchResult[];
+  tags: TagSearchResult[];
 };
 
 const SEARCH_LIMIT = 5;
@@ -44,7 +51,7 @@ export async function searchAll(query: string): Promise<ActionResult<SearchResul
   return runAction(async () => {
     const { query: validatedQuery } = searchQuerySchema.parse({ query });
 
-    const [members, topics, actionItems] = await Promise.all([
+    const [members, topics, actionItems, tags] = await Promise.all([
       prisma.member.findMany({
         where: {
           OR: [
@@ -96,6 +103,14 @@ export async function searchAll(query: string): Promise<ActionResult<SearchResul
         take: SEARCH_LIMIT,
         orderBy: { createdAt: "desc" },
       }),
+      prisma.tag.findMany({
+        where: {
+          name: { contains: validatedQuery },
+        },
+        select: { id: true, name: true, color: true },
+        take: SEARCH_LIMIT,
+        orderBy: { name: "asc" },
+      }),
     ]);
 
     return {
@@ -118,6 +133,7 @@ export async function searchAll(query: string): Promise<ActionResult<SearchResul
         memberName: item.member.name,
         meetingId: item.meetingId,
       })),
+      tags,
     };
   });
 }

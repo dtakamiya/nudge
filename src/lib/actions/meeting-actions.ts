@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import type { CreateMeetingInput, UpdateMeetingInput } from "@/lib/validations/meeting";
 import { createMeetingSchema, updateMeetingSchema } from "@/lib/validations/meeting";
 
+import { getOrCreateTagsInTx } from "./tag-actions";
 import { type ActionResult, runAction } from "./types";
 
 type MeetingWithRelations = Meeting & { topics: Topic[]; actionItems: ActionItem[] };
@@ -16,34 +17,77 @@ export async function createMeeting(
 ): Promise<ActionResult<MeetingWithRelations>> {
   return runAction(async () => {
     const validated = createMeetingSchema.parse(input);
-    const result = await prisma.meeting.create({
-      data: {
-        memberId: validated.memberId,
-        date: new Date(validated.date),
-        mood: validated.mood ?? null,
-        topics: {
-          create: validated.topics.map((topic) => ({
-            category: topic.category,
-            title: topic.title,
-            notes: topic.notes,
-            sortOrder: topic.sortOrder,
-          })),
+    const result = await prisma.$transaction(async (tx) => {
+      const meeting = await tx.meeting.create({
+        data: {
+          memberId: validated.memberId,
+          date: new Date(validated.date),
+          mood: validated.mood ?? null,
+          topics: {
+            create: validated.topics.map((topic) => ({
+              category: topic.category,
+              title: topic.title,
+              notes: topic.notes,
+              sortOrder: topic.sortOrder,
+            })),
+          },
+          actionItems: {
+            create: validated.actionItems.map((item, index) => ({
+              memberId: validated.memberId,
+              title: item.title,
+              description: item.description,
+              sortOrder: item.sortOrder ?? index,
+              dueDate: item.dueDate ? new Date(item.dueDate) : null,
+            })),
+          },
         },
-        actionItems: {
-          create: validated.actionItems.map((item, index) => ({
-            memberId: validated.memberId,
-            title: item.title,
-            description: item.description,
-            sortOrder: item.sortOrder ?? index,
-            dueDate: item.dueDate ? new Date(item.dueDate) : null,
-          })),
+        include: {
+          topics: { orderBy: { sortOrder: "asc" } },
+          actionItems: { orderBy: { sortOrder: "asc" } },
         },
-      },
-      include: {
-        topics: { orderBy: { sortOrder: "asc" } },
-        actionItems: { orderBy: { sortOrder: "asc" } },
-      },
+      });
+
+      // トピックのタグ紐付け
+      for (let i = 0; i < validated.topics.length; i++) {
+        const topicInput = validated.topics[i];
+        const topic = meeting.topics[i];
+        if (!topic) continue;
+
+        const newTagNames = topicInput.newTagNames ?? [];
+        const tagIds = topicInput.tagIds ?? [];
+
+        const newTags = newTagNames.length > 0 ? await getOrCreateTagsInTx(tx, newTagNames) : [];
+        const allTagIds = [...new Set([...tagIds, ...newTags.map((t) => t.id)])];
+
+        if (allTagIds.length > 0) {
+          await tx.topicTag.createMany({
+            data: allTagIds.map((tagId) => ({ topicId: topic.id, tagId })),
+          });
+        }
+      }
+
+      // アクションアイテムのタグ紐付け
+      for (let i = 0; i < validated.actionItems.length; i++) {
+        const itemInput = validated.actionItems[i];
+        const actionItem = meeting.actionItems[i];
+        if (!actionItem) continue;
+
+        const newTagNames = itemInput.newTagNames ?? [];
+        const tagIds = itemInput.tagIds ?? [];
+
+        const newTags = newTagNames.length > 0 ? await getOrCreateTagsInTx(tx, newTagNames) : [];
+        const allTagIds = [...new Set([...tagIds, ...newTags.map((t) => t.id)])];
+
+        if (allTagIds.length > 0) {
+          await tx.actionItemTag.createMany({
+            data: allTagIds.map((tagId) => ({ actionItemId: actionItem.id, tagId })),
+          });
+        }
+      }
+
+      return meeting;
     });
+
     revalidatePath("/", "layout");
     return result;
   });
@@ -54,8 +98,14 @@ export async function getMeeting(id: string) {
     where: { id },
     include: {
       member: true,
-      topics: { orderBy: { sortOrder: "asc" } },
-      actionItems: { orderBy: { sortOrder: "asc" } },
+      topics: {
+        orderBy: { sortOrder: "asc" },
+        include: { tags: { include: { tag: true } } },
+      },
+      actionItems: {
+        orderBy: { sortOrder: "asc" },
+        include: { tags: { include: { tag: true } } },
+      },
     },
   });
 }
@@ -105,8 +155,13 @@ export async function updateMeeting(
         });
       }
 
-      // 4. Upsert topics
+      // 4. Upsert topics with tags
       for (const topic of validated.topics) {
+        const newTagNames = topic.newTagNames ?? [];
+        const tagIds = topic.tagIds ?? [];
+        const newTags = newTagNames.length > 0 ? await getOrCreateTagsInTx(tx, newTagNames) : [];
+        const allTagIds = [...new Set([...tagIds, ...newTags.map((t) => t.id)])];
+
         if (topic.id) {
           await tx.topic.update({
             where: { id: topic.id },
@@ -117,8 +172,15 @@ export async function updateMeeting(
               sortOrder: topic.sortOrder,
             },
           });
+          // タグを全削除してから再作成
+          await tx.topicTag.deleteMany({ where: { topicId: topic.id } });
+          if (allTagIds.length > 0) {
+            await tx.topicTag.createMany({
+              data: allTagIds.map((tagId) => ({ topicId: topic.id!, tagId })),
+            });
+          }
         } else {
-          await tx.topic.create({
+          const newTopic = await tx.topic.create({
             data: {
               meetingId: validated.meetingId,
               category: topic.category,
@@ -127,11 +189,21 @@ export async function updateMeeting(
               sortOrder: topic.sortOrder,
             },
           });
+          if (allTagIds.length > 0) {
+            await tx.topicTag.createMany({
+              data: allTagIds.map((tagId) => ({ topicId: newTopic.id, tagId })),
+            });
+          }
         }
       }
 
-      // 5. Upsert action items
+      // 5. Upsert action items with tags
       for (const item of validated.actionItems) {
+        const newTagNames = item.newTagNames ?? [];
+        const tagIds = item.tagIds ?? [];
+        const newTags = newTagNames.length > 0 ? await getOrCreateTagsInTx(tx, newTagNames) : [];
+        const allTagIds = [...new Set([...tagIds, ...newTags.map((t) => t.id)])];
+
         if (item.id) {
           await tx.actionItem.update({
             where: { id: item.id },
@@ -142,8 +214,15 @@ export async function updateMeeting(
               dueDate: item.dueDate ? new Date(item.dueDate) : null,
             },
           });
+          // タグを全削除してから再作成
+          await tx.actionItemTag.deleteMany({ where: { actionItemId: item.id } });
+          if (allTagIds.length > 0) {
+            await tx.actionItemTag.createMany({
+              data: allTagIds.map((tagId) => ({ actionItemId: item.id!, tagId })),
+            });
+          }
         } else {
-          await tx.actionItem.create({
+          const newItem = await tx.actionItem.create({
             data: {
               meetingId: validated.meetingId,
               memberId: meeting.memberId,
@@ -153,6 +232,11 @@ export async function updateMeeting(
               dueDate: item.dueDate ? new Date(item.dueDate) : null,
             },
           });
+          if (allTagIds.length > 0) {
+            await tx.actionItemTag.createMany({
+              data: allTagIds.map((tagId) => ({ actionItemId: newItem.id, tagId })),
+            });
+          }
         }
       }
 

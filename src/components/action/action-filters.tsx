@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { TagFilter } from "@/components/tag/tag-filter";
 import {
   Select,
   SelectContent,
@@ -11,7 +12,8 @@ import {
 } from "@/components/ui/select";
 
 type Member = { id: string; name: string };
-type Props = { members: Member[] };
+type Tag = { id: string; name: string; color: string };
+type Props = { members: Member[]; tags?: Tag[] };
 
 export function buildFilterUrl(currentParams: string, key: string, value: string): string {
   const params = new URLSearchParams(currentParams);
@@ -23,7 +25,7 @@ export function buildFilterUrl(currentParams: string, key: string, value: string
   return `/actions?${params.toString()}`;
 }
 
-export function ActionFilters({ members }: Props) {
+export function ActionFilters({ members, tags = [] }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -32,7 +34,7 @@ export function ActionFilters({ members }: Props) {
   }
 
   return (
-    <div className="flex gap-4 mb-4">
+    <div className="flex gap-4 mb-4 flex-wrap">
       <Select
         value={searchParams.get("status") ?? "all"}
         onValueChange={(val) => updateFilter("status", val)}
@@ -63,6 +65,7 @@ export function ActionFilters({ members }: Props) {
           ))}
         </SelectContent>
       </Select>
+      {tags.length > 0 && <TagFilter tags={tags} />}
     </div>
   );
 }

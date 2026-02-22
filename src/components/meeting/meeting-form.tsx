@@ -23,6 +23,7 @@ import { createAnnouncements, screenReaderInstructions } from "@/lib/dnd-accessi
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 import { MoodSelector } from "./mood-selector";
+import type { TagData } from "./sortable-action-item";
 import { SortableActionItem } from "./sortable-action-item";
 import { SortableTopicItem } from "./sortable-topic-item";
 
@@ -32,6 +33,7 @@ type TopicFormData = {
   title: string;
   notes: string;
   sortOrder: number;
+  tags: TagData[];
 };
 
 type ActionFormData = {
@@ -40,6 +42,7 @@ type ActionFormData = {
   description: string;
   sortOrder: number;
   dueDate: string;
+  tags: TagData[];
 };
 
 type MeetingInitialData = {
@@ -52,6 +55,7 @@ type MeetingInitialData = {
     readonly title: string;
     readonly notes: string;
     readonly sortOrder: number;
+    readonly tags?: ReadonlyArray<TagData>;
   }>;
   readonly actionItems: ReadonlyArray<{
     readonly id: string;
@@ -60,6 +64,7 @@ type MeetingInitialData = {
     readonly sortOrder: number;
     readonly dueDate: string;
     readonly status: string;
+    readonly tags?: ReadonlyArray<TagData>;
   }>;
 };
 
@@ -71,11 +76,11 @@ type Props = {
 };
 
 function createEmptyTopic(sortOrder: number): TopicFormData {
-  return { category: "WORK_PROGRESS", title: "", notes: "", sortOrder };
+  return { category: "WORK_PROGRESS", title: "", notes: "", sortOrder, tags: [] };
 }
 
 function createEmptyAction(sortOrder: number): ActionFormData {
-  return { title: "", description: "", sortOrder, dueDate: "" };
+  return { title: "", description: "", sortOrder, dueDate: "", tags: [] };
 }
 
 export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }: Props) {
@@ -96,9 +101,10 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
           title: t.title,
           notes: t.notes,
           sortOrder: t.sortOrder,
+          tags: t.tags ? [...t.tags] : [],
         }))
       : initialTopics && initialTopics.length > 0
-        ? initialTopics.map((t) => ({ ...t }))
+        ? initialTopics.map((t) => ({ ...t, tags: [] }))
         : [createEmptyTopic(0)],
   );
 
@@ -110,6 +116,7 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
           description: a.description,
           sortOrder: a.sortOrder ?? index,
           dueDate: a.dueDate,
+          tags: a.tags ? [...a.tags] : [],
         }))
       : [],
   );
@@ -142,6 +149,10 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
     setTopics((prev) => prev.map((t, i) => (i === index ? { ...t, [field]: value } : t)));
   }
 
+  function updateTopicTags(index: number, tags: TagData[]) {
+    setTopics((prev) => prev.map((t, i) => (i === index ? { ...t, tags } : t)));
+  }
+
   function handleTopicDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -171,6 +182,10 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
     setActionItems((prev) => prev.map((a, i) => (i === index ? { ...a, [field]: value } : a)));
   }
 
+  function updateActionTags(index: number, tags: TagData[]) {
+    setActionItems((prev) => prev.map((a, i) => (i === index ? { ...a, tags } : a)));
+  }
+
   function handleActionDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -180,6 +195,12 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
       if (oldIndex === -1 || newIndex === -1) return prev;
       return arrayMove(prev, oldIndex, newIndex).map((a, i) => ({ ...a, sortOrder: i }));
     });
+  }
+
+  function buildTagParams(tags: TagData[]) {
+    const tagIds = tags.filter((t) => t.id).map((t) => t.id!);
+    const newTagNames = tags.filter((t) => !t.id).map((t) => t.name);
+    return { tagIds, newTagNames };
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -202,6 +223,7 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
             title: t.title,
             notes: t.notes,
             sortOrder: t.sortOrder,
+            ...buildTagParams(t.tags),
           })),
           actionItems: validActions.map((a, index) => ({
             id: a.id,
@@ -209,6 +231,7 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
             description: a.description,
             sortOrder: a.sortOrder ?? index,
             dueDate: a.dueDate || undefined,
+            ...buildTagParams(a.tags),
           })),
           deletedTopicIds,
           deletedActionItemIds,
@@ -230,12 +253,14 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
             title: t.title,
             notes: t.notes,
             sortOrder: t.sortOrder,
+            ...buildTagParams(t.tags),
           })),
           actionItems: validActions.map((a, index) => ({
             title: a.title,
             description: a.description,
             sortOrder: a.sortOrder ?? index,
             dueDate: a.dueDate || undefined,
+            ...buildTagParams(a.tags),
           })),
         });
         if (!result.success) {
@@ -308,6 +333,8 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
                   notes={topic.notes}
                   index={index}
                   showDelete={topics.length > 1}
+                  tags={topic.tags}
+                  onTagsChange={updateTopicTags}
                   onUpdate={updateTopic}
                   onRemove={removeTopic}
                 />
@@ -348,6 +375,8 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
                   description={action.description}
                   dueDate={action.dueDate}
                   index={index}
+                  tags={action.tags}
+                  onTagsChange={updateActionTags}
                   onUpdate={updateAction}
                   onRemove={removeAction}
                 />

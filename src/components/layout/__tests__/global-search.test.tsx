@@ -1,13 +1,14 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { GlobalSearch } from "../global-search";
 
 // next/navigation のモック
+const mockPush = vi.fn();
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
-    push: vi.fn(),
+    push: mockPush,
   }),
 }));
 
@@ -24,7 +25,7 @@ afterEach(() => {
 
 const emptyResults = {
   success: true as const,
-  data: { members: [], topics: [], actionItems: [] },
+  data: { members: [], topics: [], actionItems: [], tags: [] },
 };
 
 describe("GlobalSearch", () => {
@@ -76,6 +77,7 @@ describe("GlobalSearch", () => {
           members: [{ id: "m1", name: "田中太郎", department: "開発部", position: null }],
           topics: [],
           actionItems: [],
+          tags: [],
         },
       });
 
@@ -106,6 +108,7 @@ describe("GlobalSearch", () => {
             },
           ],
           actionItems: [],
+          tags: [],
         },
       });
 
@@ -136,6 +139,7 @@ describe("GlobalSearch", () => {
               meetingId: "meeting-1",
             },
           ],
+          tags: [],
         },
       });
 
@@ -147,6 +151,52 @@ describe("GlobalSearch", () => {
       await waitFor(() => {
         expect(screen.getByText("プレゼン資料作成")).toBeDefined();
       });
+    });
+
+    it("タグ検索結果が表示される", async () => {
+      mockSearchAll.mockResolvedValue({
+        success: true,
+        data: {
+          members: [],
+          topics: [],
+          actionItems: [],
+          tags: [{ id: "tag1", name: "重要", color: "#ef4444" }],
+        },
+      });
+
+      const user = userEvent.setup({ delay: null });
+      render(<GlobalSearch />);
+      const input = screen.getByPlaceholderText("検索...");
+
+      await user.type(input, "重要");
+      await waitFor(() => {
+        expect(screen.getByText("重要")).toBeDefined();
+        expect(screen.getByText("タグ")).toBeDefined();
+      });
+    });
+
+    it("タグをクリックすると /actions?tag={tagId} に遷移する", async () => {
+      mockSearchAll.mockResolvedValue({
+        success: true,
+        data: {
+          members: [],
+          topics: [],
+          actionItems: [],
+          tags: [{ id: "tag1", name: "重要", color: "#ef4444" }],
+        },
+      });
+
+      const user = userEvent.setup({ delay: null });
+      render(<GlobalSearch />);
+      const input = screen.getByPlaceholderText("検索...");
+
+      await user.type(input, "重要");
+      await waitFor(() => {
+        expect(screen.getByText("重要")).toBeDefined();
+      });
+
+      await user.click(screen.getByText("重要"));
+      expect(mockPush).toHaveBeenCalledWith("/actions?tag=tag1");
     });
 
     it("結果なしの場合「結果が見つかりませんでした」を表示する", async () => {
@@ -171,6 +221,7 @@ describe("GlobalSearch", () => {
           members: [{ id: "m1", name: "田中太郎", department: null, position: null }],
           topics: [],
           actionItems: [],
+          tags: [],
         },
       });
 

@@ -7,6 +7,8 @@ const topicInputSchema = z.object({
   title: z.string().min(1, "話題のタイトルは必須です"),
   notes: z.string().default(""),
   sortOrder: z.number().int().min(0).default(0),
+  tagIds: z.array(z.string().uuid()).default([]),
+  newTagNames: z.array(z.string().min(1).max(30)).default([]),
 });
 
 const actionItemInputSchema = z.object({
@@ -14,6 +16,8 @@ const actionItemInputSchema = z.object({
   description: z.string().default(""),
   sortOrder: z.number().int().min(0).default(0),
   dueDate: z.string().optional(),
+  tagIds: z.array(z.string().uuid()).default([]),
+  newTagNames: z.array(z.string().min(1).max(30)).default([]),
 });
 
 export const createMeetingSchema = z.object({
@@ -30,6 +34,8 @@ const updateTopicInputSchema = z.object({
   title: z.string().min(1, "話題のタイトルは必須です"),
   notes: z.string().default(""),
   sortOrder: z.number().int().min(0).default(0),
+  tagIds: z.array(z.string().uuid()).default([]),
+  newTagNames: z.array(z.string().min(1).max(30)).default([]),
 });
 
 const updateActionItemInputSchema = z.object({
@@ -38,6 +44,8 @@ const updateActionItemInputSchema = z.object({
   description: z.string().default(""),
   sortOrder: z.number().int().min(0).default(0),
   dueDate: z.string().optional(),
+  tagIds: z.array(z.string().uuid()).default([]),
+  newTagNames: z.array(z.string().min(1).max(30)).default([]),
 });
 
 export const updateMeetingSchema = z.object({

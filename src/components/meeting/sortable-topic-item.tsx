@@ -4,6 +4,8 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 
+import { TagBadge } from "@/components/tag/tag-badge";
+import { TagInput } from "@/components/tag/tag-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +26,12 @@ const categoryOptions = [
   { value: "OTHER", label: "その他" },
 ];
 
+export type TagData = {
+  id?: string;
+  name: string;
+  color?: string;
+};
+
 type Props = {
   readonly id: string;
   readonly category: string;
@@ -31,6 +39,8 @@ type Props = {
   readonly notes: string;
   readonly index: number;
   readonly showDelete: boolean;
+  readonly tags?: TagData[];
+  readonly onTagsChange?: (index: number, tags: TagData[]) => void;
   readonly onUpdate: (index: number, field: "category" | "title" | "notes", value: string) => void;
   readonly onRemove: (index: number) => void;
 };
@@ -42,6 +52,8 @@ export function SortableTopicItem({
   notes,
   index,
   showDelete,
+  tags = [],
+  onTagsChange,
   onUpdate,
   onRemove,
 }: Props) {
@@ -53,6 +65,10 @@ export function SortableTopicItem({
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
+  function handleTagsChange(newTags: TagData[]) {
+    onTagsChange?.(index, newTags);
+  }
 
   return (
     <div
@@ -109,6 +125,20 @@ export function SortableTopicItem({
           placeholder="詳細メモ"
           rows={2}
         />
+      </div>
+      <div>
+        <Label>タグ</Label>
+        {onTagsChange ? (
+          <TagInput selectedTags={tags} onTagsChange={handleTagsChange} />
+        ) : (
+          tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-1">
+              {tags.map((tag) => (
+                <TagBadge key={tag.id ?? tag.name} name={tag.name} color={tag.color} size="sm" />
+              ))}
+            </div>
+          )
+        )}
       </div>
     </div>
   );

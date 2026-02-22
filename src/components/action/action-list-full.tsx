@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 
+import { TagBadge } from "@/components/tag/tag-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -21,6 +22,12 @@ import { updateActionItem, updateActionItemStatus } from "@/lib/actions/action-i
 import { formatDate } from "@/lib/format";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
+type TagData = {
+  id: string;
+  name: string;
+  color: string;
+};
+
 type ActionItemRow = {
   id: string;
   title: string;
@@ -29,6 +36,7 @@ type ActionItemRow = {
   dueDate: Date | null;
   member: { id: string; name: string };
   meeting: { id: string; date: Date };
+  tags?: TagData[];
 };
 
 type EditFormState = {
@@ -163,6 +171,13 @@ export function ActionListFull({ actionItems }: Props) {
                     {" ・ "}
                     {formatDate(item.meeting.date)}
                   </p>
+                  {item.tags && item.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {item.tags.map((tag) => (
+                        <TagBadge key={tag.id} name={tag.name} color={tag.color} size="sm" />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-3">
