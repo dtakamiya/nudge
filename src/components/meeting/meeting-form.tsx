@@ -11,7 +11,7 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useRouter } from "next/navigation";
-import { useMemo,useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createMeeting, updateMeeting } from "@/lib/actions/meeting-actions";
-import { createAnnouncements,screenReaderInstructions } from "@/lib/dnd-accessibility";
+import { createAnnouncements, screenReaderInstructions } from "@/lib/dnd-accessibility";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 import { SortableActionItem } from "./sortable-action-item";

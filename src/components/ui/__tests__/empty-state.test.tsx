@@ -1,4 +1,4 @@
-import { cleanup,render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { Users } from "lucide-react";
 import { afterEach, describe, expect, it } from "vitest";
 

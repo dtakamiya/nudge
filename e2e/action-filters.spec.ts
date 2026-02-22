@@ -1,6 +1,6 @@
-import { expect,test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-import { createMeetingFromDetail,createMemberAndNavigateToDetail } from "./helpers";
+import { createMeetingFromDetail, createMemberAndNavigateToDetail } from "./helpers";
 
 test.describe("アクションフィルタリング", () => {
   /**

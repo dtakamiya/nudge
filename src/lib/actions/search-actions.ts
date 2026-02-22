@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { searchQuerySchema } from "@/lib/validations/search";
 
-import { type ActionResult,runAction } from "./types";
+import { type ActionResult, runAction } from "./types";
 
 export type MemberSearchResult = {
   id: string;

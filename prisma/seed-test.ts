@@ -2,7 +2,7 @@ import "dotenv/config";
 
 import { fakerJA as faker } from "@faker-js/faker";
 
-import { ActionItemStatus,PrismaClient, TopicCategory } from "../src/generated/prisma/client";
+import { ActionItemStatus, PrismaClient, TopicCategory } from "../src/generated/prisma/client";
 
 const prisma = new PrismaClient();
 

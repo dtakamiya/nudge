@@ -12,11 +12,11 @@ import {
   YAxis,
 } from "recharts";
 
-import { Card, CardContent, CardDescription,CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TopicCategory } from "@/generated/prisma/client";
 import { type MonthlyTrend } from "@/lib/actions/analytics-actions";
 
-import { CATEGORY_COLORS,CATEGORY_LABELS } from "./topic-distribution-chart";
+import { CATEGORY_COLORS, CATEGORY_LABELS } from "./topic-distribution-chart";
 
 type Props = {
   data: MonthlyTrend[];
