@@ -41,6 +41,16 @@ describe("SortableActionItem", () => {
     expect(screen.getByRole("button", { name: "削除" })).toBeTruthy();
   });
 
+  it("ドラッグハンドルに aria-label が設定されている", () => {
+    render(<SortableActionItem {...defaultProps} />);
+    expect(screen.getByRole("button", { name: "レビュー依頼を並び替え" })).toBeTruthy();
+  });
+
+  it("タイトルが空のときドラッグハンドルに fallback aria-label が設定される", () => {
+    render(<SortableActionItem {...defaultProps} title="" />);
+    expect(screen.getByRole("button", { name: "アクションアイテムを並び替え" })).toBeTruthy();
+  });
+
   it("calls onUpdate when title changes", async () => {
     const user = userEvent.setup();
     render(<SortableActionItem {...defaultProps} />);

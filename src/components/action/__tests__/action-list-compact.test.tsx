@@ -131,6 +131,18 @@ describe("ActionListCompact", () => {
     expect(mockRefresh).toHaveBeenCalled();
   });
 
+  it("ステータスボタンに aria-label が設定されている", () => {
+    render(<ActionListCompact actionItems={baseItems} />);
+    // TODO → 次は IN_PROGRESS
+    expect(
+      screen.getByRole("button", { name: "テストタスク1のステータスを進行中に変更" }),
+    ).toBeDefined();
+    // IN_PROGRESS → 次は DONE
+    expect(
+      screen.getByRole("button", { name: "テストタスク2のステータスを完了に変更" }),
+    ).toBeDefined();
+  });
+
   it("編集ボタンが各行に表示される", () => {
     render(<ActionListCompact actionItems={baseItems} />);
     const editButtons = screen.getAllByRole("button", { name: /編集/ });
