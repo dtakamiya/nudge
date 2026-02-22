@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { toMonthKey } from "@/lib/format";
 import type { TopicCategory } from "@/generated/prisma/client";
 
 export type CategoryTrend = {
@@ -29,7 +30,7 @@ export async function getMemberTopicTrends(memberId: string) {
 
     // 2. 時系列集計
     const date = new Date(topic.meeting.date);
-    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    const monthKey = toMonthKey(date);
 
     if (!monthlyMap.has(monthKey)) {
       monthlyMap.set(monthKey, {});
@@ -106,9 +107,7 @@ export async function getMemberActionTrends(memberId: string): Promise<ActionTre
   for (const action of actions) {
     // Collect created
     const createdDate = new Date(action.createdAt);
-    const createdMonthKey = `${createdDate.getFullYear()}-${String(
-      createdDate.getMonth() + 1,
-    ).padStart(2, "0")}`;
+    const createdMonthKey = toMonthKey(createdDate);
     if (!monthlyMap.has(createdMonthKey)) {
       monthlyMap.set(createdMonthKey, { created: 0, completed: 0 });
     }
@@ -117,9 +116,7 @@ export async function getMemberActionTrends(memberId: string): Promise<ActionTre
     // Collect completed
     if (action.completedAt) {
       const completedDate = new Date(action.completedAt);
-      const completedMonthKey = `${completedDate.getFullYear()}-${String(
-        completedDate.getMonth() + 1,
-      ).padStart(2, "0")}`;
+      const completedMonthKey = toMonthKey(completedDate);
       if (!monthlyMap.has(completedMonthKey)) {
         monthlyMap.set(completedMonthKey, { created: 0, completed: 0 });
       }
@@ -136,4 +133,108 @@ export async function getMemberActionTrends(memberId: string): Promise<ActionTre
     onTimeCompletionRate,
     monthlyTrends,
   };
+}
+
+export type MeetingFrequencyMonth = {
+  month: string;
+  count: number;
+};
+
+export async function getMeetingFrequencyByMonth(): Promise<MeetingFrequencyMonth[]> {
+  const twelveMonthsAgo = new Date();
+  twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+
+  const meetings = await prisma.meeting.findMany({
+    where: { date: { gte: twelveMonthsAgo } },
+    select: { date: true },
+    orderBy: { date: "asc" },
+  });
+
+  const monthMap = new Map<string, number>();
+  for (const meeting of meetings) {
+    const d = new Date(meeting.date);
+    const key = toMonthKey(d);
+    monthMap.set(key, (monthMap.get(key) ?? 0) + 1);
+  }
+
+  return Array.from(monthMap.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([month, count]) => ({ month, count }));
+}
+
+export type RecommendedMeeting = {
+  id: string;
+  name: string;
+  department: string | null;
+  position: string | null;
+  daysSinceLast: number;
+  lastMeetingDate: Date | null;
+};
+
+export async function getRecommendedMeetings(): Promise<RecommendedMeeting[]> {
+  const fourteenDaysAgo = new Date();
+  fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+  const now = new Date();
+
+  const members = await prisma.member.findMany({
+    include: {
+      meetings: {
+        orderBy: { date: "desc" },
+        take: 1,
+        select: { date: true },
+      },
+    },
+  });
+
+  return members
+    .filter((m) => {
+      const lastDate = m.meetings[0]?.date ?? null;
+      if (!lastDate) return true;
+      return new Date(lastDate) < fourteenDaysAgo;
+    })
+    .map((m) => {
+      const lastDate = m.meetings[0]?.date ?? null;
+      const daysSinceLast = lastDate
+        ? Math.floor((now.getTime() - new Date(lastDate).getTime()) / (1000 * 60 * 60 * 24))
+        : 9999;
+      return {
+        id: m.id,
+        name: m.name,
+        department: m.department,
+        position: m.position,
+        daysSinceLast,
+        lastMeetingDate: lastDate ? new Date(lastDate) : null,
+      };
+    })
+    .sort((a, b) => b.daysSinceLast - a.daysSinceLast);
+}
+
+export async function getAllMembersWithInterval(): Promise<RecommendedMeeting[]> {
+  const now = new Date();
+
+  const members = await prisma.member.findMany({
+    include: {
+      meetings: {
+        orderBy: { date: "desc" },
+        take: 1,
+        select: { date: true },
+      },
+    },
+    orderBy: { name: "asc" },
+  });
+
+  return members.map((m) => {
+    const lastDate = m.meetings[0]?.date ?? null;
+    const daysSinceLast = lastDate
+      ? Math.floor((now.getTime() - new Date(lastDate).getTime()) / (1000 * 60 * 60 * 24))
+      : 9999;
+    return {
+      id: m.id,
+      name: m.name,
+      department: m.department,
+      position: m.position,
+      daysSinceLast,
+      lastMeetingDate: lastDate ? new Date(lastDate) : null,
+    };
+  });
 }

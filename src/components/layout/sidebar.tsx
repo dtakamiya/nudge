@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, UserPlus, ListChecks, Menu, X } from "lucide-react";
+import { LayoutDashboard, UserPlus, ListChecks, BarChart2, Menu, X } from "lucide-react";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Separator } from "@/components/ui/separator";
 import { GlobalSearch } from "./global-search";
@@ -22,6 +22,7 @@ const navItems = [
   { href: "/", label: "ダッシュボード", icon: LayoutDashboard },
   { href: "/members/new", label: "メンバー追加", icon: UserPlus },
   { href: "/actions", label: "アクション一覧", icon: ListChecks },
+  { href: "/analytics", label: "ミーティング分析", icon: BarChart2 },
 ];
 
 function NavLinks({
