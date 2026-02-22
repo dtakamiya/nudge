@@ -4,6 +4,7 @@ import {
   getMemberActionTrends,
   getMeetingFrequencyByMonth,
   getRecommendedMeetings,
+  getMemberMeetingHeatmap,
 } from "../analytics-actions";
 import { createMember } from "../member-actions";
 
@@ -216,5 +217,92 @@ describe("getRecommendedMeetings", () => {
     const result = await getRecommendedMeetings();
     const found = result.find((r) => r.id === member.data.id);
     expect(found).toBeUndefined();
+  });
+});
+
+describe("getMemberMeetingHeatmap", () => {
+  it("メンバーがいない場合は空配列を返す", async () => {
+    const result = await getMemberMeetingHeatmap();
+    expect(result.members).toEqual([]);
+    expect(result.months).toHaveLength(12);
+  });
+
+  it("直近12ヶ月の月キー配列を返す", async () => {
+    const result = await getMemberMeetingHeatmap();
+    expect(result.months).toHaveLength(12);
+    // 月キーは YYYY-MM 形式で昇順
+    const now = new Date();
+    const expectedLatest = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    expect(result.months[11]).toBe(expectedLatest);
+  });
+
+  it("メンバーとミーティングのクロス集計を正しく返す", async () => {
+    const memberA = await createMember({
+      name: "Alice",
+      department: undefined,
+      position: undefined,
+    });
+    const memberB = await createMember({ name: "Bob", department: undefined, position: undefined });
+    if (!memberA.success || !memberB.success) throw new Error("Member creation failed");
+
+    const now = new Date();
+    const thisMonth = new Date(now.getFullYear(), now.getMonth(), 15);
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 10);
+
+    // Alice: 今月2回、先月1回
+    await prisma.meeting.createMany({
+      data: [
+        { memberId: memberA.data.id, date: thisMonth },
+        { memberId: memberA.data.id, date: new Date(now.getFullYear(), now.getMonth(), 20) },
+        { memberId: memberA.data.id, date: lastMonth },
+      ],
+    });
+
+    // Bob: 今月1回
+    await prisma.meeting.create({
+      data: { memberId: memberB.data.id, date: thisMonth },
+    });
+
+    const result = await getMemberMeetingHeatmap();
+
+    const alice = result.members.find((m) => m.memberName === "Alice");
+    const bob = result.members.find((m) => m.memberName === "Bob");
+
+    expect(alice).toBeDefined();
+    expect(bob).toBeDefined();
+
+    const thisMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const lastMonthKey = `${now.getFullYear()}-${String(now.getMonth()).padStart(2, "0")}`;
+
+    const aliceThisMonth = alice!.months.find((m) => m.month === thisMonthKey);
+    const aliceLastMonth = alice!.months.find((m) => m.month === lastMonthKey);
+    expect(aliceThisMonth?.count).toBe(2);
+    expect(aliceLastMonth?.count).toBe(1);
+
+    const bobThisMonth = bob!.months.find((m) => m.month === thisMonthKey);
+    expect(bobThisMonth?.count).toBe(1);
+  });
+
+  it("12ヶ月以上前のミーティングは集計しない", async () => {
+    const member = await createMember({
+      name: "OldMeeting",
+      department: undefined,
+      position: undefined,
+    });
+    if (!member.success) throw new Error("Member creation failed");
+
+    const oldDate = new Date();
+    oldDate.setMonth(oldDate.getMonth() - 13);
+
+    await prisma.meeting.create({
+      data: { memberId: member.data.id, date: oldDate },
+    });
+
+    const result = await getMemberMeetingHeatmap();
+    const found = result.members.find((m) => m.memberName === "OldMeeting");
+
+    expect(found).toBeDefined();
+    const totalCount = found!.months.reduce((sum, m) => sum + m.count, 0);
+    expect(totalCount).toBe(0);
   });
 });
