@@ -54,7 +54,7 @@ Member (1) ──< (N) Meeting (1) ──< (N) Topic
 
 - [x] ~~**メンバー編集 UI の欠如**: `updateMember` Server Action は実装済みだが、呼び出す UI が存在しない~~ → `MemberEditDialog` として実装済み
 - [x] ~~**削除確認ダイアログの欠如**: UI 上に削除ボタン・確認ダイアログがない~~ → `MeetingDeleteDialog` / `MemberDeleteDialog` として実装済み
-- [ ] **ActionItem の並び順が未永続化**: フォーム上では dnd-kit による並び替え UI が存在するが、`ActionItem` モデルに `sortOrder` フィールドがなく、DB には順序が保存されない。保存後は `dueDate asc, createdAt desc` で表示される
+- [x] ~~**ActionItem の並び順が未永続化**: フォーム上では dnd-kit による並び替え UI が存在するが、`ActionItem` モデルに `sortOrder` フィールドがなく、DB には順序が保存されない。保存後は `dueDate asc, createdAt desc` で表示される~~ → `sortOrder Int @default(0)` フィールド追加、DnD 並び替え後の順序を DB に永続化済み
 - [x] ~~**ミーティング編集不可**: 作成後の修正・追記ができない。`updateMeeting` Server Action が存在しない~~ → `updateMeeting` Server Action + `MeetingDetailPageClient` 編集モードとして実装済み
 - [x] ~~**サイレントエラー**: 一部の Server Action で `catch` ブロックがエラーを握りつぶしており、ユーザーにフィードバックがない~~ → `ActionResult<T>` パターンで統一、エラーを UI にフィードバック
 - [x] ~~**エラー境界が未設定**: `error.tsx` / `not-found.tsx` がなく、ランタイムエラー時のフォールバック UI がない~~ → `error.tsx` / `not-found.tsx` を追加
