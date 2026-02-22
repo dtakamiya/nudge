@@ -4,13 +4,17 @@ import {
   getRecentActivity,
   getUpcomingActions,
 } from "@/lib/actions/dashboard-actions";
-import { getRecommendedMeetings } from "@/lib/actions/analytics-actions";
+import {
+  getRecommendedMeetings,
+  getScheduledMeetingsThisWeek,
+} from "@/lib/actions/analytics-actions";
 import { getOverdueReminders } from "@/lib/actions/reminder-actions";
 import { MemberList } from "@/components/member/member-list";
 import { DashboardSummary } from "@/components/dashboard/dashboard-summary";
 import { RecentActivityFeed } from "@/components/dashboard/recent-activity-feed";
 import { UpcomingActionsSection } from "@/components/dashboard/upcoming-actions-section";
 import { RecommendedMeetingsSection } from "@/components/dashboard/recommended-meetings-section";
+import { ScheduledMeetingsSection } from "@/components/dashboard/scheduled-meetings-section";
 import { ReminderAlertBanner } from "@/components/dashboard/reminder-alert-banner";
 import { BrowserNotification } from "@/components/dashboard/browser-notification";
 import { OnboardingCard } from "@/components/dashboard/onboarding-card";
@@ -18,15 +22,23 @@ import { OnboardingCard } from "@/components/dashboard/onboarding-card";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const [members, summary, recentActivity, upcomingActions, recommendedMeetings, overdueReminders] =
-    await Promise.all([
-      getMembers(),
-      getDashboardSummary(),
-      getRecentActivity(),
-      getUpcomingActions(),
-      getRecommendedMeetings(),
-      getOverdueReminders(),
-    ]);
+  const [
+    members,
+    summary,
+    recentActivity,
+    upcomingActions,
+    recommendedMeetings,
+    scheduledMeetings,
+    overdueReminders,
+  ] = await Promise.all([
+    getMembers(),
+    getDashboardSummary(),
+    getRecentActivity(),
+    getUpcomingActions(),
+    getRecommendedMeetings(),
+    getScheduledMeetingsThisWeek(),
+    getOverdueReminders(),
+  ]);
 
   const isFirstTime = members.length === 0;
 
@@ -57,6 +69,15 @@ export default async function DashboardPage() {
           />
         </div>
       </div>
+
+      {!isFirstTime && (
+        <div className="rounded-xl border bg-card p-5 mb-8">
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
+            今週の1on1予定
+          </h2>
+          <ScheduledMeetingsSection meetings={scheduledMeetings} />
+        </div>
+      )}
 
       {recommendedMeetings.length > 0 && (
         <div className="rounded-xl border bg-card p-5 mb-8">

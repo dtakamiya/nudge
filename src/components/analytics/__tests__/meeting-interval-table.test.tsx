@@ -18,6 +18,8 @@ const mockData = [
     position: null,
     daysSinceLast: 30,
     lastMeetingDate: new Date("2026-01-23T00:00:00Z"),
+    meetingIntervalDays: 14,
+    nextRecommendedDate: new Date("2026-02-06T00:00:00Z"),
   },
   {
     id: "m2",
@@ -26,6 +28,8 @@ const mockData = [
     position: null,
     daysSinceLast: 9999,
     lastMeetingDate: null,
+    meetingIntervalDays: 14,
+    nextRecommendedDate: null,
   },
 ];
 

@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { isOverdue } from "@/lib/schedule";
 
 export type DashboardSummary = {
   needsFollowUp: number;
@@ -13,8 +14,6 @@ export type DashboardSummary = {
 
 export async function getDashboardSummary(): Promise<DashboardSummary> {
   const now = new Date();
-  const fourteenDaysAgo = new Date(now);
-  fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
 
   const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -44,9 +43,8 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
   ]);
 
   const needsFollowUp = members.filter((m) => {
-    const lastMeeting = m.meetings[0];
-    if (!lastMeeting) return true;
-    return new Date(lastMeeting.date) < fourteenDaysAgo;
+    const lastDate = m.meetings[0]?.date ?? null;
+    return isOverdue(lastDate ? new Date(lastDate) : null, m.meetingIntervalDays, now);
   }).length;
 
   const totalActions = actionCounts.reduce((sum, g) => sum + g._count.id, 0);

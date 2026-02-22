@@ -1,5 +1,6 @@
-import { Calendar, TrendingUp, CircleAlert } from "lucide-react";
+import { Calendar, TrendingUp, CircleAlert, CalendarClock } from "lucide-react";
 import { formatDaysElapsed } from "@/lib/format";
+import { calcNextRecommendedDate, formatNextRecommendedDate, isOverdue } from "@/lib/schedule";
 
 type Variant = "success" | "warning" | "danger" | "info";
 
@@ -7,6 +8,7 @@ type Props = {
   readonly lastMeetingDate: Date | null;
   readonly totalMeetingCount: number;
   readonly pendingActionCount: number;
+  readonly meetingIntervalDays: number;
 };
 
 function getBorderClass(variant: Variant): string {
@@ -82,16 +84,39 @@ function getPendingVariant(count: number): Variant {
   return "danger";
 }
 
-export function MemberStatsBar({ lastMeetingDate, totalMeetingCount, pendingActionCount }: Props) {
+function getNextMeetingVariant(nextDate: Date | null, intervalDays: number): Variant {
+  if (!nextDate) return "info";
+  const now = new Date();
+  if (isOverdue(null, intervalDays, now)) return "info"; // null case handled above
+  const daysUntil = Math.ceil((nextDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  if (daysUntil < 0) return "danger";
+  if (daysUntil <= 3) return "warning";
+  return "info";
+}
+
+export function MemberStatsBar({
+  lastMeetingDate,
+  totalMeetingCount,
+  pendingActionCount,
+  meetingIntervalDays,
+}: Props) {
   const lastMeetingVariant = getLastMeetingVariant(lastMeetingDate);
+  const nextRecommendedDate = calcNextRecommendedDate(lastMeetingDate, meetingIntervalDays);
+  const nextMeetingVariant = getNextMeetingVariant(nextRecommendedDate, meetingIntervalDays);
 
   return (
-    <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
         title="最終1on1"
         displayValue={formatDaysElapsed(lastMeetingDate)}
         variant={lastMeetingVariant}
         icon={<Calendar className="w-5 h-5" />}
+      />
+      <StatCard
+        title="次回推奨日"
+        displayValue={formatNextRecommendedDate(nextRecommendedDate)}
+        variant={nextMeetingVariant}
+        icon={<CalendarClock className="w-5 h-5" />}
       />
       <StatCard
         title="通算1on1"
