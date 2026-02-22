@@ -2,12 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 
-import type { ActionItem,Meeting, Topic } from "@/generated/prisma/client";
+import type { ActionItem, Meeting, Topic } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import type { CreateMeetingInput, UpdateMeetingInput } from "@/lib/validations/meeting";
 import { createMeetingSchema, updateMeetingSchema } from "@/lib/validations/meeting";
 
-import { type ActionResult,runAction } from "./types";
+import { type ActionResult, runAction } from "./types";
 
 type MeetingWithRelations = Meeting & { topics: Topic[]; actionItems: ActionItem[] };
 

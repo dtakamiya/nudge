@@ -1,5 +1,5 @@
 import { fireEvent } from "@testing-library/dom";
-import { cleanup,render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { KeyboardShortcutProvider } from "../keyboard-shortcut-provider";

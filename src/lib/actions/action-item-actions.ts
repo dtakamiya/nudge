@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import type { ActionItem,Prisma } from "@/generated/prisma/client";
+import type { ActionItem, Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import type { ActionItemStatusType, UpdateActionItemInput } from "@/lib/validations/action-item";
 import {
@@ -10,7 +10,7 @@ import {
   updateActionItemStatusSchema,
 } from "@/lib/validations/action-item";
 
-import { type ActionResult,runAction } from "./types";
+import { type ActionResult, runAction } from "./types";
 
 type ActionItemFilters = {
   status?: ActionItemStatusType;

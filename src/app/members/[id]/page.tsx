@@ -14,20 +14,23 @@ import { MemberStatsBar } from "@/components/member/member-stats-bar";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { getMember } from "@/lib/actions/member-actions";
+import { getMember, getMemberMeetings } from "@/lib/actions/member-actions";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ page?: string }>;
+};
 
-export default async function MemberDetailPage({ params }: Props) {
+export default async function MemberDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
-  const member = await getMember(id);
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
+
+  const [member, meetingsPage] = await Promise.all([getMember(id), getMemberMeetings(id, page)]);
+
   if (!member) {
     notFound();
   }
-
-  const lastMeetingDate = member.meetings[0]?.date ?? null;
-  const totalMeetingCount = member.meetings.length;
-  const pendingActionItems = member.actionItems.filter((a) => a.status !== "DONE");
 
   return (
     <div className="animate-fade-in-up">
@@ -63,19 +66,29 @@ export default async function MemberDetailPage({ params }: Props) {
       </div>
 
       <MemberStatsBar
-        lastMeetingDate={lastMeetingDate}
-        totalMeetingCount={totalMeetingCount}
-        pendingActionCount={pendingActionItems.length}
+        lastMeetingDate={member.lastMeetingDate}
+        totalMeetingCount={member.totalMeetingCount}
+        pendingActionCount={member.pendingActionItems.length}
         meetingIntervalDays={member.meetingIntervalDays}
       />
 
       <TopicAnalyticsSection memberId={id} />
       <ActionAnalyticsSection memberId={id} />
 
-      <MemberQuickActions pendingActionItems={pendingActionItems} />
+      <MemberQuickActions pendingActionItems={member.pendingActionItems} />
 
       <h2 className="text-lg font-semibold tracking-tight mb-3 text-foreground mt-8">1on1履歴</h2>
-      <MeetingHistory meetings={member.meetings} memberId={id} />
+      <MeetingHistory
+        meetings={meetingsPage.meetings}
+        memberId={id}
+        pagination={{
+          page: meetingsPage.page,
+          total: meetingsPage.total,
+          pageSize: meetingsPage.pageSize,
+          hasNext: meetingsPage.hasNext,
+          hasPrev: meetingsPage.hasPrev,
+        }}
+      />
       <Separator className="my-6" />
       <h2 className="text-lg font-semibold tracking-tight mb-3 text-foreground">
         アクションアイテム

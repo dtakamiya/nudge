@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
-import { updateActionItem,updateActionItemStatus } from "@/lib/actions/action-item-actions";
+import { updateActionItem, updateActionItemStatus } from "@/lib/actions/action-item-actions";
 import { formatDate } from "@/lib/format";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
@@ -19,7 +19,7 @@ type ActionItemRow = {
   description: string;
   status: string;
   dueDate: Date | null;
-  meeting: { date: Date };
+  meeting: { date: Date } | null;
 };
 
 type EditFormState = {

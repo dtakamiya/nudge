@@ -48,6 +48,7 @@ model Topic {
   meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 
   @@index([meetingId])
+  @@index([meetingId, sortOrder])
 }
 
 enum TopicCategory {
@@ -75,7 +76,9 @@ model ActionItem {
   member  Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   @@index([meetingId])
+  @@index([meetingId, sortOrder])
   @@index([memberId])
+  @@index([memberId, status])
   @@index([status])
 }
 

@@ -1,6 +1,6 @@
 import { fireEvent } from "@testing-library/dom";
 import { renderHook } from "@testing-library/react";
-import { afterEach,beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useKeyboardShortcuts } from "../use-keyboard-shortcuts";
 

@@ -1,6 +1,6 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { formatDaysElapsed,formatRelativeDate } from "@/lib/format";
+import { formatDaysElapsed, formatRelativeDate } from "@/lib/format";
 
 describe("formatRelativeDate", () => {
   it("returns '未実施' for null", () => {

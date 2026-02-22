@@ -50,4 +50,4 @@ const AccordionContent = React.forwardRef<
 ));
 AccordionContent.displayName = Accordion.Content.displayName;
 
-export { AccordionContent,AccordionItem, AccordionRoot, AccordionTrigger };
+export { AccordionContent, AccordionItem, AccordionRoot, AccordionTrigger };

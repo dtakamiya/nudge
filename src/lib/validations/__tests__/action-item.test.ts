@@ -1,6 +1,6 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { updateActionItemSchema,updateActionItemStatusSchema } from "../action-item";
+import { updateActionItemSchema, updateActionItemStatusSchema } from "../action-item";
 
 describe("updateActionItemStatusSchema", () => {
   it("accepts valid status", () => {

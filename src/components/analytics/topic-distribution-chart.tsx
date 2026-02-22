@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import { Cell, Legend,Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
-import { Card, CardContent, CardDescription,CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TopicCategory } from "@/generated/prisma/client";
 import { type CategoryTrend } from "@/lib/actions/analytics-actions";
 

@@ -1,6 +1,6 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { createAnnouncements,screenReaderInstructions } from "../dnd-accessibility";
+import { createAnnouncements, screenReaderInstructions } from "../dnd-accessibility";
 
 describe("dnd-accessibility", () => {
   describe("screenReaderInstructions", () => {

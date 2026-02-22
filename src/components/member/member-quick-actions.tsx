@@ -10,7 +10,7 @@ type ActionItemRow = {
   description: string;
   status: string;
   dueDate: Date | null;
-  meeting: { date: Date };
+  meeting: { date: Date } | null;
 };
 
 type Props = {
