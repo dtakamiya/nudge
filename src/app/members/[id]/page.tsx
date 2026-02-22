@@ -13,6 +13,7 @@ import { TopicAnalyticsSection } from "@/components/analytics/topic-analytics-se
 import { ActionAnalyticsSection } from "@/components/analytics/action-analytics-section";
 import { MemberStatsBar } from "@/components/member/member-stats-bar";
 import { MemberQuickActions } from "@/components/member/member-quick-actions";
+import { ExportDialog } from "@/components/meeting/export-dialog";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -41,6 +42,7 @@ export default async function MemberDetailPage({ params }: Props) {
           </div>
         </div>
         <div className="flex gap-2">
+          <ExportDialog memberId={member.id} memberName={member.name} />
           <MemberDeleteDialog memberId={member.id} memberName={member.name} />
           <MemberEditDialog
             member={{
