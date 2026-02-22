@@ -11,6 +11,7 @@ beforeEach(async () => {
   await prisma.topic.deleteMany();
   await prisma.meeting.deleteMany();
   await prisma.member.deleteMany();
+  await prisma.tag.deleteMany();
 });
 
 describe("searchAll", () => {
@@ -197,5 +198,40 @@ describe("searchAll", () => {
       memberName: expect.any(String),
       meetingId: expect.any(String),
     });
+  });
+
+  it("タグ名で検索できる", async () => {
+    await prisma.tag.create({ data: { name: "フロントエンド", color: "#6366f1" } });
+    await prisma.tag.create({ data: { name: "バックエンド", color: "#22c55e" } });
+
+    const result = await searchAll("フロントエンド");
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.tags).toHaveLength(1);
+    expect(result.data.tags[0].name).toBe("フロントエンド");
+  });
+
+  it("タグ検索結果に id, name, color が含まれる", async () => {
+    await prisma.tag.create({ data: { name: "テストタグ", color: "#ef4444" } });
+
+    const result = await searchAll("テストタグ");
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.tags[0]).toMatchObject({
+      id: expect.any(String),
+      name: "テストタグ",
+      color: "#ef4444",
+    });
+  });
+
+  it("searchResults に tags フィールドが存在する", async () => {
+    const memberResult = await createMember({ name: "タグフィールドテスト" });
+    if (!memberResult.success) throw new Error(memberResult.error);
+
+    const result = await searchAll("タグフィールドテスト");
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data).toHaveProperty("tags");
+    expect(Array.isArray(result.data.tags)).toBe(true);
   });
 });

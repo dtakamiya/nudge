@@ -15,18 +15,23 @@ import { type ActionResult, runAction } from "./types";
 type ActionItemFilters = {
   status?: ActionItemStatusType;
   memberId?: string;
+  tagIds?: string[];
 };
 
 export async function getActionItems(filters: ActionItemFilters = {}) {
   const where: Prisma.ActionItemWhereInput = {};
   if (filters.status) where.status = filters.status;
   if (filters.memberId) where.memberId = filters.memberId;
+  if (filters.tagIds && filters.tagIds.length > 0) {
+    where.tags = { some: { tagId: { in: filters.tagIds } } };
+  }
   return prisma.actionItem.findMany({
     where,
     orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
     include: {
       member: { select: { id: true, name: true } },
       meeting: { select: { id: true, date: true } },
+      tags: { include: { tag: true } },
     },
   });
 }
