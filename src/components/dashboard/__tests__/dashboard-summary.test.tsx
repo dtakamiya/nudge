@@ -1,7 +1,9 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
-import { DashboardSummary } from "../dashboard-summary";
+import { cleanup,render, screen } from "@testing-library/react";
+import { afterEach,describe, expect, it } from "vitest";
+
 import type { DashboardSummary as DashboardSummaryType } from "@/lib/actions/dashboard-actions";
+
+import { DashboardSummary } from "../dashboard-summary";
 
 afterEach(() => {
   cleanup();

@@ -1,7 +1,9 @@
-import { render, screen, cleanup } from "@testing-library/react";
-import { describe, it, expect, afterEach } from "vitest";
-import { ScheduledMeetingsSection } from "../scheduled-meetings-section";
+import { cleanup,render, screen } from "@testing-library/react";
+import { afterEach,describe, expect, it } from "vitest";
+
 import type { ScheduledMeeting } from "@/lib/actions/analytics-actions";
+
+import { ScheduledMeetingsSection } from "../scheduled-meetings-section";
 
 afterEach(() => {
   cleanup();

@@ -1,15 +1,16 @@
 "use client";
 
 import { CalendarDays, Copy } from "lucide-react";
-import { EmptyState } from "@/components/ui/empty-state";
+
+import {
+  AccordionContent,
+  AccordionItem,
+  AccordionRoot,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  AccordionRoot,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@/components/ui/accordion";
+import { EmptyState } from "@/components/ui/empty-state";
 import { CATEGORY_LABELS } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 

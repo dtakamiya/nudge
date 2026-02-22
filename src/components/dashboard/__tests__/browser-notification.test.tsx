@@ -1,7 +1,9 @@
-import { describe, it, expect, afterEach, vi, beforeEach } from "vitest";
-import { render, cleanup, act } from "@testing-library/react";
-import { BrowserNotification } from "../browser-notification";
+import { act,cleanup, render } from "@testing-library/react";
+import { afterEach, beforeEach,describe, expect, it, vi } from "vitest";
+
 import type { OverdueReminder } from "@/lib/actions/reminder-actions";
+
+import { BrowserNotification } from "../browser-notification";
 
 const makeReminder = (overrides: Partial<OverdueReminder> = {}): OverdueReminder => ({
   memberId: "member-1",

@@ -1,5 +1,6 @@
-import { test, expect } from "@playwright/test";
-import { createMemberAndNavigateToDetail, createMeetingFromDetail } from "./helpers";
+import { expect,test } from "@playwright/test";
+
+import { createMeetingFromDetail,createMemberAndNavigateToDetail } from "./helpers";
 
 test.describe("ミーティング準備", () => {
   test("準備ページに遷移できる", async ({ page }) => {

@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
 import { MEETING_TEMPLATES } from "../meeting-templates";
 
 describe("MEETING_TEMPLATES", () => {

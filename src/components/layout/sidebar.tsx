@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { BarChart2, LayoutDashboard, ListChecks, Menu, UserPlus, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, UserPlus, ListChecks, BarChart2, Menu, X } from "lucide-react";
+import { useState } from "react";
+
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Separator } from "@/components/ui/separator";
+
 import { GlobalSearch } from "./global-search";
 import { ThemeToggle } from "./theme-toggle";
 

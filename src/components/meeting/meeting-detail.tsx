@@ -1,7 +1,7 @@
+import { ActionListCompact } from "@/components/action/action-list-compact";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ActionListCompact } from "@/components/action/action-list-compact";
 import { CATEGORY_LABELS } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 

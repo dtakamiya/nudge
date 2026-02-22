@@ -1,7 +1,8 @@
-import { test, expect } from "@playwright/test";
+import { expect,test } from "@playwright/test";
+
 import {
-  createMemberAndNavigateToDetail,
   createMeetingFromDetail,
+  createMemberAndNavigateToDetail,
   navigateToFirstMeetingDetail,
 } from "./helpers";
 

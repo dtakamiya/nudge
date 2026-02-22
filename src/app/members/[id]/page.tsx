@@ -1,19 +1,20 @@
-import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getMember } from "@/lib/actions/member-actions";
+import { notFound } from "next/navigation";
+
+import { ActionListCompact } from "@/components/action/action-list-compact";
+import { ActionAnalyticsSection } from "@/components/analytics/action-analytics-section";
+import { TopicAnalyticsSection } from "@/components/analytics/topic-analytics-section";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { ExportDialog } from "@/components/meeting/export-dialog";
+import { MeetingHistory } from "@/components/meeting/meeting-history";
+import { MemberDeleteDialog } from "@/components/member/member-delete-dialog";
+import { MemberEditDialog } from "@/components/member/member-edit-dialog";
+import { MemberQuickActions } from "@/components/member/member-quick-actions";
+import { MemberStatsBar } from "@/components/member/member-stats-bar";
+import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { AvatarInitial } from "@/components/ui/avatar-initial";
-import { MeetingHistory } from "@/components/meeting/meeting-history";
-import { ActionListCompact } from "@/components/action/action-list-compact";
-import { Breadcrumb } from "@/components/layout/breadcrumb";
-import { MemberEditDialog } from "@/components/member/member-edit-dialog";
-import { MemberDeleteDialog } from "@/components/member/member-delete-dialog";
-import { TopicAnalyticsSection } from "@/components/analytics/topic-analytics-section";
-import { ActionAnalyticsSection } from "@/components/analytics/action-analytics-section";
-import { MemberStatsBar } from "@/components/member/member-stats-bar";
-import { MemberQuickActions } from "@/components/member/member-quick-actions";
-import { ExportDialog } from "@/components/meeting/export-dialog";
+import { getMember } from "@/lib/actions/member-actions";
 
 type Props = { params: Promise<{ id: string }> };
 

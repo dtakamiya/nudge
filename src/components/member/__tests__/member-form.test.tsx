@@ -1,9 +1,11 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { cleanup,render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
-import { MemberForm } from "../member-form";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
+
+import { MemberForm } from "../member-form";
 
 const mockPush = vi.fn();
 const mockRefresh = vi.fn();

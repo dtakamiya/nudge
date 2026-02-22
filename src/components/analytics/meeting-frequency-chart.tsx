@@ -1,7 +1,8 @@
 "use client";
 
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer,Tooltip, XAxis, YAxis } from "recharts";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import type { MeetingFrequencyMonth } from "@/lib/actions/analytics-actions";
 
 export function MeetingFrequencyChart({ data }: { data: MeetingFrequencyMonth[] }) {

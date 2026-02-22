@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { AvatarInitial } from "@/components/ui/avatar-initial";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { RecommendedMeeting } from "@/lib/actions/analytics-actions";
 
 export function MeetingIntervalTable({ data }: { data: RecommendedMeeting[] }) {

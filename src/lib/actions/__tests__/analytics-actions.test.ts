@@ -1,10 +1,12 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { beforeEach,describe, expect, it } from "vitest";
+
 import { prisma } from "@/lib/prisma";
+
 import {
-  getMemberActionTrends,
   getMeetingFrequencyByMonth,
-  getRecommendedMeetings,
+  getMemberActionTrends,
   getMemberMeetingHeatmap,
+  getRecommendedMeetings,
   getScheduledMeetingsThisWeek,
 } from "../analytics-actions";
 import { createMember } from "../member-actions";

@@ -1,5 +1,5 @@
-import { MemberForm } from "@/components/member/member-form";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { MemberForm } from "@/components/member/member-form";
 
 export default function NewMemberPage() {
   return (

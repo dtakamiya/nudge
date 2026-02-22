@@ -1,7 +1,9 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
-import { ReminderAlertBanner } from "../reminder-alert-banner";
+import { cleanup,render, screen } from "@testing-library/react";
+import { afterEach,describe, expect, it } from "vitest";
+
 import type { OverdueReminder } from "@/lib/actions/reminder-actions";
+
+import { ReminderAlertBanner } from "../reminder-alert-banner";
 
 afterEach(() => {
   cleanup();

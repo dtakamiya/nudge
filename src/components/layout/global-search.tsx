@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, useTransition } from "react";
+import { CheckSquare, MessageSquare, Search, User, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Search, User, MessageSquare, CheckSquare, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+
 import { searchAll, type SearchResults } from "@/lib/actions/search-actions";
 import { cn } from "@/lib/utils";
 

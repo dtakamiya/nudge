@@ -1,9 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
 import {
   calcNextRecommendedDate,
+  formatNextRecommendedDate,
   isOverdue,
   isScheduledThisWeek,
-  formatNextRecommendedDate,
 } from "@/lib/schedule";
 
 describe("calcNextRecommendedDate", () => {

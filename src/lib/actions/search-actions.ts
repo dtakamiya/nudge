@@ -2,7 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { searchQuerySchema } from "@/lib/validations/search";
-import { runAction, type ActionResult } from "./types";
+
+import { type ActionResult,runAction } from "./types";
 
 export type MemberSearchResult = {
   id: string;

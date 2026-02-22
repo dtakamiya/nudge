@@ -1,11 +1,12 @@
-import { notFound } from "next/navigation";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+
+import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { MeetingDeleteDialog } from "@/components/meeting/meeting-delete-dialog";
+import { MeetingDetailPageClient } from "@/components/meeting/meeting-detail-page-client";
+import { Button } from "@/components/ui/button";
 import { getMeeting } from "@/lib/actions/meeting-actions";
 import { formatDate } from "@/lib/format";
-import { Button } from "@/components/ui/button";
-import { MeetingDetailPageClient } from "@/components/meeting/meeting-detail-page-client";
-import { MeetingDeleteDialog } from "@/components/meeting/meeting-delete-dialog";
-import { Breadcrumb } from "@/components/layout/breadcrumb";
 
 type Props = { params: Promise<{ id: string; meetingId: string }> };
 

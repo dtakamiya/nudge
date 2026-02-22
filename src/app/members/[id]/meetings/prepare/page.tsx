@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
-import { getMember } from "@/lib/actions/member-actions";
-import { getRecentMeetings } from "@/lib/actions/meeting-actions";
-import { getPendingActionItems } from "@/lib/actions/action-item-actions";
-import { MeetingPrepare } from "@/components/meeting/meeting-prepare";
+
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { MeetingPrepare } from "@/components/meeting/meeting-prepare";
+import { getPendingActionItems } from "@/lib/actions/action-item-actions";
+import { getRecentMeetings } from "@/lib/actions/meeting-actions";
+import { getMember } from "@/lib/actions/member-actions";
 
 type Props = { params: Promise<{ id: string }> };
 

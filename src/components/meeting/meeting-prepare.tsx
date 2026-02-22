@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
 import { toast } from "sonner";
+
+import { PastMeetingsAccordion } from "@/components/meeting/past-meetings-accordion";
+import { PrepareActionChecklist } from "@/components/meeting/prepare-action-checklist";
+import { TemplateSelector } from "@/components/meeting/template-selector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -15,11 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TemplateSelector } from "@/components/meeting/template-selector";
-import { PastMeetingsAccordion } from "@/components/meeting/past-meetings-accordion";
-import { PrepareActionChecklist } from "@/components/meeting/prepare-action-checklist";
-import { TOAST_MESSAGES } from "@/lib/toast-messages";
+import { Textarea } from "@/components/ui/textarea";
 import type { MeetingTemplate, TopicCategory } from "@/lib/meeting-templates";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 type TopicDraft = {
   category: TopicCategory;

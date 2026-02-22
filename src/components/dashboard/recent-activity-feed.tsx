@@ -1,9 +1,10 @@
-import Link from "next/link";
 import { Activity, Calendar, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+
+import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { ActivityItem } from "@/lib/actions/dashboard-actions";
 import { formatRelativeDate } from "@/lib/format";
-import { AvatarInitial } from "@/components/ui/avatar-initial";
 
 type Props = {
   readonly activities: readonly ActivityItem[];

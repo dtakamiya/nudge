@@ -1,8 +1,10 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { beforeEach,describe, expect, it } from "vitest";
+
 import { prisma } from "@/lib/prisma";
+
 import { getMeetingsForExport } from "../export-actions";
-import { createMember } from "../member-actions";
 import { createMeeting } from "../meeting-actions";
+import { createMember } from "../member-actions";
 
 beforeEach(async () => {
   await prisma.actionItem.deleteMany();

@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from "react";
-import { Accordion } from "radix-ui";
 import { ChevronDown } from "lucide-react";
+import { Accordion } from "radix-ui";
+import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -50,4 +50,4 @@ const AccordionContent = React.forwardRef<
 ));
 AccordionContent.displayName = Accordion.Content.displayName;
 
-export { AccordionRoot, AccordionItem, AccordionTrigger, AccordionContent };
+export { AccordionContent,AccordionItem, AccordionRoot, AccordionTrigger };

@@ -4,17 +4,19 @@ import { useMemo } from "react";
 import {
   Bar,
   BarChart,
+  CartesianGrid,
+  Legend,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  Legend,
-  CartesianGrid,
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { type MonthlyTrend } from "@/lib/actions/analytics-actions";
-import { CATEGORY_LABELS, CATEGORY_COLORS } from "./topic-distribution-chart";
+
+import { Card, CardContent, CardDescription,CardHeader, CardTitle } from "@/components/ui/card";
 import { TopicCategory } from "@/generated/prisma/client";
+import { type MonthlyTrend } from "@/lib/actions/analytics-actions";
+
+import { CATEGORY_COLORS,CATEGORY_LABELS } from "./topic-distribution-chart";
 
 type Props = {
   data: MonthlyTrend[];

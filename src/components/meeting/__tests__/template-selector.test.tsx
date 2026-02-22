@@ -1,8 +1,10 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { cleanup,render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { TemplateSelector } from "../template-selector";
+import { afterEach,describe, expect, it, vi } from "vitest";
+
 import { MEETING_TEMPLATES } from "@/lib/meeting-templates";
+
+import { TemplateSelector } from "../template-selector";
 
 afterEach(() => {
   cleanup();

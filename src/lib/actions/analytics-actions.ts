@@ -1,9 +1,9 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { toMonthKey } from "@/lib/format";
-import { calcNextRecommendedDate, isOverdue, isScheduledThisWeek } from "@/lib/schedule";
 import type { TopicCategory } from "@/generated/prisma/client";
+import { toMonthKey } from "@/lib/format";
+import { prisma } from "@/lib/prisma";
+import { calcNextRecommendedDate, isOverdue, isScheduledThisWeek } from "@/lib/schedule";
 
 export type CategoryTrend = {
   category: TopicCategory;

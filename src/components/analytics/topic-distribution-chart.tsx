@@ -1,10 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
-import { Pie, PieChart, ResponsiveContainer, Cell, Tooltip, Legend } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { type CategoryTrend } from "@/lib/actions/analytics-actions";
+import { Cell, Legend,Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+
+import { Card, CardContent, CardDescription,CardHeader, CardTitle } from "@/components/ui/card";
 import { TopicCategory } from "@/generated/prisma/client";
+import { type CategoryTrend } from "@/lib/actions/analytics-actions";
 
 export const CATEGORY_LABELS: Record<TopicCategory, string> = {
   WORK_PROGRESS: "業務進捗",

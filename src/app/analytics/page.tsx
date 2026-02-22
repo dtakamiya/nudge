@@ -1,12 +1,12 @@
+import { MeetingFrequencyChart } from "@/components/analytics/meeting-frequency-chart";
+import { MeetingHeatmap } from "@/components/analytics/meeting-heatmap";
+import { MeetingIntervalTable } from "@/components/analytics/meeting-interval-table";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import {
-  getMeetingFrequencyByMonth,
   getAllMembersWithInterval,
+  getMeetingFrequencyByMonth,
   getMemberMeetingHeatmap,
 } from "@/lib/actions/analytics-actions";
-import { MeetingFrequencyChart } from "@/components/analytics/meeting-frequency-chart";
-import { MeetingIntervalTable } from "@/components/analytics/meeting-interval-table";
-import { MeetingHeatmap } from "@/components/analytics/meeting-heatmap";
 
 export const dynamic = "force-dynamic";
 

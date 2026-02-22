@@ -1,7 +1,7 @@
 "use client";
 
+import { Monitor, Moon,Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Monitor, Sun, Moon } from "lucide-react";
 import { useSyncExternalStore } from "react";
 
 const modes = [

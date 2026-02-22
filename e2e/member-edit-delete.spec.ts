@@ -1,4 +1,5 @@
-import { test, expect } from "@playwright/test";
+import { expect,test } from "@playwright/test";
+
 import { createMemberAndNavigateToDetail } from "./helpers";
 
 test.describe("メンバー編集・削除", () => {

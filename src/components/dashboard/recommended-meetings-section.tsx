@@ -1,11 +1,12 @@
-import Link from "next/link";
 import { Heart } from "lucide-react";
+import Link from "next/link";
+
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import type { RecommendedMeeting } from "@/lib/actions/analytics-actions";
 import { getMeetingIntervalLabel } from "@/lib/constants";
 import { formatNextRecommendedDate } from "@/lib/schedule";
-import type { RecommendedMeeting } from "@/lib/actions/analytics-actions";
 
 export function RecommendedMeetingsSection({ members }: { members: RecommendedMeeting[] }) {
   if (members.length === 0) {

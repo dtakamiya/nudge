@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
+import "./globals.css";
+
 import { GeistSans } from "geist/font/sans";
+import type { Metadata } from "next";
 import { Noto_Sans_JP } from "next/font/google";
-import { prisma } from "@/lib/prisma";
-import { Sidebar } from "@/components/layout/sidebar";
+
 import { KeyboardShortcutProvider } from "@/components/layout/keyboard-shortcut-provider";
+import { Sidebar } from "@/components/layout/sidebar";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
-import "./globals.css";
+import { prisma } from "@/lib/prisma";
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],

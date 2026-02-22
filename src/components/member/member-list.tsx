@@ -1,22 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { ArrowUpDown, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Table,
-  TableHeader,
   TableBody,
-  TableRow,
-  TableHead,
   TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { formatRelativeDate } from "@/lib/format";
-import { ArrowUpDown, Users } from "lucide-react";
-import { EmptyState } from "@/components/ui/empty-state";
 
 type MemberWithStats = {
   readonly id: string;

@@ -1,9 +1,10 @@
 import { Suspense } from "react";
+
+import { ActionFilters } from "@/components/action/action-filters";
+import { ActionListFull } from "@/components/action/action-list-full";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { getActionItems } from "@/lib/actions/action-item-actions";
 import { getMembers } from "@/lib/actions/member-actions";
-import { ActionListFull } from "@/components/action/action-list-full";
-import { ActionFilters } from "@/components/action/action-filters";
-import { Breadcrumb } from "@/components/layout/breadcrumb";
 import type { ActionItemStatusType } from "@/lib/validations/action-item";
 
 export const dynamic = "force-dynamic";

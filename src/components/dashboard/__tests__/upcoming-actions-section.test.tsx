@@ -1,7 +1,9 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
-import { UpcomingActionsSection } from "../upcoming-actions-section";
+import { cleanup,render, screen } from "@testing-library/react";
+import { afterEach,describe, expect, it } from "vitest";
+
 import type { ActionItemWithMember } from "@/lib/actions/dashboard-actions";
+
+import { UpcomingActionsSection } from "../upcoming-actions-section";
 
 afterEach(() => {
   cleanup();

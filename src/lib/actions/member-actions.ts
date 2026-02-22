@@ -1,11 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma } from "@/lib/prisma";
-import { createMemberSchema, updateMemberSchema } from "@/lib/validations/member";
-import type { CreateMemberInput, UpdateMemberInput } from "@/lib/validations/member";
+
 import type { Member } from "@/generated/prisma/client";
-import { runAction, type ActionResult } from "./types";
+import { prisma } from "@/lib/prisma";
+import type { CreateMemberInput, UpdateMemberInput } from "@/lib/validations/member";
+import { createMemberSchema, updateMemberSchema } from "@/lib/validations/member";
+
+import { type ActionResult,runAction } from "./types";
 
 export async function getMembers() {
   const now = new Date();

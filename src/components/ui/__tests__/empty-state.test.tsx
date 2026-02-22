@@ -1,6 +1,7 @@
-import { render, screen, cleanup } from "@testing-library/react";
+import { cleanup,render, screen } from "@testing-library/react";
 import { Users } from "lucide-react";
 import { afterEach, describe, expect, it } from "vitest";
+
 import { EmptyState } from "../empty-state";
 
 afterEach(() => cleanup());

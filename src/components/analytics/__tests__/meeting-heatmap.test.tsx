@@ -1,7 +1,9 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
-import { MeetingHeatmap } from "../meeting-heatmap";
+import { describe, expect,it } from "vitest";
+
 import type { HeatmapData } from "@/lib/actions/analytics-actions";
+
+import { MeetingHeatmap } from "../meeting-heatmap";
 
 const emptyData: HeatmapData = {
   members: [],

@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook } from "@testing-library/react";
 import { fireEvent } from "@testing-library/dom";
+import { renderHook } from "@testing-library/react";
+import { afterEach,beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useKeyboardShortcuts } from "../use-keyboard-shortcuts";
 
 const defaultCallbacks = () => ({

@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { cleanup,render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { afterEach,describe, expect, it, vi } from "vitest";
+
 import { SortableTopicItem } from "../sortable-topic-item";
 
 // Mock @dnd-kit/sortable — useSortable returns no-op values for unit tests

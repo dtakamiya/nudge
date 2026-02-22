@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
-import { getMember } from "@/lib/actions/member-actions";
-import { getPreviousMeeting } from "@/lib/actions/meeting-actions";
-import { getPendingActionItems } from "@/lib/actions/action-item-actions";
+
+import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { MeetingForm } from "@/components/meeting/meeting-form";
 import { PreviousMeetingSidebar } from "@/components/meeting/previous-meeting-sidebar";
-import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { getPendingActionItems } from "@/lib/actions/action-item-actions";
+import { getPreviousMeeting } from "@/lib/actions/meeting-actions";
+import { getMember } from "@/lib/actions/member-actions";
 
 type Props = {
   params: Promise<{ id: string }>;

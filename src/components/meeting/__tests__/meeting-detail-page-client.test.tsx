@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { cleanup,render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
-import { MeetingDetailPageClient } from "../meeting-detail-page-client";
+import { afterEach,describe, expect, it, vi } from "vitest";
+
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
+
+import { MeetingDetailPageClient } from "../meeting-detail-page-client";
 
 const mockRefresh = vi.fn();
 vi.mock("next/navigation", () => ({

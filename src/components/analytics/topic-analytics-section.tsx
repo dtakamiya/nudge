@@ -1,4 +1,5 @@
 import { getMemberTopicTrends } from "@/lib/actions/analytics-actions";
+
 import { TopicDistributionChart } from "./topic-distribution-chart";
 import { TopicTrendChart } from "./topic-trend-chart";
 

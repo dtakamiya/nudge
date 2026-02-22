@@ -1,7 +1,9 @@
 "use client";
 
+import { Copy, Download, FileText } from "lucide-react";
 import { useState } from "react";
-import { Download, Copy, FileText } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,7 +16,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
 import { getMeetingsForExport } from "@/lib/actions/export-actions";
 import { formatMeetingMarkdown } from "@/lib/export";
 
