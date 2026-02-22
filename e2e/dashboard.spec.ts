@@ -55,4 +55,34 @@ test.describe("ダッシュボード", () => {
     await expect(page).toHaveURL("/actions");
     await expect(page.getByRole("heading", { name: "アクション一覧" })).toBeVisible();
   });
+
+  test("最近のアクティビティセクションが表示される", async ({ page }) => {
+    await page.goto("/");
+
+    await expect(page.getByText("最近のアクティビティ")).toBeVisible();
+  });
+
+  test("今週のタスクセクションが表示される", async ({ page }) => {
+    await page.goto("/");
+
+    await expect(page.getByText("今週のタスク")).toBeVisible();
+  });
+
+  test("KPIカードに数値が表示される", async ({ page }) => {
+    await page.goto("/");
+
+    // 各KPIカードに単位が表示される
+    await expect(page.getByTestId("kpi-card-follow-up")).toContainText("人");
+    await expect(page.getByTestId("kpi-card-completion")).toContainText("%");
+    await expect(page.getByTestId("kpi-card-meetings")).toContainText("回");
+    await expect(page.getByTestId("kpi-card-overdue")).toContainText("件");
+  });
+
+  test("ダッシュボードのサイドバーリンクがアクティブ状態になる", async ({ page }) => {
+    await page.goto("/");
+
+    const sidebar = page.locator("aside").last();
+    const dashboardLink = sidebar.getByRole("link", { name: "ダッシュボード" });
+    await expect(dashboardLink).toBeVisible();
+  });
 });

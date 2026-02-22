@@ -93,7 +93,7 @@ test.describe("ミーティング管理", () => {
     await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
 
     // アクションアイテムセクションに追加したアイテムが表示される
-    await expect(page.getByText("テストレポートを作成する")).toBeVisible();
+    await expect(page.getByText("テストレポートを作成する").first()).toBeVisible();
   });
 
   test("ミーティング詳細ページが表示される", async ({ page }) => {
