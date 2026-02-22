@@ -36,26 +36,30 @@ npm run dev
 
 ## npm スクリプト一覧
 
-| コマンド               | 実行内容             | 説明                                   |
-| ---------------------- | -------------------- | -------------------------------------- |
-| `npm run dev`          | `next dev`           | 開発サーバー起動（ホットリロード付き） |
-| `npm run build`        | `next build`         | 本番用ビルド                           |
-| `npm run start`        | `next start`         | 本番サーバー起動                       |
-| `npm run lint`         | `eslint`             | ESLint による静的解析                  |
-| `npm test`             | `vitest run`         | テスト実行（単発）                     |
-| `npm run test:watch`   | `vitest`             | テスト実行（ウォッチモード）           |
-| `npm run format`       | `prettier --write .` | Prettier で全ファイルフォーマット      |
-| `npm run format:check` | `prettier --check .` | Prettier フォーマットチェック（CI 用） |
-| `npm run prepare`      | `husky`              | Git フック設定（自動実行）             |
+| コマンド                  | 実行内容                   | 説明                                           |
+| ------------------------- | -------------------------- | ---------------------------------------------- |
+| `npm run dev`             | `next dev --turbo`         | 開発サーバー起動（Turbopack + ホットリロード） |
+| `npm run build`           | `next build`               | 本番用ビルド                                   |
+| `npm run start`           | `next start`               | 本番サーバー起動                               |
+| `npm run lint`            | `eslint`                   | ESLint による静的解析                          |
+| `npm test`                | `vitest run`               | ユニット/統合テスト実行（単発）                |
+| `npm run test:watch`      | `vitest`                   | テスト実行（ウォッチモード）                   |
+| `npm run test:e2e`        | `playwright test`          | E2E テスト実行                                 |
+| `npm run test:e2e:ui`     | `playwright test --ui`     | E2E テスト実行（Playwright UI モード）         |
+| `npm run test:e2e:headed` | `playwright test --headed` | E2E テスト実行（ブラウザ表示あり）             |
+| `npm run format`          | `prettier --write .`       | Prettier で全ファイルフォーマット              |
+| `npm run format:check`    | `prettier --check .`       | Prettier フォーマットチェック（CI 用）         |
+| `npm run prepare`         | `husky`                    | Git フック設定（自動実行）                     |
 
 ## データベースコマンド
 
 | コマンド                 | 説明                             |
 | ------------------------ | -------------------------------- |
 | `npx prisma migrate dev` | マイグレーション実行（開発環境） |
-| `npx prisma db seed`     | シードデータ投入                 |
 | `npx prisma generate`    | Prisma クライアント生成          |
 | `npx prisma studio`      | Prisma Studio（DB GUI）起動      |
+| `npm run db:seed`        | 開発用シードデータ投入           |
+| `npm run db:seed-test`   | テスト用シードデータ投入         |
 
 ## 環境変数
 
@@ -103,10 +107,25 @@ npm run test:watch
 
 ### テスト構成
 
-- **フレームワーク:** Vitest + Testing Library + jsdom
+- **ユニット/統合テスト:** Vitest + Testing Library + jsdom
+- **E2E テスト:** Playwright（`@playwright/test`）
+- **テストデータ:** `@faker-js/faker` でランダムデータ生成
 - **テストファイル:** `src/**/__tests__/*.test.{ts,tsx}`
 - **カバレッジ目標:** 80% 以上
 - **テスト DB:** `file:./test.db`（開発 DB とは分離）
+
+### E2E テスト
+
+```bash
+# E2E テスト実行
+npm run test:e2e
+
+# UI モードで確認しながら実行
+npm run test:e2e:ui
+
+# ブラウザ表示あり（デバッグ用）
+npm run test:e2e:headed
+```
 
 ### TDD ワークフロー
 
@@ -128,14 +147,17 @@ npm run test:watch
 
 ## 技術スタック
 
-| カテゴリ       | 技術                                  |
-| -------------- | ------------------------------------- |
-| フレームワーク | Next.js 16 (App Router) + React 19    |
-| データベース   | Prisma ORM + SQLite                   |
-| スタイリング   | Tailwind CSS 4 + shadcn/ui            |
-| バリデーション | Zod 4                                 |
-| テスト         | Vitest + Testing Library + jsdom      |
-| アイコン       | lucide-react                          |
-| DnD            | @dnd-kit/core + @dnd-kit/sortable     |
-| コード品質     | ESLint, Prettier, husky + lint-staged |
-| 言語           | TypeScript 5 (strict mode)            |
+| カテゴリ       | 技術                                          |
+| -------------- | --------------------------------------------- |
+| フレームワーク | Next.js 16 (App Router) + React 19            |
+| データベース   | Prisma ORM + SQLite                           |
+| スタイリング   | Tailwind CSS 4 + shadcn/ui                    |
+| テーマ         | next-themes（ダークモード対応）               |
+| バリデーション | Zod 4                                         |
+| チャート       | recharts                                      |
+| テスト         | Vitest + Testing Library + jsdom + Playwright |
+| テストデータ   | @faker-js/faker                               |
+| アイコン       | lucide-react                                  |
+| DnD            | @dnd-kit/core + @dnd-kit/sortable             |
+| コード品質     | ESLint, Prettier, husky + lint-staged         |
+| 言語           | TypeScript 5 (strict mode)                    |

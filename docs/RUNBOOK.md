@@ -32,7 +32,7 @@ cp .env.example .env
 
 # データベース初期化（マイグレーション + シード）
 npx prisma migrate dev
-npx prisma db seed
+npm run db:seed
 ```
 
 ## トラブルシューティング
@@ -85,7 +85,7 @@ npm run dev
 
 ### テスト関連
 
-**症状:** テストが失敗する
+**症状:** ユニット/統合テストが失敗する
 
 ```bash
 # 1. 全テスト実行で状況確認
@@ -96,6 +96,22 @@ npx vitest run src/lib/__tests__/format.test.ts
 
 # 3. テスト DB のリセット
 DATABASE_URL="file:./test.db" npx prisma migrate reset --force
+```
+
+**症状:** E2E テストが失敗する
+
+```bash
+# 1. Playwright ブラウザのインストール確認
+npx playwright install
+
+# 2. ヘッドありモードで視覚的に確認
+npm run test:e2e:headed
+
+# 3. UI モードでインタラクティブに確認
+npm run test:e2e:ui
+
+# 4. 開発サーバーが起動していることを確認（E2E はサーバーが必要）
+npm run dev
 ```
 
 ### 開発サーバー
@@ -126,12 +142,15 @@ npx prisma studio
 
 ### モデル一覧
 
-| モデル       | 説明                   |
-| ------------ | ---------------------- |
-| `Member`     | 1on1 対象メンバー      |
-| `Meeting`    | ミーティング記録       |
-| `Topic`      | ミーティングのトピック |
-| `ActionItem` | アクションアイテム     |
+| モデル          | 説明                                    |
+| --------------- | --------------------------------------- |
+| `Member`        | 1on1 対象メンバー                       |
+| `Meeting`       | ミーティング記録（mood フィールドあり） |
+| `Topic`         | ミーティングのトピック                  |
+| `ActionItem`    | アクションアイテム                      |
+| `Tag`           | タグ/ラベル（色付き）                   |
+| `TopicTag`      | Topic と Tag の中間テーブル             |
+| `ActionItemTag` | ActionItem と Tag の中間テーブル        |
 
 ### リレーション
 
@@ -140,6 +159,8 @@ Member 1--* Meeting
 Member 1--* ActionItem
 Meeting 1--* Topic
 Meeting 1--* ActionItem
+Topic *--* Tag (via TopicTag)
+ActionItem *--* Tag (via ActionItemTag)
 ```
 
 ### Enum
