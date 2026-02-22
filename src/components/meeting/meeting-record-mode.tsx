@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect,useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { ActionListCompact } from "@/components/action/action-list-compact";
@@ -29,12 +29,11 @@ type ActionItem = {
 };
 
 type Props = {
-  meetingId: string;
   topics: Topic[];
   actionItems: ActionItem[];
 };
 
-export function MeetingRecordMode({ meetingId, topics: initialTopics, actionItems }: Props) {
+export function MeetingRecordMode({ topics: initialTopics, actionItems }: Props) {
   const [topics, setTopics] = useState(initialTopics);
 
   const handleNotesChange = (topicId: string, notes: string) => {
@@ -48,7 +47,7 @@ export function MeetingRecordMode({ meetingId, topics: initialTopics, actionItem
         toast.error("ノートの保存に失敗しました");
       }
       // No success toast to avoid spamming the user during typing
-    } catch (e) {
+    } catch {
       toast.error("ノートの保存に失敗しました");
     }
   };

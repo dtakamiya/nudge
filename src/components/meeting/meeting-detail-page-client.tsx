@@ -191,11 +191,7 @@ export function MeetingDetailPageClient({
             終了
           </Button>
         </div>
-        <MeetingRecordMode
-          meetingId={meetingId}
-          topics={[...topics]}
-          actionItems={[...actionItems]}
-        />
+        <MeetingRecordMode topics={[...topics]} actionItems={[...actionItems]} />
       </div>
     );
   }
