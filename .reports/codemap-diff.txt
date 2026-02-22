@@ -1,0 +1,18 @@
+Codemap Diff Report
+Generated: 2026-02-23
+
+Status: INITIAL CREATION (no previous codemaps found)
+Diff %: N/A (first run)
+
+Files Created:
+  + codemaps/architecture.md
+  + codemaps/backend.md
+  + codemaps/frontend.md
+  + codemaps/data.md
+
+Summary:
+  - 6 Prisma models (Member, Meeting, Topic, ActionItem, Tag, TopicTag, ActionItemTag)
+  - 9 Server Action files
+  - 8 route segments (/, /members/new, /members/[id], /members/[id]/meetings/*)
+  - ~45 React components across 7 feature areas
+  - 5 Zod validation schema files
