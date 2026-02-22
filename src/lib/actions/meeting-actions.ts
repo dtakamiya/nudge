@@ -65,6 +65,15 @@ export async function getPreviousMeeting(memberId: string, excludeMeetingId?: st
   });
 }
 
+export async function getRecentMeetings(memberId: string, limit: number = 5) {
+  return prisma.meeting.findMany({
+    where: { memberId },
+    orderBy: { date: "desc" },
+    take: limit,
+    include: { topics: { orderBy: { sortOrder: "asc" } }, actionItems: true },
+  });
+}
+
 export async function updateMeeting(
   input: UpdateMeetingInput,
 ): Promise<ActionResult<MeetingWithRelations>> {

@@ -21,4 +21,7 @@ export const TOAST_MESSAGES = {
     updateSuccess: "アクションアイテムを更新しました",
     updateError: "アクションアイテムの更新に失敗しました",
   },
+  prepare: {
+    topicCopied: "話題をアジェンダにコピーしました",
+  },
 } as const;

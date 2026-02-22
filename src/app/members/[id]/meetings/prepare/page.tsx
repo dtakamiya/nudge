@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getMember } from "@/lib/actions/member-actions";
-import { getPreviousMeeting } from "@/lib/actions/meeting-actions";
+import { getRecentMeetings } from "@/lib/actions/meeting-actions";
 import { getPendingActionItems } from "@/lib/actions/action-item-actions";
 import { MeetingPrepare } from "@/components/meeting/meeting-prepare";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
@@ -14,7 +14,7 @@ export default async function PrepareMeetingPage({ params }: Props) {
     notFound();
   }
 
-  const previousMeeting = await getPreviousMeeting(id);
+  const recentMeetings = await getRecentMeetings(id, 5);
   const pendingActions = await getPendingActionItems(id);
 
   return (
@@ -31,7 +31,7 @@ export default async function PrepareMeetingPage({ params }: Props) {
       </h1>
       <MeetingPrepare
         memberId={id}
-        previousMeeting={previousMeeting}
+        recentMeetings={recentMeetings}
         pendingActions={pendingActions}
       />
     </div>
