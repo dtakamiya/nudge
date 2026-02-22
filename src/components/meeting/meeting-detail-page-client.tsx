@@ -21,6 +21,7 @@ type ActionItem = {
   readonly id: string;
   readonly title: string;
   readonly description: string;
+  readonly sortOrder: number;
   readonly status: string;
   readonly dueDate: Date | null;
   readonly meeting: { readonly date: Date };
@@ -68,6 +69,7 @@ export function MeetingDetailPageClient({ meetingId, memberId, date, topics, act
               id: a.id,
               title: a.title,
               description: a.description,
+              sortOrder: a.sortOrder,
               dueDate: a.dueDate ? new Date(a.dueDate).toISOString().split("T")[0] : "",
               status: a.status,
             })),

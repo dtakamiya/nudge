@@ -86,6 +86,7 @@ const defaultProps = {
       id: "action-1",
       title: "Fix bug",
       description: "Critical",
+      sortOrder: 0,
       status: "TODO",
       dueDate: new Date("2026-03-01"),
       meeting: { date: new Date("2026-02-20T10:00:00.000Z") },

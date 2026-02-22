@@ -35,6 +35,7 @@ type ActionFormData = {
   id?: string;
   title: string;
   description: string;
+  sortOrder: number;
   dueDate: string;
 };
 
@@ -52,6 +53,7 @@ type MeetingInitialData = {
     readonly id: string;
     readonly title: string;
     readonly description: string;
+    readonly sortOrder: number;
     readonly dueDate: string;
     readonly status: string;
   }>;
@@ -68,8 +70,8 @@ function createEmptyTopic(sortOrder: number): TopicFormData {
   return { category: "WORK_PROGRESS", title: "", notes: "", sortOrder };
 }
 
-function createEmptyAction(): ActionFormData {
-  return { title: "", description: "", dueDate: "" };
+function createEmptyAction(sortOrder: number): ActionFormData {
+  return { title: "", description: "", sortOrder, dueDate: "" };
 }
 
 export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }: Props) {
@@ -98,10 +100,11 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
 
   const [actionItems, setActionItems] = useState<ActionFormData[]>(
     initialData
-      ? initialData.actionItems.map((a) => ({
+      ? initialData.actionItems.map((a, index) => ({
           id: a.id,
           title: a.title,
           description: a.description,
+          sortOrder: a.sortOrder ?? index,
           dueDate: a.dueDate,
         }))
       : [],
@@ -146,7 +149,7 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
   }
 
   function addAction() {
-    setActionItems((prev) => [...prev, createEmptyAction()]);
+    setActionItems((prev) => [...prev, createEmptyAction(prev.length)]);
   }
 
   function removeAction(index: number) {
@@ -155,7 +158,7 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
       if (removed.id) {
         setDeletedActionItemIds((ids) => [...ids, removed.id!]);
       }
-      return prev.filter((_, i) => i !== index);
+      return prev.filter((_, i) => i !== index).map((a, i) => ({ ...a, sortOrder: i }));
     });
   }
 
@@ -170,7 +173,7 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
       const oldIndex = prev.findIndex((_, i) => `action-${i}` === active.id);
       const newIndex = prev.findIndex((_, i) => `action-${i}` === over.id);
       if (oldIndex === -1 || newIndex === -1) return prev;
-      return arrayMove(prev, oldIndex, newIndex);
+      return arrayMove(prev, oldIndex, newIndex).map((a, i) => ({ ...a, sortOrder: i }));
     });
   }
 
@@ -194,10 +197,11 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
             notes: t.notes,
             sortOrder: t.sortOrder,
           })),
-          actionItems: validActions.map((a) => ({
+          actionItems: validActions.map((a, index) => ({
             id: a.id,
             title: a.title,
             description: a.description,
+            sortOrder: a.sortOrder ?? index,
             dueDate: a.dueDate || undefined,
           })),
           deletedTopicIds,
@@ -220,9 +224,10 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
             notes: t.notes,
             sortOrder: t.sortOrder,
           })),
-          actionItems: validActions.map((a) => ({
+          actionItems: validActions.map((a, index) => ({
             title: a.title,
             description: a.description,
+            sortOrder: a.sortOrder ?? index,
             dueDate: a.dueDate || undefined,
           })),
         });

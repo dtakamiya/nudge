@@ -64,6 +64,7 @@ model ActionItem {
   title       String
   description String           @default("")
   status      ActionItemStatus @default(TODO)
+  sortOrder   Int              @default(0)
   dueDate     DateTime?
   completedAt DateTime?
   createdAt   DateTime         @default(now())

@@ -51,9 +51,9 @@ describe("getMembers", () => {
       date: new Date().toISOString(),
       topics: [],
       actionItems: [
-        { title: "Overdue", description: "", dueDate: yesterday.toISOString() },
-        { title: "Not yet", description: "", dueDate: tomorrow.toISOString() },
-        { title: "No due", description: "" },
+        { title: "Overdue", description: "", sortOrder: 0, dueDate: yesterday.toISOString() },
+        { title: "Not yet", description: "", sortOrder: 1, dueDate: tomorrow.toISOString() },
+        { title: "No due", description: "", sortOrder: 2 },
       ],
     });
 
