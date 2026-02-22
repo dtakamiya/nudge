@@ -5,6 +5,7 @@ import {
   getMeetingFrequencyByMonth,
   getRecommendedMeetings,
   getMemberMeetingHeatmap,
+  getScheduledMeetingsThisWeek,
 } from "../analytics-actions";
 import { createMember } from "../member-actions";
 
@@ -170,7 +171,7 @@ describe("getMeetingFrequencyByMonth", () => {
 });
 
 describe("getRecommendedMeetings", () => {
-  it("returns members with no meetings", async () => {
+  it("ミーティング未実施のメンバーを返す", async () => {
     const member = await createMember({
       name: "NoMeeting",
       department: undefined,
@@ -182,13 +183,15 @@ describe("getRecommendedMeetings", () => {
     const found = result.find((r) => r.id === member.data.id);
     expect(found).toBeDefined();
     expect(found?.lastMeetingDate).toBeNull();
+    expect(found?.nextRecommendedDate).toBeNull();
   });
 
-  it("returns members whose last meeting was over 14 days ago", async () => {
+  it("各メンバーの meetingIntervalDays を超えた場合に返す（デフォルト14日）", async () => {
     const member = await createMember({
       name: "OldMeeting",
       department: undefined,
       position: undefined,
+      meetingIntervalDays: 14,
     });
     if (!member.success) throw new Error();
 
@@ -200,21 +203,114 @@ describe("getRecommendedMeetings", () => {
     const found = result.find((r) => r.id === member.data.id);
     expect(found).toBeDefined();
     expect(found!.daysSinceLast).toBeGreaterThanOrEqual(20);
+    expect(found!.meetingIntervalDays).toBe(14);
+    expect(found!.nextRecommendedDate).not.toBeNull();
   });
 
-  it("excludes members with recent meetings (within 14 days)", async () => {
+  it("meetingIntervalDays=7 のメンバーが 10 日経過で推奨に含まれる", async () => {
+    const member = await createMember({
+      name: "WeeklyMeeting",
+      department: undefined,
+      position: undefined,
+      meetingIntervalDays: 7,
+    });
+    if (!member.success) throw new Error();
+
+    const oldDate = new Date();
+    oldDate.setDate(oldDate.getDate() - 10); // 10日経過 > interval=7
+    await prisma.meeting.create({ data: { memberId: member.data.id, date: oldDate } });
+
+    const result = await getRecommendedMeetings();
+    const found = result.find((r) => r.id === member.data.id);
+    expect(found).toBeDefined();
+  });
+
+  it("meetingIntervalDays=30 のメンバーが 20 日経過で推奨に含まれない", async () => {
+    const member = await createMember({
+      name: "MonthlyMeeting",
+      department: undefined,
+      position: undefined,
+      meetingIntervalDays: 30,
+    });
+    if (!member.success) throw new Error();
+
+    const recentDate = new Date();
+    recentDate.setDate(recentDate.getDate() - 20); // 20日経過 < interval=30
+    await prisma.meeting.create({ data: { memberId: member.data.id, date: recentDate } });
+
+    const result = await getRecommendedMeetings();
+    const found = result.find((r) => r.id === member.data.id);
+    expect(found).toBeUndefined();
+  });
+
+  it("自分の meetingIntervalDays 以内のミーティングがあるメンバーを除外する（デフォルト14日）", async () => {
     const member = await createMember({
       name: "RecentMeeting",
+      department: undefined,
+      position: undefined,
+      meetingIntervalDays: 14,
+    });
+    if (!member.success) throw new Error();
+
+    const recentDate = new Date();
+    recentDate.setDate(recentDate.getDate() - 5); // 5日経過 < interval=14
+    await prisma.meeting.create({ data: { memberId: member.data.id, date: recentDate } });
+
+    const result = await getRecommendedMeetings();
+    const found = result.find((r) => r.id === member.data.id);
+    expect(found).toBeUndefined();
+  });
+});
+
+describe("getScheduledMeetingsThisWeek", () => {
+  it("今週に次回推奨日があるメンバーを返す", async () => {
+    const member = await createMember({
+      name: "ThisWeek",
+      department: undefined,
+      position: undefined,
+      meetingIntervalDays: 14,
+    });
+    if (!member.success) throw new Error();
+
+    // 13日前にミーティング → next = 明日 → 今週内（タイミング問題を回避）
+    const lastDate = new Date();
+    lastDate.setDate(lastDate.getDate() - 13);
+    await prisma.meeting.create({ data: { memberId: member.data.id, date: lastDate } });
+
+    const result = await getScheduledMeetingsThisWeek();
+    const found = result.find((r) => r.id === member.data.id);
+    expect(found).toBeDefined();
+    expect(found!.nextRecommendedDate).not.toBeNull();
+  });
+
+  it("来週以降に次回推奨日があるメンバーを含まない", async () => {
+    const member = await createMember({
+      name: "NextWeek",
+      department: undefined,
+      position: undefined,
+      meetingIntervalDays: 14,
+    });
+    if (!member.success) throw new Error();
+
+    // 5日前にミーティング → next = 9日後 = 来週以降
+    const lastDate = new Date();
+    lastDate.setDate(lastDate.getDate() - 5);
+    await prisma.meeting.create({ data: { memberId: member.data.id, date: lastDate } });
+
+    const result = await getScheduledMeetingsThisWeek();
+    const found = result.find((r) => r.id === member.data.id);
+    expect(found).toBeUndefined();
+  });
+
+  it("ミーティング未実施のメンバーを含まない", async () => {
+    const member = await createMember({
+      name: "NoMeetingScheduled",
       department: undefined,
       position: undefined,
     });
     if (!member.success) throw new Error();
 
-    const recentDate = new Date();
-    recentDate.setDate(recentDate.getDate() - 5);
-    await prisma.meeting.create({ data: { memberId: member.data.id, date: recentDate } });
-
-    const result = await getRecommendedMeetings();
+    const result = await getScheduledMeetingsThisWeek();
     const found = result.find((r) => r.id === member.data.id);
     expect(found).toBeUndefined();
   });

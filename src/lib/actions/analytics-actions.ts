@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { toMonthKey } from "@/lib/format";
+import { calcNextRecommendedDate, isOverdue, isScheduledThisWeek } from "@/lib/schedule";
 import type { TopicCategory } from "@/generated/prisma/client";
 
 export type CategoryTrend = {
@@ -169,11 +170,11 @@ export type RecommendedMeeting = {
   position: string | null;
   daysSinceLast: number;
   lastMeetingDate: Date | null;
+  meetingIntervalDays: number;
+  nextRecommendedDate: Date | null;
 };
 
 export async function getRecommendedMeetings(): Promise<RecommendedMeeting[]> {
-  const fourteenDaysAgo = new Date();
-  fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
   const now = new Date();
 
   const members = await prisma.member.findMany({
@@ -189,13 +190,13 @@ export async function getRecommendedMeetings(): Promise<RecommendedMeeting[]> {
   return members
     .filter((m) => {
       const lastDate = m.meetings[0]?.date ?? null;
-      if (!lastDate) return true;
-      return new Date(lastDate) < fourteenDaysAgo;
+      return isOverdue(lastDate ? new Date(lastDate) : null, m.meetingIntervalDays, now);
     })
     .map((m) => {
       const lastDate = m.meetings[0]?.date ?? null;
-      const daysSinceLast = lastDate
-        ? Math.floor((now.getTime() - new Date(lastDate).getTime()) / (1000 * 60 * 60 * 24))
+      const lastDateObj = lastDate ? new Date(lastDate) : null;
+      const daysSinceLast = lastDateObj
+        ? Math.floor((now.getTime() - lastDateObj.getTime()) / (1000 * 60 * 60 * 24))
         : 9999;
       return {
         id: m.id,
@@ -203,10 +204,56 @@ export async function getRecommendedMeetings(): Promise<RecommendedMeeting[]> {
         department: m.department,
         position: m.position,
         daysSinceLast,
-        lastMeetingDate: lastDate ? new Date(lastDate) : null,
+        lastMeetingDate: lastDateObj,
+        meetingIntervalDays: m.meetingIntervalDays,
+        nextRecommendedDate: calcNextRecommendedDate(lastDateObj, m.meetingIntervalDays),
       };
     })
     .sort((a, b) => b.daysSinceLast - a.daysSinceLast);
+}
+
+export type ScheduledMeeting = {
+  id: string;
+  name: string;
+  department: string | null;
+  position: string | null;
+  meetingIntervalDays: number;
+  nextRecommendedDate: Date;
+  lastMeetingDate: Date;
+};
+
+export async function getScheduledMeetingsThisWeek(): Promise<ScheduledMeeting[]> {
+  const now = new Date();
+
+  const members = await prisma.member.findMany({
+    include: {
+      meetings: {
+        orderBy: { date: "desc" },
+        take: 1,
+        select: { date: true },
+      },
+    },
+  });
+
+  return members
+    .filter((m) => {
+      const lastDate = m.meetings[0]?.date ?? null;
+      return isScheduledThisWeek(lastDate ? new Date(lastDate) : null, m.meetingIntervalDays, now);
+    })
+    .map((m) => {
+      const lastDate = new Date(m.meetings[0]!.date);
+      const nextRecommendedDate = calcNextRecommendedDate(lastDate, m.meetingIntervalDays)!;
+      return {
+        id: m.id,
+        name: m.name,
+        department: m.department,
+        position: m.position,
+        meetingIntervalDays: m.meetingIntervalDays,
+        nextRecommendedDate,
+        lastMeetingDate: lastDate,
+      };
+    })
+    .sort((a, b) => a.nextRecommendedDate.getTime() - b.nextRecommendedDate.getTime());
 }
 
 export type MemberMeetingHeatmapEntry = {
@@ -276,8 +323,9 @@ export async function getAllMembersWithInterval(): Promise<RecommendedMeeting[]>
 
   return members.map((m) => {
     const lastDate = m.meetings[0]?.date ?? null;
-    const daysSinceLast = lastDate
-      ? Math.floor((now.getTime() - new Date(lastDate).getTime()) / (1000 * 60 * 60 * 24))
+    const lastDateObj = lastDate ? new Date(lastDate) : null;
+    const daysSinceLast = lastDateObj
+      ? Math.floor((now.getTime() - lastDateObj.getTime()) / (1000 * 60 * 60 * 24))
       : 9999;
     return {
       id: m.id,
@@ -285,7 +333,9 @@ export async function getAllMembersWithInterval(): Promise<RecommendedMeeting[]>
       department: m.department,
       position: m.position,
       daysSinceLast,
-      lastMeetingDate: lastDate ? new Date(lastDate) : null,
+      lastMeetingDate: lastDateObj,
+      meetingIntervalDays: m.meetingIntervalDays,
+      nextRecommendedDate: calcNextRecommendedDate(lastDateObj, m.meetingIntervalDays),
     };
   });
 }

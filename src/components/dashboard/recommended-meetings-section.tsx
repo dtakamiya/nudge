@@ -3,6 +3,8 @@ import { Heart } from "lucide-react";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { getMeetingIntervalLabel } from "@/lib/constants";
+import { formatNextRecommendedDate } from "@/lib/schedule";
 import type { RecommendedMeeting } from "@/lib/actions/analytics-actions";
 
 export function RecommendedMeetingsSection({ members }: { members: RecommendedMeeting[] }) {
@@ -26,9 +28,16 @@ export function RecommendedMeetingsSection({ members }: { members: RecommendedMe
         >
           <AvatarInitial name={member.name} size="sm" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{member.name}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium truncate">{member.name}</p>
+              <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">
+                {getMeetingIntervalLabel(member.meetingIntervalDays)}
+              </span>
+            </div>
             <p className="text-xs text-muted-foreground">
-              {member.daysSinceLast >= 9999 ? "未実施" : `${member.daysSinceLast}日経過`}
+              {member.daysSinceLast >= 9999
+                ? "未実施"
+                : `${member.daysSinceLast}日経過 · 次回: ${formatNextRecommendedDate(member.nextRecommendedDate)}`}
             </p>
           </div>
           <Link href={`/members/${member.id}/meetings/prepare`}>

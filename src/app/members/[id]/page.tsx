@@ -65,6 +65,7 @@ export default async function MemberDetailPage({ params }: Props) {
         lastMeetingDate={lastMeetingDate}
         totalMeetingCount={totalMeetingCount}
         pendingActionCount={pendingActionItems.length}
+        meetingIntervalDays={member.meetingIntervalDays}
       />
 
       <TopicAnalyticsSection memberId={id} />
