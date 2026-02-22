@@ -7,6 +7,7 @@ import { LayoutDashboard, UserPlus, ListChecks, BarChart2, Menu, X } from "lucid
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Separator } from "@/components/ui/separator";
 import { GlobalSearch } from "./global-search";
+import { ThemeToggle } from "./theme-toggle";
 
 type MemberItem = {
   readonly id: string;
@@ -143,6 +144,9 @@ export function Sidebar({ members = [], actionCount }: SidebarProps) {
               onNavigate={() => setIsOpen(false)}
             />
             <MemberQuickList members={members} onNavigate={() => setIsOpen(false)} />
+            <div className="mt-auto pt-4 border-t border-border">
+              <ThemeToggle />
+            </div>
           </aside>
         </div>
       )}
@@ -155,6 +159,9 @@ export function Sidebar({ members = [], actionCount }: SidebarProps) {
         <GlobalSearch />
         <NavLinks pathname={pathname} actionCount={actionCount} />
         <MemberQuickList members={members} />
+        <div className="mt-auto pt-4 border-t border-border">
+          <ThemeToggle />
+        </div>
       </aside>
     </>
   );

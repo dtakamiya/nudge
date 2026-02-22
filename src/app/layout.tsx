@@ -4,6 +4,7 @@ import { Noto_Sans_JP } from "next/font/google";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/layout/sidebar";
 import { KeyboardShortcutProvider } from "@/components/layout/keyboard-shortcut-provider";
+import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -41,14 +42,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const { members, actionCount } = await getSidebarData();
 
   return (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
       <body className={`${GeistSans.variable} ${notoSansJP.variable} flex h-screen`}>
-        <Sidebar members={members} actionCount={actionCount} />
-        <main className="flex-1 overflow-auto p-6 pt-18 lg:p-10 lg:pt-10">
-          <div className="max-w-5xl mx-auto">{children}</div>
-        </main>
-        <Toaster />
-        <KeyboardShortcutProvider members={members} />
+        <Providers>
+          <Sidebar members={members} actionCount={actionCount} />
+          <main className="flex-1 overflow-auto p-6 pt-18 lg:p-10 lg:pt-10">
+            <div className="max-w-5xl mx-auto">{children}</div>
+          </main>
+          <Toaster />
+          <KeyboardShortcutProvider members={members} />
+        </Providers>
       </body>
     </html>
   );
