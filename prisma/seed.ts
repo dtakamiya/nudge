@@ -5,10 +5,30 @@ import { PrismaClient } from "../src/generated/prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.actionItemTag.deleteMany();
+  await prisma.topicTag.deleteMany();
+  await prisma.tag.deleteMany();
   await prisma.actionItem.deleteMany();
   await prisma.topic.deleteMany();
   await prisma.meeting.deleteMany();
   await prisma.member.deleteMany();
+
+  // サンプルタグを作成
+  const tagDev = await prisma.tag.create({
+    data: { name: "開発", color: "#6366f1" },
+  });
+  const tagCareer = await prisma.tag.create({
+    data: { name: "キャリア", color: "#8b5cf6" },
+  });
+  const tagUrgent = await prisma.tag.create({
+    data: { name: "緊急", color: "#ef4444" },
+  });
+  const tagTeam = await prisma.tag.create({
+    data: { name: "チーム", color: "#10b981" },
+  });
+  const tagImprovement = await prisma.tag.create({
+    data: { name: "改善", color: "#f59e0b" },
+  });
 
   const tanaka = await prisma.member.create({
     data: {
@@ -34,7 +54,7 @@ async function main() {
     },
   });
 
-  await prisma.meeting.create({
+  const tanakaM1 = await prisma.meeting.create({
     data: {
       memberId: tanaka.id,
       date: new Date("2026-02-10"),
@@ -71,9 +91,27 @@ async function main() {
         ],
       },
     },
+    include: {
+      topics: true,
+      actionItems: true,
+    },
   });
 
-  await prisma.meeting.create({
+  // タグをトピックとアクションアイテムに紐付け
+  await prisma.topicTag.create({
+    data: { topicId: tanakaM1.topics[0].id, tagId: tagDev.id },
+  });
+  await prisma.topicTag.create({
+    data: { topicId: tanakaM1.topics[1].id, tagId: tagCareer.id },
+  });
+  await prisma.actionItemTag.create({
+    data: { actionItemId: tanakaM1.actionItems[0].id, tagId: tagCareer.id },
+  });
+  await prisma.actionItemTag.create({
+    data: { actionItemId: tanakaM1.actionItems[1].id, tagId: tagDev.id },
+  });
+
+  const suzukiM1 = await prisma.meeting.create({
     data: {
       memberId: suzuki.id,
       date: new Date("2026-02-12"),
@@ -111,9 +149,23 @@ async function main() {
         ],
       },
     },
+    include: {
+      topics: true,
+      actionItems: true,
+    },
   });
 
-  await prisma.meeting.create({
+  await prisma.topicTag.create({
+    data: { topicId: suzukiM1.topics[1].id, tagId: tagTeam.id },
+  });
+  await prisma.topicTag.create({
+    data: { topicId: suzukiM1.topics[1].id, tagId: tagImprovement.id },
+  });
+  await prisma.actionItemTag.create({
+    data: { actionItemId: suzukiM1.actionItems[0].id, tagId: tagUrgent.id },
+  });
+
+  const satoM1 = await prisma.meeting.create({
     data: {
       memberId: sato.id,
       date: new Date("2026-02-14"),
@@ -144,6 +196,23 @@ async function main() {
         ],
       },
     },
+    include: {
+      topics: true,
+      actionItems: true,
+    },
+  });
+
+  await prisma.topicTag.create({
+    data: { topicId: satoM1.topics[0].id, tagId: tagDev.id },
+  });
+  await prisma.topicTag.create({
+    data: { topicId: satoM1.topics[1].id, tagId: tagImprovement.id },
+  });
+  await prisma.actionItemTag.create({
+    data: { actionItemId: satoM1.actionItems[0].id, tagId: tagUrgent.id },
+  });
+  await prisma.actionItemTag.create({
+    data: { actionItemId: satoM1.actionItems[0].id, tagId: tagDev.id },
   });
 
   console.log("Seed data created successfully!");

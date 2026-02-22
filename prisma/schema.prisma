@@ -46,7 +46,8 @@ model Topic {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
-  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  meeting Meeting    @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  tags    TopicTag[]
 
   @@index([meetingId])
   @@index([meetingId, sortOrder])
@@ -73,8 +74,9 @@ model ActionItem {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
-  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-  member  Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  meeting Meeting         @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  member  Member          @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  tags    ActionItemTag[]
 
   @@index([meetingId])
   @@index([meetingId, sortOrder])
@@ -87,4 +89,37 @@ enum ActionItemStatus {
   TODO
   IN_PROGRESS
   DONE
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  color     String   @default("#6366f1")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  topics      TopicTag[]
+  actionItems ActionItemTag[]
+}
+
+model TopicTag {
+  topicId String
+  tagId   String
+
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  tag   Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([topicId, tagId])
+  @@index([tagId])
+}
+
+model ActionItemTag {
+  actionItemId String
+  tagId        String
+
+  actionItem ActionItem @relation(fields: [actionItemId], references: [id], onDelete: Cascade)
+  tag        Tag        @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([actionItemId, tagId])
+  @@index([tagId])
 }
