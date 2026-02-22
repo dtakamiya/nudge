@@ -4,20 +4,24 @@ import {
   getRecentActivity,
   getUpcomingActions,
 } from "@/lib/actions/dashboard-actions";
+import { getRecommendedMeetings } from "@/lib/actions/analytics-actions";
 import { MemberList } from "@/components/member/member-list";
 import { DashboardSummary } from "@/components/dashboard/dashboard-summary";
 import { RecentActivityFeed } from "@/components/dashboard/recent-activity-feed";
 import { UpcomingActionsSection } from "@/components/dashboard/upcoming-actions-section";
+import { RecommendedMeetingsSection } from "@/components/dashboard/recommended-meetings-section";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const [members, summary, recentActivity, upcomingActions] = await Promise.all([
-    getMembers(),
-    getDashboardSummary(),
-    getRecentActivity(),
-    getUpcomingActions(),
-  ]);
+  const [members, summary, recentActivity, upcomingActions, recommendedMeetings] =
+    await Promise.all([
+      getMembers(),
+      getDashboardSummary(),
+      getRecentActivity(),
+      getUpcomingActions(),
+      getRecommendedMeetings(),
+    ]);
 
   return (
     <div className="animate-fade-in-up">
@@ -42,6 +46,15 @@ export default async function DashboardPage() {
           />
         </div>
       </div>
+
+      {recommendedMeetings.length > 0 && (
+        <div className="rounded-xl border bg-card p-5 mb-8">
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
+            推奨: 1on1すべきメンバー
+          </h2>
+          <RecommendedMeetingsSection members={recommendedMeetings} />
+        </div>
+      )}
 
       <MemberList members={members} />
     </div>
