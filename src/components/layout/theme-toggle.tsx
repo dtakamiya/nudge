@@ -31,6 +31,7 @@ export function ThemeToggle() {
           key={value}
           onClick={() => setTheme(value)}
           aria-label={label}
+          aria-pressed={theme === value}
           title={label}
           className={`flex items-center justify-center w-7 h-7 rounded-md transition-colors duration-150 ${
             theme === value
