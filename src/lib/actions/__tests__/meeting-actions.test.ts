@@ -539,3 +539,120 @@ describe("updateMeeting", () => {
     expect(result.data.actionItems[0].title).toBe("Updated title only");
   });
 });
+
+describe("createMeeting - チェックインコンディション", () => {
+  it("コンディションフィールドを保存できる", async () => {
+    const result = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [],
+      conditionHealth: 4,
+      conditionMood: 3,
+      conditionWorkload: 2,
+      checkinNote: "体調は良好です",
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    const meeting = await getMeeting(result.data.id);
+    expect(meeting?.conditionHealth).toBe(4);
+    expect(meeting?.conditionMood).toBe(3);
+    expect(meeting?.conditionWorkload).toBe(2);
+    expect(meeting?.checkinNote).toBe("体調は良好です");
+  });
+
+  it("コンディションフィールドを省略してもデフォルト値で作成される", async () => {
+    const result = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    const meeting = await getMeeting(result.data.id);
+    expect(meeting?.conditionHealth).toBeNull();
+    expect(meeting?.conditionMood).toBeNull();
+    expect(meeting?.conditionWorkload).toBeNull();
+    expect(meeting?.checkinNote).toBe("");
+  });
+
+  it("コンディションを null で保存できる", async () => {
+    const result = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [],
+      conditionHealth: null,
+      conditionMood: null,
+      conditionWorkload: null,
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    const meeting = await getMeeting(result.data.id);
+    expect(meeting?.conditionHealth).toBeNull();
+    expect(meeting?.conditionMood).toBeNull();
+    expect(meeting?.conditionWorkload).toBeNull();
+  });
+});
+
+describe("updateMeeting - チェックインコンディション", () => {
+  async function createTestMeetingWithCondition() {
+    const result = await createMeeting({
+      memberId,
+      date: "2026-02-20T10:00:00.000Z",
+      topics: [],
+      actionItems: [],
+      conditionHealth: 3,
+      conditionMood: 3,
+      conditionWorkload: 3,
+      checkinNote: "初期ノート",
+    });
+    if (!result.success) throw new Error(result.error);
+    return result.data;
+  }
+
+  it("コンディションフィールドを更新できる", async () => {
+    const meeting = await createTestMeetingWithCondition();
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: [],
+      actionItems: [],
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+      conditionHealth: 5,
+      conditionMood: 4,
+      conditionWorkload: 2,
+      checkinNote: "更新後のノート",
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    const updated = await getMeeting(meeting.id);
+    expect(updated?.conditionHealth).toBe(5);
+    expect(updated?.conditionMood).toBe(4);
+    expect(updated?.conditionWorkload).toBe(2);
+    expect(updated?.checkinNote).toBe("更新後のノート");
+  });
+
+  it("コンディションを null にリセットできる", async () => {
+    const meeting = await createTestMeetingWithCondition();
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: [],
+      actionItems: [],
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+      conditionHealth: null,
+      conditionMood: null,
+      conditionWorkload: null,
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    const updated = await getMeeting(meeting.id);
+    expect(updated?.conditionHealth).toBeNull();
+    expect(updated?.conditionMood).toBeNull();
+    expect(updated?.conditionWorkload).toBeNull();
+  });
+});

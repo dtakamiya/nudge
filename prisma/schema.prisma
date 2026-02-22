@@ -26,6 +26,10 @@ model Meeting {
   memberId  String
   date      DateTime
   mood      Int?
+  conditionHealth    Int?
+  conditionMood      Int?
+  conditionWorkload  Int?
+  checkinNote        String   @default("")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

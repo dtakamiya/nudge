@@ -23,6 +23,10 @@ export async function createMeeting(
           memberId: validated.memberId,
           date: new Date(validated.date),
           mood: validated.mood ?? null,
+          conditionHealth: validated.conditionHealth ?? null,
+          conditionMood: validated.conditionMood ?? null,
+          conditionWorkload: validated.conditionWorkload ?? null,
+          checkinNote: validated.checkinNote ?? "",
           topics: {
             create: validated.topics.map((topic) => ({
               category: topic.category,
@@ -134,10 +138,17 @@ export async function updateMeeting(
     const validated = updateMeetingSchema.parse(input);
 
     const result = await prisma.$transaction(async (tx) => {
-      // 1. Verify meeting exists, update date/mood, and get memberId
+      // 1. Verify meeting exists, update date/mood/condition, and get memberId
       const meeting = await tx.meeting.update({
         where: { id: validated.meetingId },
-        data: { date: new Date(validated.date), mood: validated.mood ?? null },
+        data: {
+          date: new Date(validated.date),
+          mood: validated.mood ?? null,
+          conditionHealth: validated.conditionHealth ?? null,
+          conditionMood: validated.conditionMood ?? null,
+          conditionWorkload: validated.conditionWorkload ?? null,
+          checkinNote: validated.checkinNote ?? "",
+        },
         select: { memberId: true },
       });
 
