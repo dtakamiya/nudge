@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { toMonthKey } from "@/lib/format";
 import type { TopicCategory } from "@/generated/prisma/client";
 
 export type CategoryTrend = {
@@ -29,7 +30,7 @@ export async function getMemberTopicTrends(memberId: string) {
 
     // 2. 時系列集計
     const date = new Date(topic.meeting.date);
-    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    const monthKey = toMonthKey(date);
 
     if (!monthlyMap.has(monthKey)) {
       monthlyMap.set(monthKey, {});
@@ -106,9 +107,7 @@ export async function getMemberActionTrends(memberId: string): Promise<ActionTre
   for (const action of actions) {
     // Collect created
     const createdDate = new Date(action.createdAt);
-    const createdMonthKey = `${createdDate.getFullYear()}-${String(
-      createdDate.getMonth() + 1,
-    ).padStart(2, "0")}`;
+    const createdMonthKey = toMonthKey(createdDate);
     if (!monthlyMap.has(createdMonthKey)) {
       monthlyMap.set(createdMonthKey, { created: 0, completed: 0 });
     }
@@ -117,9 +116,7 @@ export async function getMemberActionTrends(memberId: string): Promise<ActionTre
     // Collect completed
     if (action.completedAt) {
       const completedDate = new Date(action.completedAt);
-      const completedMonthKey = `${completedDate.getFullYear()}-${String(
-        completedDate.getMonth() + 1,
-      ).padStart(2, "0")}`;
+      const completedMonthKey = toMonthKey(completedDate);
       if (!monthlyMap.has(completedMonthKey)) {
         monthlyMap.set(completedMonthKey, { created: 0, completed: 0 });
       }
@@ -156,7 +153,7 @@ export async function getMeetingFrequencyByMonth(): Promise<MeetingFrequencyMont
   const monthMap = new Map<string, number>();
   for (const meeting of meetings) {
     const d = new Date(meeting.date);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    const key = toMonthKey(d);
     monthMap.set(key, (monthMap.get(key) ?? 0) + 1);
   }
 

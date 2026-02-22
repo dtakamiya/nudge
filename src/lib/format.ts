@@ -30,3 +30,7 @@ export function formatRelativeDate(date: Date | string | null): string {
   if (diffDays < 30) return `${Math.floor(diffDays / 7)}週間前`;
   return "1ヶ月以上前";
 }
+
+export function toMonthKey(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
