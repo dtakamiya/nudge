@@ -6,6 +6,8 @@ import { CATEGORY_LABELS } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import { getMoodOption } from "@/lib/mood";
 
+import { ConditionBar } from "./condition-bar";
+
 type Topic = {
   id: string;
   category: string;
@@ -33,19 +35,6 @@ type Props = {
   topics: Topic[];
   actionItems: ActionItem[];
 };
-
-const MAX_CONDITION = 5;
-
-function ConditionBar({ value }: { value: number }) {
-  const filled = "●".repeat(value);
-  const empty = "○".repeat(MAX_CONDITION - value);
-  return (
-    <span className="font-mono text-sm">
-      {filled}
-      {empty}（{value}/{MAX_CONDITION}）
-    </span>
-  );
-}
 
 export function MeetingDetail({
   date,
@@ -89,13 +78,13 @@ export function MeetingDetail({
               )}
               {conditionMood != null && (
                 <div className="flex items-center gap-2">
-                  <span className="w-20 text-muted-foreground">気分😊:</span>
+                  <span className="w-20 text-muted-foreground">気分💭:</span>
                   <ConditionBar value={conditionMood} />
                 </div>
               )}
               {conditionWorkload != null && (
                 <div className="flex items-center gap-2">
-                  <span className="w-20 text-muted-foreground">業務量📋:</span>
+                  <span className="w-20 text-muted-foreground">業務量📊:</span>
                   <ConditionBar value={conditionWorkload} />
                 </div>
               )}

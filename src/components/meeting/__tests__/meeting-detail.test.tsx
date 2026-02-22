@@ -78,13 +78,13 @@ describe("MeetingDetail", () => {
 
   it("renders conditionMood when provided", () => {
     render(<MeetingDetail {...baseProps} conditionMood={3} />);
-    expect(screen.getByText(/気分😊:/)).toBeTruthy();
+    expect(screen.getByText(/気分💭:/)).toBeTruthy();
     expect(screen.getByText(/3\/5/)).toBeTruthy();
   });
 
   it("renders conditionWorkload when provided", () => {
     render(<MeetingDetail {...baseProps} conditionWorkload={5} />);
-    expect(screen.getByText(/業務量📋:/)).toBeTruthy();
+    expect(screen.getByText(/業務量📊:/)).toBeTruthy();
     expect(screen.getByText(/5\/5/)).toBeTruthy();
   });
 
@@ -97,7 +97,7 @@ describe("MeetingDetail", () => {
   it("does not render conditionHealth row when conditionHealth is null", () => {
     render(<MeetingDetail {...baseProps} conditionMood={3} conditionHealth={null} />);
     expect(screen.queryByText(/体調🏥:/)).toBeNull();
-    expect(screen.getByText(/気分😊:/)).toBeTruthy();
+    expect(screen.getByText(/気分💭:/)).toBeTruthy();
   });
 
   it("renders all conditions together", () => {
@@ -111,8 +111,8 @@ describe("MeetingDetail", () => {
       />,
     );
     expect(screen.getByText(/体調🏥:/)).toBeTruthy();
-    expect(screen.getByText(/気分😊:/)).toBeTruthy();
-    expect(screen.getByText(/業務量📋:/)).toBeTruthy();
+    expect(screen.getByText(/気分💭:/)).toBeTruthy();
+    expect(screen.getByText(/業務量📊:/)).toBeTruthy();
     expect(screen.getByText("今日は元気です")).toBeTruthy();
   });
 });

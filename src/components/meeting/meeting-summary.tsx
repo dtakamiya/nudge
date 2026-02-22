@@ -1,5 +1,7 @@
 import { formatDateLong } from "@/lib/format";
 
+import { ConditionBar } from "./condition-bar";
+
 export interface MeetingSummaryProps {
   date: string;
   conditionHealth: number | null;
@@ -9,19 +11,6 @@ export interface MeetingSummaryProps {
   topicCount: number;
   actionItemCount: number;
   showWarnings?: boolean;
-}
-
-const MAX_CONDITION = 5;
-
-function ConditionBar({ value }: { value: number }) {
-  const filled = "●".repeat(value);
-  const empty = "○".repeat(MAX_CONDITION - value);
-  return (
-    <span className="font-mono text-sm">
-      {filled}
-      {empty}（{value}/{MAX_CONDITION}）
-    </span>
-  );
 }
 
 export function MeetingSummary({
@@ -56,13 +45,13 @@ export function MeetingSummary({
             )}
             {conditionMood !== null && (
               <div className="flex items-center gap-2">
-                <span>気分😊:</span>
+                <span>気分💭:</span>
                 <ConditionBar value={conditionMood} />
               </div>
             )}
             {conditionWorkload !== null && (
               <div className="flex items-center gap-2">
-                <span>業務量📋:</span>
+                <span>業務量📊:</span>
                 <ConditionBar value={conditionWorkload} />
               </div>
             )}
