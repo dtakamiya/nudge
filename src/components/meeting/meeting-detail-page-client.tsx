@@ -33,11 +33,19 @@ type Props = {
   readonly meetingId: string;
   readonly memberId: string;
   readonly date: Date;
+  readonly mood?: number | null;
   readonly topics: ReadonlyArray<Topic>;
   readonly actionItems: ReadonlyArray<ActionItem>;
 };
 
-export function MeetingDetailPageClient({ meetingId, memberId, date, topics, actionItems }: Props) {
+export function MeetingDetailPageClient({
+  meetingId,
+  memberId,
+  date,
+  mood,
+  topics,
+  actionItems,
+}: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
 
@@ -60,6 +68,7 @@ export function MeetingDetailPageClient({ meetingId, memberId, date, topics, act
           initialData={{
             meetingId,
             date: date.toISOString(),
+            mood,
             topics: topics.map((t) => ({
               id: t.id,
               category: t.category,
@@ -90,7 +99,7 @@ export function MeetingDetailPageClient({ meetingId, memberId, date, topics, act
           編集
         </Button>
       </div>
-      <MeetingDetail date={date} topics={[...topics]} actionItems={[...actionItems]} />
+      <MeetingDetail date={date} mood={mood} topics={[...topics]} actionItems={[...actionItems]} />
     </div>
   );
 }

@@ -11,9 +11,11 @@ import { MemberDeleteDialog } from "@/components/member/member-delete-dialog";
 import { MemberEditDialog } from "@/components/member/member-edit-dialog";
 import { MemberQuickActions } from "@/components/member/member-quick-actions";
 import { MemberStatsBar } from "@/components/member/member-stats-bar";
+import { MoodTrendChart } from "@/components/member/mood-trend-chart";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { getMoodTrend } from "@/lib/actions/meeting-actions";
 import { getMember, getMemberMeetings } from "@/lib/actions/member-actions";
 
 type Props = {
@@ -26,7 +28,11 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
   const { page: pageParam } = await searchParams;
   const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
 
-  const [member, meetingsPage] = await Promise.all([getMember(id), getMemberMeetings(id, page)]);
+  const [member, meetingsPage, moodTrend] = await Promise.all([
+    getMember(id),
+    getMemberMeetings(id, page),
+    getMoodTrend(id, 10),
+  ]);
 
   if (!member) {
     notFound();
@@ -74,6 +80,15 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
 
       <TopicAnalyticsSection memberId={id} />
       <ActionAnalyticsSection memberId={id} />
+
+      {moodTrend.length > 0 && (
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold tracking-tight mb-3 text-foreground">
+            雰囲気の推移
+          </h2>
+          <MoodTrendChart data={moodTrend} />
+        </div>
+      )}
 
       <MemberQuickActions pendingActionItems={member.pendingActionItems} />
 

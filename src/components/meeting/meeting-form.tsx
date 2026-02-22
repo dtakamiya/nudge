@@ -22,6 +22,7 @@ import { createMeeting, updateMeeting } from "@/lib/actions/meeting-actions";
 import { createAnnouncements, screenReaderInstructions } from "@/lib/dnd-accessibility";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
+import { MoodSelector } from "./mood-selector";
 import { SortableActionItem } from "./sortable-action-item";
 import { SortableTopicItem } from "./sortable-topic-item";
 
@@ -44,6 +45,7 @@ type ActionFormData = {
 type MeetingInitialData = {
   readonly meetingId: string;
   readonly date: string;
+  readonly mood?: number | null;
   readonly topics: ReadonlyArray<{
     readonly id: string;
     readonly category: string;
@@ -112,6 +114,7 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
       : [],
   );
 
+  const [mood, setMood] = useState<number | null>(initialData?.mood ?? null);
   const [deletedTopicIds, setDeletedTopicIds] = useState<string[]>([]);
   const [deletedActionItemIds, setDeletedActionItemIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -192,6 +195,7 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
         const result = await updateMeeting({
           meetingId: initialData!.meetingId,
           date: new Date(date).toISOString(),
+          mood,
           topics: validTopics.map((t) => ({
             id: t.id,
             category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
@@ -220,6 +224,7 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
         const result = await createMeeting({
           memberId,
           date: new Date(date).toISOString(),
+          mood,
           topics: validTopics.map((t) => ({
             category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
             title: t.title,
@@ -264,6 +269,14 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
           onChange={(e) => setDate(e.target.value)}
           required
         />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label>ミーティングの雰囲気</Label>
+        <MoodSelector value={mood} onChange={setMood} />
+        {mood && (
+          <p className="text-xs text-muted-foreground">選択をもう一度クリックすると解除できます</p>
+        )}
       </div>
 
       <Card>
