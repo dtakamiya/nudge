@@ -62,3 +62,66 @@ export async function createMemberAndNavigateToDetail(
   });
   await navigateToMemberDetail(page, name);
 }
+
+/**
+ * メンバー詳細ページからミーティングを作成してメンバー詳細に戻る
+ * 事前に createMemberAndNavigateToDetail でメンバー詳細ページにいることが前提
+ */
+export async function createMeetingFromDetail(
+  page: Page,
+  memberName: string,
+  options?: { topicTitle?: string; actionTitle?: string },
+) {
+  await page.getByRole("link", { name: "新規1on1" }).click();
+  await expect(page.getByRole("heading", { name: `${memberName}との1on1` })).toBeVisible();
+
+  // トピックを入力
+  const topicTitle = options?.topicTitle ?? "テスト話題";
+  await page.getByPlaceholder("話題のタイトル").first().fill(topicTitle);
+
+  // アクションアイテムを追加（オプション）
+  if (options?.actionTitle) {
+    await page.getByRole("button", { name: "+ アクション追加" }).click();
+    await page.getByPlaceholder("アクションのタイトル").first().fill(options.actionTitle);
+  }
+
+  // 保存
+  await page.getByRole("button", { name: "1on1を保存" }).click();
+  await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
+}
+
+/**
+ * メンバー詳細ページから最初のミーティング詳細ページに遷移する
+ * 事前にメンバー詳細ページにいて、ミーティングが存在することが前提
+ */
+export async function navigateToFirstMeetingDetail(page: Page, memberName: string) {
+  const meetingCards = page.locator(
+    "main a[href*='/meetings/']:not([href$='/new']):not([href$='/prepare'])",
+  );
+  await expect(meetingCards.first()).toBeVisible({ timeout: 10000 });
+  await meetingCards.first().click();
+  await page.waitForURL(/\/meetings\/[^/]+$/, { timeout: 15000 });
+  await expect(page.getByRole("heading", { name: `${memberName}との1on1` })).toBeVisible({
+    timeout: 10000,
+  });
+}
+
+/**
+ * ダッシュボードのメンバー一覧テーブルからメンバー ID を取得する
+ */
+export async function getMemberIdFromDashboard(page: Page, name: string): Promise<string> {
+  await page.goto("/");
+  const tableRow = page.locator("main").locator("[role='link']").filter({ hasText: name }).first();
+  await expect(tableRow).toBeVisible({ timeout: 10000 });
+
+  const linkHref = await tableRow.locator("a[href]").first().getAttribute("href");
+  if (!linkHref) {
+    throw new Error(`Member link not found for "${name}"`);
+  }
+  // /members/{id}/meetings/new → {id} を取得
+  const match = linkHref.match(/\/members\/([^/]+)/);
+  if (!match) {
+    throw new Error(`Could not extract member ID from "${linkHref}"`);
+  }
+  return match[1];
+}

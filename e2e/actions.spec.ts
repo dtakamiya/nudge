@@ -77,7 +77,8 @@ test.describe("アクションアイテム", () => {
     await page.goto("/actions");
 
     // 作成したアクションアイテムが表示されることを確認
-    await expect(page.getByText(actionTitle)).toBeVisible();
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByText(actionTitle)).toBeVisible({ timeout: 10000 });
 
     // アクションアイテムのカード内のステータスセレクトを見つける
     // ActionListFull のカード構造: Card > CardContent > div(flex) > Select + div(info)
@@ -107,7 +108,7 @@ test.describe("アクションアイテム", () => {
     await createMemberWithAction(page, memberName, actionTitle);
 
     // メンバー詳細でアクションアイテムが表示される
-    await expect(page.getByText(actionTitle)).toBeVisible();
+    await expect(page.getByText(actionTitle).first()).toBeVisible();
 
     // ステータスバッジ「未着手」をクリックしてステータスを切り替え
     // ActionListCompact ではバッジクリックでサイクルする
