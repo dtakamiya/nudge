@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,8 +16,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TemplateSelector } from "@/components/meeting/template-selector";
-import { CATEGORY_LABELS } from "@/lib/constants";
-import { formatDate } from "@/lib/format";
+import { PastMeetingsAccordion } from "@/components/meeting/past-meetings-accordion";
+import { PrepareActionChecklist } from "@/components/meeting/prepare-action-checklist";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
 import type { MeetingTemplate, TopicCategory } from "@/lib/meeting-templates";
 
 type TopicDraft = {
@@ -27,13 +28,8 @@ type TopicDraft = {
   sortOrder: number;
 };
 
-type PreviousTopic = { id: string; category: string; title: string; notes: string };
-type PreviousMeetingData = {
-  id: string;
-  date: Date;
-  topics: PreviousTopic[];
-  actionItems: { id: string; title: string; status: string; dueDate: Date | null }[];
-} | null;
+type Topic = { id: string; category: string; title: string; notes: string };
+type MeetingData = { id: string; date: Date; topics: Topic[]; actionItems: unknown[] };
 
 type PendingAction = {
   id: string;
@@ -45,7 +41,7 @@ type PendingAction = {
 
 type Props = {
   memberId: string;
-  previousMeeting: PreviousMeetingData;
+  recentMeetings: MeetingData[];
   pendingActions: PendingAction[];
 };
 
@@ -61,7 +57,7 @@ function createEmptyTopic(sortOrder: number): TopicDraft {
   return { category: "WORK_PROGRESS", title: "", notes: "", sortOrder };
 }
 
-export function MeetingPrepare({ memberId, previousMeeting, pendingActions }: Props) {
+export function MeetingPrepare({ memberId, recentMeetings, pendingActions }: Props) {
   const [topics, setTopics] = useState<TopicDraft[]>([createEmptyTopic(0)]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>();
 
@@ -93,6 +89,19 @@ export function MeetingPrepare({ memberId, previousMeeting, pendingActions }: Pr
     setTopics((prev) => prev.map((t, i) => (i === index ? { ...t, [field]: value } : t)));
   }
 
+  function handleCopyTopic(topic: Topic) {
+    setTopics((prev) => [
+      ...prev,
+      {
+        category: topic.category as TopicCategory,
+        title: topic.title,
+        notes: topic.notes,
+        sortOrder: prev.length,
+      },
+    ]);
+    toast.success(TOAST_MESSAGES.prepare.topicCopied);
+  }
+
   function buildStartUrl(): string {
     const validTopics = topics.filter((t) => t.title.trim() !== "");
     const params = new URLSearchParams();
@@ -105,64 +114,23 @@ export function MeetingPrepare({ memberId, previousMeeting, pendingActions }: Pr
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {/* Left column: Previous meeting review */}
+      {/* Left column: Previous meetings review & pending actions */}
       <div className="flex flex-col gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              {previousMeeting ? `前回: ${formatDate(previousMeeting.date)}` : "前回のミーティング"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {!previousMeeting ? (
-              <p className="text-sm text-muted-foreground">前回の記録はありません</p>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {previousMeeting.topics.map((topic) => (
-                  <div key={topic.id}>
-                    <div className="flex items-center gap-1">
-                      <Badge variant="outline" className="text-xs">
-                        {CATEGORY_LABELS[topic.category] ?? topic.category}
-                      </Badge>
-                      <span className="text-sm font-medium">{topic.title}</span>
-                    </div>
-                    {topic.notes && (
-                      <p className="text-xs text-muted-foreground mt-1">{topic.notes}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">未完了アクション</CardTitle>
           </CardHeader>
           <CardContent>
-            {pendingActions.length === 0 ? (
-              <p className="text-sm text-muted-foreground">なし</p>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {pendingActions.map((action) => (
-                  <div key={action.id} className="flex items-center gap-2 text-sm">
-                    <Badge
-                      variant={action.status === "IN_PROGRESS" ? "default" : "outline"}
-                      className="text-xs"
-                    >
-                      {action.status === "IN_PROGRESS" ? "進行中" : "未着手"}
-                    </Badge>
-                    <span>{action.title}</span>
-                    {action.dueDate && (
-                      <span className="text-xs text-muted-foreground ml-auto">
-                        {formatDate(action.dueDate)}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+            <PrepareActionChecklist pendingActions={pendingActions} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">過去のミーティング</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PastMeetingsAccordion meetings={recentMeetings} onCopyTopic={handleCopyTopic} />
           </CardContent>
         </Card>
       </div>

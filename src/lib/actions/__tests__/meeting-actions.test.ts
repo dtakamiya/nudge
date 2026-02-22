@@ -1,6 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { createMeeting, getMeeting, getPreviousMeeting, updateMeeting } from "../meeting-actions";
+import {
+  createMeeting,
+  getMeeting,
+  getPreviousMeeting,
+  getRecentMeetings,
+  updateMeeting,
+} from "../meeting-actions";
 import { createMember } from "../member-actions";
 
 let memberId: string;
@@ -48,6 +54,65 @@ describe("getMeeting", () => {
     const found = await getMeeting(created.data.id);
     expect(found?.topics).toHaveLength(1);
     expect(found?.topics[0].category).toBe("CAREER");
+  });
+});
+
+describe("getRecentMeetings", () => {
+  it("returns meetings in descending date order", async () => {
+    await createMeeting({
+      memberId,
+      date: "2026-01-01T10:00:00.000Z",
+      topics: [{ category: "OTHER", title: "1月の話題", notes: "", sortOrder: 0 }],
+      actionItems: [],
+    });
+    await createMeeting({
+      memberId,
+      date: "2026-02-01T10:00:00.000Z",
+      topics: [{ category: "OTHER", title: "2月の話題", notes: "", sortOrder: 0 }],
+      actionItems: [],
+    });
+    await createMeeting({
+      memberId,
+      date: "2026-03-01T10:00:00.000Z",
+      topics: [{ category: "OTHER", title: "3月の話題", notes: "", sortOrder: 0 }],
+      actionItems: [],
+    });
+    const meetings = await getRecentMeetings(memberId);
+    expect(meetings).toHaveLength(3);
+    expect(meetings[0].topics[0].title).toBe("3月の話題");
+    expect(meetings[1].topics[0].title).toBe("2月の話題");
+    expect(meetings[2].topics[0].title).toBe("1月の話題");
+  });
+
+  it("respects the limit parameter", async () => {
+    for (let i = 1; i <= 6; i++) {
+      await createMeeting({
+        memberId,
+        date: `2026-0${Math.min(i, 9)}-01T10:00:00.000Z`,
+        topics: [],
+        actionItems: [],
+      });
+    }
+    const meetings = await getRecentMeetings(memberId, 3);
+    expect(meetings).toHaveLength(3);
+  });
+
+  it("returns empty array when no meetings exist", async () => {
+    const meetings = await getRecentMeetings(memberId);
+    expect(meetings).toHaveLength(0);
+  });
+
+  it("includes topics and actionItems", async () => {
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [{ category: "CAREER", title: "キャリア相談", notes: "メモ", sortOrder: 0 }],
+      actionItems: [{ title: "タスク1", description: "", sortOrder: 0 }],
+    });
+    const meetings = await getRecentMeetings(memberId, 1);
+    expect(meetings[0].topics).toHaveLength(1);
+    expect(meetings[0].topics[0].title).toBe("キャリア相談");
+    expect(meetings[0].actionItems).toHaveLength(1);
   });
 });
 
