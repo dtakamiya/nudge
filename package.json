@@ -14,6 +14,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:seed-test": "tsx prisma/seed-test.ts",
     "prepare": "husky"
   },
   "dependencies": {
@@ -36,6 +38,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.3.0",
     "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
