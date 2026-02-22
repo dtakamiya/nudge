@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckSquare, MessageSquare, Search, User, X } from "lucide-react";
+import { CheckSquare, MessageSquare, Search, Tag, User, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 
@@ -87,7 +87,10 @@ export function GlobalSearch() {
 
   const hasResults =
     results &&
-    (results.members.length > 0 || results.topics.length > 0 || results.actionItems.length > 0);
+    (results.members.length > 0 ||
+      results.topics.length > 0 ||
+      results.actionItems.length > 0 ||
+      results.tags.length > 0);
 
   return (
     <div ref={containerRef} className="relative">
@@ -180,6 +183,18 @@ export function GlobalSearch() {
                           ? handleNavigate(`/members/${item.memberId}/meetings/${item.meetingId}`)
                           : handleNavigate(`/members/${item.memberId}`)
                       }
+                    />
+                  ))}
+                </SearchSection>
+              )}
+              {results.tags.length > 0 && (
+                <SearchSection label="タグ">
+                  {results.tags.map((tag) => (
+                    <SearchItem
+                      key={tag.id}
+                      icon={<Tag size={12} />}
+                      primary={tag.name}
+                      onClick={() => handleNavigate(`/actions?tag=${tag.id}`)}
                     />
                   ))}
                 </SearchSection>
