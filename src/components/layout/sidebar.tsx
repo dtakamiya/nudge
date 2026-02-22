@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { LayoutDashboard, UserPlus, ListChecks, Menu, X } from "lucide-react";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Separator } from "@/components/ui/separator";
+import { GlobalSearch } from "./global-search";
 
 type MemberItem = {
   readonly id: string;
@@ -134,6 +135,7 @@ export function Sidebar({ members = [], actionCount }: SidebarProps) {
                 <X className="w-4 h-4" />
               </button>
             </div>
+            <GlobalSearch />
             <NavLinks
               pathname={pathname}
               actionCount={actionCount}
@@ -149,6 +151,7 @@ export function Sidebar({ members = [], actionCount }: SidebarProps) {
         <Link href="/" className="text-lg font-semibold tracking-tight text-foreground">
           Nudge
         </Link>
+        <GlobalSearch />
         <NavLinks pathname={pathname} actionCount={actionCount} />
         <MemberQuickList members={members} />
       </aside>

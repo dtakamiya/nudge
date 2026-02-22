@@ -4,9 +4,17 @@ import userEvent from "@testing-library/user-event";
 import { Sidebar } from "../sidebar";
 
 const mockPathname = vi.fn().mockReturnValue("/");
+const mockPush = vi.fn();
 
 vi.mock("next/navigation", () => ({
   usePathname: () => mockPathname(),
+  useRouter: () => ({ push: mockPush }),
+}));
+
+vi.mock("@/lib/actions/search-actions", () => ({
+  searchAll: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { members: [], topics: [], actionItems: [] } }),
 }));
 
 afterEach(() => {
