@@ -10,11 +10,18 @@ import { toast } from "sonner";
 import { createMember, updateMember } from "@/lib/actions/member-actions";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
+const MEETING_INTERVAL_OPTIONS = [
+  { value: 7, label: "1週間（7日）" },
+  { value: 14, label: "2週間（14日）" },
+  { value: 30, label: "1ヶ月（30日）" },
+] as const;
+
 type MemberData = {
   readonly id: string;
   readonly name: string;
   readonly department: string | null;
   readonly position: string | null;
+  readonly meetingIntervalDays?: number;
 };
 
 type Props = {
@@ -37,10 +44,16 @@ export function MemberForm({ initialData, onSuccess }: Props) {
     const name = formData.get("name") as string;
     const department = (formData.get("department") as string) || undefined;
     const position = (formData.get("position") as string) || undefined;
+    const meetingIntervalDays = Number(formData.get("meetingIntervalDays") ?? 14);
 
     try {
       if (isEditing) {
-        const result = await updateMember(initialData.id, { name, department, position });
+        const result = await updateMember(initialData.id, {
+          name,
+          department,
+          position,
+          meetingIntervalDays,
+        });
         if (!result.success) {
           setError(result.error);
           toast.error(TOAST_MESSAGES.member.updateError);
@@ -49,7 +62,7 @@ export function MemberForm({ initialData, onSuccess }: Props) {
         toast.success(TOAST_MESSAGES.member.updateSuccess);
         onSuccess?.();
       } else {
-        const result = await createMember({ name, department, position });
+        const result = await createMember({ name, department, position, meetingIntervalDays });
         if (!result.success) {
           setError(result.error);
           toast.error(TOAST_MESSAGES.member.createError);
@@ -96,6 +109,21 @@ export function MemberForm({ initialData, onSuccess }: Props) {
           defaultValue={initialData?.position ?? ""}
           placeholder="例: シニアエンジニア"
         />
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="meetingIntervalDays">ミーティング間隔</Label>
+        <select
+          id="meetingIntervalDays"
+          name="meetingIntervalDays"
+          defaultValue={String(initialData?.meetingIntervalDays ?? 14)}
+          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          {MEETING_INTERVAL_OPTIONS.map((opt) => (
+            <option key={opt.value} value={String(opt.value)}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
       <Button type="submit" disabled={isSubmitting}>

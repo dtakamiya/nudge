@@ -69,9 +69,31 @@ describe("MemberForm - 新規作成モード", () => {
       name: "山田花子",
       department: "デザイン",
       position: undefined,
+      meetingIntervalDays: 14,
     });
     expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.member.createSuccess);
     expect(mockPush).toHaveBeenCalledWith("/");
+  });
+
+  it("ミーティング間隔セレクトが表示される（デフォルト14日）", () => {
+    render(<MemberForm />);
+    expect(screen.getByLabelText("ミーティング間隔")).toBeDefined();
+    const select = screen.getByLabelText("ミーティング間隔") as HTMLSelectElement;
+    expect(select.value).toBe("14");
+  });
+
+  it("ミーティング間隔を7日に変更して送信できる", async () => {
+    const user = userEvent.setup();
+    mockCreateMember.mockResolvedValue({ success: true, data: {} });
+    render(<MemberForm />);
+
+    await user.type(screen.getByLabelText("名前 *"), "テストメンバー");
+    await user.selectOptions(screen.getByLabelText("ミーティング間隔"), "7");
+    await user.click(screen.getByRole("button", { name: "登録する" }));
+
+    expect(mockCreateMember).toHaveBeenCalledWith(
+      expect.objectContaining({ meetingIntervalDays: 7 }),
+    );
   });
 
   it("エラー時にエラーメッセージとトーストが表示される", async () => {
@@ -93,6 +115,7 @@ describe("MemberForm - 編集モード", () => {
     name: "田中太郎",
     department: "エンジニアリング",
     position: "シニアエンジニア",
+    meetingIntervalDays: 14,
   };
 
   it("「メンバー登録」タイトルが表示されない（Card なし）", () => {
@@ -130,6 +153,7 @@ describe("MemberForm - 編集モード", () => {
       name: "田中次郎",
       department: "エンジニアリング",
       position: "シニアエンジニア",
+      meetingIntervalDays: 14,
     });
     expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.member.updateSuccess);
     expect(onSuccess).toHaveBeenCalled();
@@ -150,5 +174,11 @@ describe("MemberForm - 編集モード", () => {
     render(<MemberForm initialData={{ ...initialData, department: null }} />);
     const deptInput = screen.getByLabelText("部署") as HTMLInputElement;
     expect(deptInput.value).toBe("");
+  });
+
+  it("初期値の meetingIntervalDays がセレクトに反映される", () => {
+    render(<MemberForm initialData={{ ...initialData, meetingIntervalDays: 30 }} />);
+    const select = screen.getByLabelText("ミーティング間隔") as HTMLSelectElement;
+    expect(select.value).toBe("30");
   });
 });

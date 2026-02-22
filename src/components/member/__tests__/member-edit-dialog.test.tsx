@@ -69,6 +69,7 @@ describe("MemberEditDialog", () => {
       name: "田中太郎",
       department: "エンジニアリング",
       position: "シニアエンジニア",
+      meetingIntervalDays: 14,
     });
     expect(mockRefresh).toHaveBeenCalled();
   });

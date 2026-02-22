@@ -9,12 +9,13 @@ datasource db {
 }
 
 model Member {
-  id         String   @id @default(uuid())
-  name       String
-  department String?
-  position   String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id                  String   @id @default(uuid())
+  name                String
+  department          String?
+  position            String?
+  meetingIntervalDays Int      @default(14)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   meetings    Meeting[]
   actionItems ActionItem[]
