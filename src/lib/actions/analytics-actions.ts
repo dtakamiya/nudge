@@ -208,3 +208,33 @@ export async function getRecommendedMeetings(): Promise<RecommendedMeeting[]> {
     })
     .sort((a, b) => b.daysSinceLast - a.daysSinceLast);
 }
+
+export async function getAllMembersWithInterval(): Promise<RecommendedMeeting[]> {
+  const now = new Date();
+
+  const members = await prisma.member.findMany({
+    include: {
+      meetings: {
+        orderBy: { date: "desc" },
+        take: 1,
+        select: { date: true },
+      },
+    },
+    orderBy: { name: "asc" },
+  });
+
+  return members.map((m) => {
+    const lastDate = m.meetings[0]?.date ?? null;
+    const daysSinceLast = lastDate
+      ? Math.floor((now.getTime() - new Date(lastDate).getTime()) / (1000 * 60 * 60 * 24))
+      : 9999;
+    return {
+      id: m.id,
+      name: m.name,
+      department: m.department,
+      position: m.position,
+      daysSinceLast,
+      lastMeetingDate: lastDate ? new Date(lastDate) : null,
+    };
+  });
+}
