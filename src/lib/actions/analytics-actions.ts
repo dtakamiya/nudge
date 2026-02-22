@@ -209,6 +209,57 @@ export async function getRecommendedMeetings(): Promise<RecommendedMeeting[]> {
     .sort((a, b) => b.daysSinceLast - a.daysSinceLast);
 }
 
+export type MemberMeetingHeatmapEntry = {
+  memberId: string;
+  memberName: string;
+  months: { month: string; count: number }[];
+};
+
+export type HeatmapData = {
+  members: MemberMeetingHeatmapEntry[];
+  months: string[];
+};
+
+export async function getMemberMeetingHeatmap(): Promise<HeatmapData> {
+  const now = new Date();
+  const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+
+  // 直近12ヶ月の月キー配列を宣言的に生成
+  const months: string[] = Array.from({ length: 12 }, (_, i) =>
+    toMonthKey(new Date(now.getFullYear(), now.getMonth() - (11 - i), 1)),
+  );
+
+  try {
+    const members = await prisma.member.findMany({
+      include: {
+        meetings: {
+          where: { date: { gte: twelveMonthsAgo } },
+          select: { date: true },
+        },
+      },
+      orderBy: { name: "asc" },
+    });
+
+    const memberEntries: MemberMeetingHeatmapEntry[] = members.map((member) => {
+      const countMap = new Map<string, number>();
+      for (const meeting of member.meetings) {
+        const key = toMonthKey(new Date(meeting.date));
+        countMap.set(key, (countMap.get(key) ?? 0) + 1);
+      }
+      return {
+        memberId: member.id,
+        memberName: member.name,
+        months: months.map((month) => ({ month, count: countMap.get(month) ?? 0 })),
+      };
+    });
+
+    return { members: memberEntries, months };
+  } catch (error) {
+    console.error("Failed to fetch meeting heatmap:", error);
+    return { members: [], months };
+  }
+}
+
 export async function getAllMembersWithInterval(): Promise<RecommendedMeeting[]> {
   const now = new Date();
 

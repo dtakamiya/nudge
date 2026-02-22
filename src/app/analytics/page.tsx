@@ -2,15 +2,18 @@ import { Breadcrumb } from "@/components/layout/breadcrumb";
 import {
   getMeetingFrequencyByMonth,
   getAllMembersWithInterval,
+  getMemberMeetingHeatmap,
 } from "@/lib/actions/analytics-actions";
 import { MeetingFrequencyChart } from "@/components/analytics/meeting-frequency-chart";
 import { MeetingIntervalTable } from "@/components/analytics/meeting-interval-table";
+import { MeetingHeatmap } from "@/components/analytics/meeting-heatmap";
 
 export const dynamic = "force-dynamic";
 
 export default async function AnalyticsPage() {
-  const [frequencyData, allMembers] = await Promise.all([
+  const [frequencyData, heatmapData, allMembers] = await Promise.all([
     getMeetingFrequencyByMonth(),
+    getMemberMeetingHeatmap(),
     getAllMembersWithInterval(),
   ]);
 
@@ -26,6 +29,10 @@ export default async function AnalyticsPage() {
           月次実施回数（直近12ヶ月）
         </h2>
         <MeetingFrequencyChart data={frequencyData} />
+      </div>
+
+      <div className="mb-8">
+        <MeetingHeatmap data={heatmapData} />
       </div>
 
       <div>
