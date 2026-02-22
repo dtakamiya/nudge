@@ -10,6 +10,7 @@ import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { MemberEditDialog } from "@/components/member/member-edit-dialog";
 import { MemberDeleteDialog } from "@/components/member/member-delete-dialog";
 import { TopicAnalyticsSection } from "@/components/analytics/topic-analytics-section";
+import { ActionAnalyticsSection } from "@/components/analytics/action-analytics-section";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -52,6 +53,7 @@ export default async function MemberDetailPage({ params }: Props) {
       </div>
 
       <TopicAnalyticsSection memberId={id} />
+      <ActionAnalyticsSection memberId={id} />
 
       <h2 className="text-lg font-semibold tracking-tight mb-3 text-foreground mt-8">1on1履歴</h2>
       <MeetingHistory meetings={member.meetings} memberId={id} />
