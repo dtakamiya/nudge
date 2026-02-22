@@ -60,6 +60,36 @@ describe("createMeetingSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("accepts actionItems with sortOrder", () => {
+    const result = createMeetingSchema.safeParse({
+      memberId: "some-uuid",
+      date: "2026-02-20T10:00:00.000Z",
+      topics: [],
+      actionItems: [
+        { title: "First", description: "", sortOrder: 0 },
+        { title: "Second", description: "", sortOrder: 1 },
+      ],
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.actionItems[0].sortOrder).toBe(0);
+      expect(result.data.actionItems[1].sortOrder).toBe(1);
+    }
+  });
+
+  it("defaults actionItem sortOrder to 0 when omitted", () => {
+    const result = createMeetingSchema.safeParse({
+      memberId: "some-uuid",
+      date: "2026-02-20T10:00:00.000Z",
+      topics: [],
+      actionItems: [{ title: "Action", description: "" }],
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.actionItems[0].sortOrder).toBe(0);
+    }
+  });
+
   it("allows empty topics and actions", () => {
     const result = createMeetingSchema.safeParse({
       memberId: "some-uuid",

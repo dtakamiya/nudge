@@ -23,7 +23,9 @@ describe("createMeeting", () => {
       topics: [
         { category: "WORK_PROGRESS", title: "Sprint review", notes: "Good progress", sortOrder: 0 },
       ],
-      actionItems: [{ title: "Fix bug #123", description: "Critical bug", dueDate: "2026-03-01" }],
+      actionItems: [
+        { title: "Fix bug #123", description: "Critical bug", sortOrder: 0, dueDate: "2026-03-01" },
+      ],
     });
     expect(result.success).toBe(true);
     if (!result.success) return;
@@ -87,7 +89,12 @@ describe("updateMeeting", () => {
         { category: "CAREER", title: "Career topic", notes: "", sortOrder: 1 },
       ],
       actionItems: [
-        { title: "Original action", description: "Original desc", dueDate: "2026-03-01" },
+        {
+          title: "Original action",
+          description: "Original desc",
+          sortOrder: 0,
+          dueDate: "2026-03-01",
+        },
       ],
     });
     if (!result.success) throw new Error(result.error);
@@ -110,6 +117,7 @@ describe("updateMeeting", () => {
         id: a.id,
         title: a.title,
         description: a.description,
+        sortOrder: a.sortOrder,
         dueDate: a.dueDate?.toISOString().split("T")[0],
       })),
       deletedTopicIds: [],
@@ -145,6 +153,7 @@ describe("updateMeeting", () => {
         id: a.id,
         title: a.title,
         description: a.description,
+        sortOrder: a.sortOrder,
       })),
       deletedTopicIds: [],
       deletedActionItemIds: [],
@@ -175,6 +184,7 @@ describe("updateMeeting", () => {
         id: a.id,
         title: a.title,
         description: a.description,
+        sortOrder: a.sortOrder,
       })),
       deletedTopicIds: [],
       deletedActionItemIds: [],
@@ -203,6 +213,7 @@ describe("updateMeeting", () => {
         id: a.id,
         title: a.title,
         description: a.description,
+        sortOrder: a.sortOrder,
       })),
       deletedTopicIds: [meeting.topics[1].id],
       deletedActionItemIds: [],
@@ -229,6 +240,7 @@ describe("updateMeeting", () => {
           id: meeting.actionItems[0].id,
           title: "Updated action",
           description: "Updated desc",
+          sortOrder: meeting.actionItems[0].sortOrder,
           dueDate: "2026-04-01",
         },
       ],
@@ -258,8 +270,9 @@ describe("updateMeeting", () => {
           id: a.id,
           title: a.title,
           description: a.description,
+          sortOrder: a.sortOrder,
         })),
-        { title: "New action", description: "New desc", dueDate: "2026-05-01" },
+        { title: "New action", description: "New desc", sortOrder: 1, dueDate: "2026-05-01" },
       ],
       deletedTopicIds: [],
       deletedActionItemIds: [],
@@ -318,6 +331,7 @@ describe("updateMeeting", () => {
         id: a.id,
         title: a.title,
         description: a.description,
+        sortOrder: a.sortOrder,
       })),
       deletedTopicIds: [],
       deletedActionItemIds: [],
@@ -352,6 +366,78 @@ describe("updateMeeting", () => {
     expect(result.success).toBe(false);
   });
 
+  it("saves sortOrder when creating action items", async () => {
+    const result = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [{ category: "WORK_PROGRESS", title: "Topic", notes: "", sortOrder: 0 }],
+      actionItems: [
+        { title: "First action", description: "", sortOrder: 0 },
+        { title: "Second action", description: "", sortOrder: 1 },
+        { title: "Third action", description: "", sortOrder: 2 },
+      ],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    const meeting = await getMeeting(result.data.id);
+    expect(meeting?.actionItems[0].title).toBe("First action");
+    expect(meeting?.actionItems[0].sortOrder).toBe(0);
+    expect(meeting?.actionItems[1].title).toBe("Second action");
+    expect(meeting?.actionItems[1].sortOrder).toBe(1);
+    expect(meeting?.actionItems[2].title).toBe("Third action");
+    expect(meeting?.actionItems[2].sortOrder).toBe(2);
+  });
+
+  it("updates actionItem sortOrder when reordering", async () => {
+    const meeting = await createTestMeeting();
+    const actionId = meeting.actionItems[0].id;
+    // Add a second action item via update
+    const withTwo = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: meeting.topics.map((t) => ({
+        id: t.id,
+        category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
+        title: t.title,
+        notes: t.notes,
+        sortOrder: t.sortOrder,
+      })),
+      actionItems: [
+        { id: actionId, title: "First action", description: "", sortOrder: 0 },
+        { title: "Second action", description: "", sortOrder: 1 },
+      ],
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+    });
+    if (!withTwo.success) throw new Error(withTwo.error);
+
+    // Reorder: swap first and second
+    const secondId = withTwo.data.actionItems.find((a) => a.title === "Second action")!.id;
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: meeting.topics.map((t) => ({
+        id: t.id,
+        category: t.category as "WORK_PROGRESS" | "CAREER" | "ISSUES" | "FEEDBACK" | "OTHER",
+        title: t.title,
+        notes: t.notes,
+        sortOrder: t.sortOrder,
+      })),
+      actionItems: [
+        { id: secondId, title: "Second action", description: "", sortOrder: 0 },
+        { id: actionId, title: "First action", description: "", sortOrder: 1 },
+      ],
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.actionItems[0].title).toBe("Second action");
+    expect(result.data.actionItems[0].sortOrder).toBe(0);
+    expect(result.data.actionItems[1].title).toBe("First action");
+    expect(result.data.actionItems[1].sortOrder).toBe(1);
+  });
+
   it("does not change action item status", async () => {
     const meeting = await createTestMeeting();
     // Change status via direct update
@@ -374,6 +460,7 @@ describe("updateMeeting", () => {
           id: meeting.actionItems[0].id,
           title: "Updated title only",
           description: meeting.actionItems[0].description,
+          sortOrder: meeting.actionItems[0].sortOrder,
         },
       ],
       deletedTopicIds: [],

@@ -152,6 +152,7 @@ describe("MeetingForm (edit mode)", () => {
         id: "action-1",
         title: "Existing action",
         description: "Desc",
+        sortOrder: 0,
         dueDate: "2026-03-01",
         status: "TODO",
       },

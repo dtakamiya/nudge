@@ -27,15 +27,19 @@ export async function createMeeting(
           })),
         },
         actionItems: {
-          create: validated.actionItems.map((item) => ({
+          create: validated.actionItems.map((item, index) => ({
             memberId: validated.memberId,
             title: item.title,
             description: item.description,
+            sortOrder: item.sortOrder ?? index,
             dueDate: item.dueDate ? new Date(item.dueDate) : null,
           })),
         },
       },
-      include: { topics: { orderBy: { sortOrder: "asc" } }, actionItems: true },
+      include: {
+        topics: { orderBy: { sortOrder: "asc" } },
+        actionItems: { orderBy: { sortOrder: "asc" } },
+      },
     });
     revalidatePath("/", "layout");
     return result;
@@ -45,7 +49,11 @@ export async function createMeeting(
 export async function getMeeting(id: string) {
   return prisma.meeting.findUnique({
     where: { id },
-    include: { member: true, topics: { orderBy: { sortOrder: "asc" } }, actionItems: true },
+    include: {
+      member: true,
+      topics: { orderBy: { sortOrder: "asc" } },
+      actionItems: { orderBy: { sortOrder: "asc" } },
+    },
   });
 }
 
@@ -118,6 +126,7 @@ export async function updateMeeting(
             data: {
               title: item.title,
               description: item.description,
+              sortOrder: item.sortOrder,
               dueDate: item.dueDate ? new Date(item.dueDate) : null,
             },
           });
@@ -128,6 +137,7 @@ export async function updateMeeting(
               memberId: meeting.memberId,
               title: item.title,
               description: item.description,
+              sortOrder: item.sortOrder,
               dueDate: item.dueDate ? new Date(item.dueDate) : null,
             },
           });
@@ -139,7 +149,7 @@ export async function updateMeeting(
         where: { id: validated.meetingId },
         include: {
           topics: { orderBy: { sortOrder: "asc" } },
-          actionItems: true,
+          actionItems: { orderBy: { sortOrder: "asc" } },
         },
       });
     });

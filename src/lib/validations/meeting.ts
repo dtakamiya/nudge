@@ -12,6 +12,7 @@ const topicInputSchema = z.object({
 const actionItemInputSchema = z.object({
   title: z.string().min(1, "アクションのタイトルは必須です"),
   description: z.string().default(""),
+  sortOrder: z.number().int().min(0).default(0),
   dueDate: z.string().optional(),
 });
 
@@ -34,6 +35,7 @@ const updateActionItemInputSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(1, "アクションのタイトルは必須です"),
   description: z.string().default(""),
+  sortOrder: z.number().int().min(0).default(0),
   dueDate: z.string().optional(),
 });
 
@@ -46,7 +48,7 @@ export const updateMeetingSchema = z.object({
   deletedActionItemIds: z.array(z.string()).default([]),
 });
 
-export type CreateMeetingInput = z.infer<typeof createMeetingSchema>;
-export type UpdateMeetingInput = z.infer<typeof updateMeetingSchema>;
+export type CreateMeetingInput = z.input<typeof createMeetingSchema>;
+export type UpdateMeetingInput = z.input<typeof updateMeetingSchema>;
 export type TopicInput = z.infer<typeof topicInputSchema>;
 export type ActionItemInput = z.infer<typeof actionItemInputSchema>;
