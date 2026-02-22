@@ -9,6 +9,7 @@ import { ActionListCompact } from "@/components/action/action-list-compact";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { MemberEditDialog } from "@/components/member/member-edit-dialog";
 import { MemberDeleteDialog } from "@/components/member/member-delete-dialog";
+import { TopicAnalyticsSection } from "@/components/analytics/topic-analytics-section";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -49,7 +50,10 @@ export default async function MemberDetailPage({ params }: Props) {
           </Link>
         </div>
       </div>
-      <h2 className="text-lg font-semibold tracking-tight mb-3 text-foreground">1on1履歴</h2>
+
+      <TopicAnalyticsSection memberId={id} />
+
+      <h2 className="text-lg font-semibold tracking-tight mb-3 text-foreground mt-8">1on1履歴</h2>
       <MeetingHistory meetings={member.meetings} memberId={id} />
       <Separator className="my-6" />
       <h2 className="text-lg font-semibold tracking-tight mb-3 text-foreground">
