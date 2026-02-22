@@ -4,9 +4,17 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 
+import { TagBadge } from "@/components/tag/tag-badge";
+import { TagInput } from "@/components/tag/tag-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+export type TagData = {
+  id?: string;
+  name: string;
+  color?: string;
+};
 
 type Props = {
   readonly id: string;
@@ -14,6 +22,8 @@ type Props = {
   readonly description: string;
   readonly dueDate: string;
   readonly index: number;
+  readonly tags?: TagData[];
+  readonly onTagsChange?: (index: number, tags: TagData[]) => void;
   readonly onUpdate: (
     index: number,
     field: "title" | "description" | "dueDate",
@@ -28,6 +38,8 @@ export function SortableActionItem({
   description,
   dueDate,
   index,
+  tags = [],
+  onTagsChange,
   onUpdate,
   onRemove,
 }: Props) {
@@ -39,6 +51,10 @@ export function SortableActionItem({
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
+  function handleTagsChange(newTags: TagData[]) {
+    onTagsChange?.(index, newTags);
+  }
 
   return (
     <div
@@ -85,6 +101,20 @@ export function SortableActionItem({
           onChange={(e) => onUpdate(index, "description", e.target.value)}
           placeholder="詳細（任意）"
         />
+      </div>
+      <div>
+        <Label>タグ</Label>
+        {onTagsChange ? (
+          <TagInput selectedTags={tags} onTagsChange={handleTagsChange} />
+        ) : (
+          tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-1">
+              {tags.map((tag) => (
+                <TagBadge key={tag.id ?? tag.name} name={tag.name} color={tag.color} size="sm" />
+              ))}
+            </div>
+          )
+        )}
       </div>
     </div>
   );
