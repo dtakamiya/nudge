@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Calendar, CheckCircle2 } from "lucide-react";
+import { Activity, Calendar, CheckCircle2 } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { ActivityItem } from "@/lib/actions/dashboard-actions";
 import { formatRelativeDate } from "@/lib/format";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
@@ -53,11 +54,7 @@ function ActivityRow({ activity }: { readonly activity: ActivityItem }) {
 
 export function RecentActivityFeed({ activities }: Props) {
   if (activities.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground text-center py-6">
-        最近のアクティビティはありません
-      </p>
-    );
+    return <EmptyState icon={Activity} title="最近のアクティビティはありません" size="compact" />;
   }
 
   return (

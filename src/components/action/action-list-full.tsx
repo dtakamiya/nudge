@@ -3,7 +3,8 @@
 import { useState, useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Pencil } from "lucide-react";
+import { Pencil, SquareCheck } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -53,7 +54,13 @@ export function ActionListFull({ actionItems }: Props) {
   );
 
   if (actionItems.length === 0) {
-    return <p className="text-muted-foreground py-8 text-center">アクションアイテムはありません</p>;
+    return (
+      <EmptyState
+        icon={SquareCheck}
+        title="アクションアイテムはありません"
+        description="1on1でアクションアイテムを作成すると、ここに表示されます"
+      />
+    );
   }
 
   function handleStatusChange(id: string, newStatus: string) {

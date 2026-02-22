@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/table";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { formatRelativeDate } from "@/lib/format";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Users } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type MemberWithStats = {
   readonly id: string;
@@ -58,12 +59,13 @@ export function MemberList({ members }: Props) {
 
   if (members.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        <p>メンバーがまだ登録されていません</p>
-        <Link href="/members/new">
-          <Button className="mt-4">メンバーを追加</Button>
-        </Link>
-      </div>
+      <EmptyState
+        icon={Users}
+        title="メンバーがまだ登録されていません"
+        description="まずメンバーを追加して、1on1を始めましょう"
+        action={{ label: "メンバーを追加", href: "/members/new" }}
+        size="large"
+      />
     );
   }
 

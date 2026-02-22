@@ -1,5 +1,7 @@
+import { CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ActionListCompact } from "@/components/action/action-list-compact";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type ActionItemRow = {
   id: string;
@@ -24,7 +26,11 @@ export function MemberQuickActions({ pendingActionItems }: Props) {
         )}
       </div>
       {pendingActionItems.length === 0 ? (
-        <p className="text-muted-foreground py-4">未完了のアクションアイテムはありません</p>
+        <EmptyState
+          icon={CheckCircle}
+          title="未完了のアクションアイテムはありません"
+          size="compact"
+        />
       ) : (
         <ActionListCompact actionItems={pendingActionItems} />
       )}

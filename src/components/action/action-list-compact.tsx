@@ -2,7 +2,8 @@
 
 import { useState, useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil } from "lucide-react";
+import { Pencil, SquareCheck } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -59,7 +60,7 @@ export function ActionListCompact({ actionItems }: Props) {
   );
 
   if (actionItems.length === 0) {
-    return <p className="text-muted-foreground py-4">アクションアイテムはありません</p>;
+    return <EmptyState icon={SquareCheck} title="アクションアイテムはありません" size="compact" />;
   }
 
   function cycleStatus(id: string, currentStatus: string) {
