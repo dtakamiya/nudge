@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import type { Tag } from "@/generated/prisma/client";
+import type { Prisma, Tag } from "@/generated/prisma/client";
 import { TAG_SUGGESTIONS_LIMIT } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import type { CreateTagInput, UpdateTagInput } from "@/lib/validations/tag";
@@ -114,6 +114,29 @@ export async function getOrCreateTags(names: string[]): Promise<Tag[]> {
       const existing = await prisma.tag.findUnique({ where: { name } });
       if (existing) return existing;
       return prisma.tag.create({
+        data: { name, color: "#6366f1" },
+      });
+    }),
+  );
+
+  return results;
+}
+
+// トランザクション内で使用するバージョン（ロールバック時のタグ孤立を防ぐ）
+export async function getOrCreateTagsInTx(
+  tx: Prisma.TransactionClient,
+  names: string[],
+): Promise<{ id: string; name: string; color: string }[]> {
+  if (names.length === 0) return [];
+
+  // 重複を除去
+  const uniqueNames = [...new Set(names)];
+
+  const results = await Promise.all(
+    uniqueNames.map(async (name) => {
+      const existing = await tx.tag.findUnique({ where: { name } });
+      if (existing) return existing;
+      return tx.tag.create({
         data: { name, color: "#6366f1" },
       });
     }),

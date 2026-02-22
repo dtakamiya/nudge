@@ -33,15 +33,9 @@ export default async function ActionsPage({ searchParams }: Props) {
   const memberList = members.map((m) => ({ id: m.id, name: m.name }));
   const tagList = allTags.map((t) => ({ id: t.id, name: t.name, color: t.color }));
 
-  // getActionItems は tags を含んでいるが型変換が必要
   const actionItemsWithTags = actionItems.map((item) => ({
     ...item,
-    tags:
-      "tags" in item
-        ? (item.tags as Array<{ tag: { id: string; name: string; color: string } }>).map(
-            (tt) => tt.tag,
-          )
-        : [],
+    tags: item.tags.map((tt) => tt.tag),
   }));
 
   return (

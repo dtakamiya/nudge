@@ -48,10 +48,8 @@ export function TagBadge({ name, color, onRemove, size = "md" }: TagBadgeProps) 
           aria-label={`${name} を削除`}
           onClick={onRemove}
           className={cn(
-            "rounded-full transition-opacity duration-150",
+            "rounded-full transition-opacity duration-150 ml-0.5",
             "hover:opacity-70 focus-visible:outline-none focus-visible:ring-1",
-            size === "sm" && "ml-0.5",
-            size === "md" && "ml-0.5",
           )}
         >
           <X size={size === "sm" ? 10 : 12} aria-hidden="true" />

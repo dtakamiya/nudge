@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import type { CreateMeetingInput, UpdateMeetingInput } from "@/lib/validations/meeting";
 import { createMeetingSchema, updateMeetingSchema } from "@/lib/validations/meeting";
 
-import { getOrCreateTags } from "./tag-actions";
+import { getOrCreateTagsInTx } from "./tag-actions";
 import { type ActionResult, runAction } from "./types";
 
 type MeetingWithRelations = Meeting & { topics: Topic[]; actionItems: ActionItem[] };
@@ -56,7 +56,7 @@ export async function createMeeting(
         const newTagNames = topicInput.newTagNames ?? [];
         const tagIds = topicInput.tagIds ?? [];
 
-        const newTags = newTagNames.length > 0 ? await getOrCreateTags(newTagNames) : [];
+        const newTags = newTagNames.length > 0 ? await getOrCreateTagsInTx(tx, newTagNames) : [];
         const allTagIds = [...new Set([...tagIds, ...newTags.map((t) => t.id)])];
 
         if (allTagIds.length > 0) {
@@ -75,7 +75,7 @@ export async function createMeeting(
         const newTagNames = itemInput.newTagNames ?? [];
         const tagIds = itemInput.tagIds ?? [];
 
-        const newTags = newTagNames.length > 0 ? await getOrCreateTags(newTagNames) : [];
+        const newTags = newTagNames.length > 0 ? await getOrCreateTagsInTx(tx, newTagNames) : [];
         const allTagIds = [...new Set([...tagIds, ...newTags.map((t) => t.id)])];
 
         if (allTagIds.length > 0) {
@@ -159,7 +159,7 @@ export async function updateMeeting(
       for (const topic of validated.topics) {
         const newTagNames = topic.newTagNames ?? [];
         const tagIds = topic.tagIds ?? [];
-        const newTags = newTagNames.length > 0 ? await getOrCreateTags(newTagNames) : [];
+        const newTags = newTagNames.length > 0 ? await getOrCreateTagsInTx(tx, newTagNames) : [];
         const allTagIds = [...new Set([...tagIds, ...newTags.map((t) => t.id)])];
 
         if (topic.id) {
@@ -201,7 +201,7 @@ export async function updateMeeting(
       for (const item of validated.actionItems) {
         const newTagNames = item.newTagNames ?? [];
         const tagIds = item.tagIds ?? [];
-        const newTags = newTagNames.length > 0 ? await getOrCreateTags(newTagNames) : [];
+        const newTags = newTagNames.length > 0 ? await getOrCreateTagsInTx(tx, newTagNames) : [];
         const allTagIds = [...new Set([...tagIds, ...newTags.map((t) => t.id)])];
 
         if (item.id) {
