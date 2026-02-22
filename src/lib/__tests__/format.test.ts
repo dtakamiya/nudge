@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatDaysElapsed, formatRelativeDate } from "@/lib/format";
+import { formatDateLong, formatDaysElapsed, formatRelativeDate } from "@/lib/format";
 
 describe("formatRelativeDate", () => {
   it("returns '未実施' for null", () => {
@@ -97,5 +97,28 @@ describe("formatDaysElapsed", () => {
   it("accepts string dates", () => {
     const today = new Date().toISOString();
     expect(formatDaysElapsed(today)).toBe("今日");
+  });
+});
+
+describe("formatDateLong", () => {
+  it("returns '-' for null", () => {
+    expect(formatDateLong(null)).toBe("-");
+  });
+
+  it("formats ISO string to Japanese date (year/month/day)", () => {
+    expect(formatDateLong("2026-02-23T00:00:00.000Z")).toBe("2026年2月23日");
+  });
+
+  it("formats date-only string to Japanese date", () => {
+    expect(formatDateLong("2026-02-23")).toBe("2026年2月23日");
+  });
+
+  it("formats Date object to Japanese date", () => {
+    const date = new Date("2026-01-05T00:00:00.000Z");
+    expect(formatDateLong(date)).toBe("2026年1月5日");
+  });
+
+  it("does not pad month and day with zero", () => {
+    expect(formatDateLong("2026-01-05")).toBe("2026年1月5日");
   });
 });

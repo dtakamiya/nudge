@@ -1,6 +1,6 @@
 "use client";
 
-type ConditionField = "conditionHealth" | "conditionMood" | "conditionWorkload";
+export type ConditionField = "conditionHealth" | "conditionMood" | "conditionWorkload";
 
 interface ConditionAxis {
   field: ConditionField;

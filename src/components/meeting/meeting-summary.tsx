@@ -1,3 +1,5 @@
+import { formatDateLong } from "@/lib/format";
+
 export interface MeetingSummaryProps {
   date: string;
   conditionHealth: number | null;
@@ -6,6 +8,7 @@ export interface MeetingSummaryProps {
   checkinNote: string;
   topicCount: number;
   actionItemCount: number;
+  showWarnings?: boolean;
 }
 
 const MAX_CONDITION = 5;
@@ -21,14 +24,6 @@ function ConditionBar({ value }: { value: number }) {
   );
 }
 
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  const y = date.getFullYear();
-  const m = date.getMonth() + 1;
-  const d = date.getDate();
-  return `${y}年${m}月${d}日`;
-}
-
 export function MeetingSummary({
   date,
   conditionHealth,
@@ -37,6 +32,7 @@ export function MeetingSummary({
   checkinNote,
   topicCount,
   actionItemCount,
+  showWarnings = true,
 }: MeetingSummaryProps) {
   const hasAnyCondition =
     conditionHealth !== null || conditionMood !== null || conditionWorkload !== null;
@@ -45,7 +41,7 @@ export function MeetingSummary({
     <div className="flex flex-col gap-3 text-sm">
       <div className="flex items-center gap-2">
         <span className="text-muted-foreground min-w-[4rem]">日付</span>
-        <span className="font-medium">{formatDate(date)}</span>
+        <span className="font-medium">{formatDateLong(date)}</span>
       </div>
 
       {hasAnyCondition && (
@@ -91,7 +87,7 @@ export function MeetingSummary({
         <span className="font-medium">{actionItemCount}件</span>
       </div>
 
-      {actionItemCount === 0 && (
+      {showWarnings && actionItemCount === 0 && (
         <div className="flex items-center gap-1 rounded-md bg-amber-50 px-3 py-2 text-amber-700">
           <span>⚠️</span>
           <span>アクションアイテムが設定されていません</span>

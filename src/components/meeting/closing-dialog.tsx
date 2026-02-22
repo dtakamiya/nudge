@@ -34,7 +34,7 @@ export function ClosingDialog({ open, onOpenChange, onConfirm, summaryProps }: C
           <DialogDescription>保存前にミーティング内容をご確認ください。</DialogDescription>
         </DialogHeader>
 
-        <MeetingSummary {...summaryProps} />
+        <MeetingSummary {...summaryProps} showWarnings={false} />
 
         {hasNoAction && (
           <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700">

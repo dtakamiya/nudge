@@ -6,10 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { getRandomCheckinMessage } from "@/lib/checkin-messages";
 
-import { ConditionSelector } from "./condition-selector";
+import { type ConditionField,ConditionSelector } from "./condition-selector";
 import { IcebreakerCard } from "./icebreaker-card";
-
-type ConditionField = "conditionHealth" | "conditionMood" | "conditionWorkload";
 
 interface CheckinSectionProps {
   conditionHealth: number | null;
