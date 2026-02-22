@@ -2,12 +2,20 @@
 
 import { revalidatePath } from "next/cache";
 
-import type { ActionItem,Meeting, Topic } from "@/generated/prisma/client";
+import type { ActionItem, Meeting, Topic } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import type { CreateMeetingInput, UpdateMeetingInput } from "@/lib/validations/meeting";
-import { createMeetingSchema, updateMeetingSchema } from "@/lib/validations/meeting";
+import type {
+  CreateMeetingInput,
+  UpdateMeetingInput,
+  UpdateTopicNoteInput,
+} from "@/lib/validations/meeting";
+import {
+  createMeetingSchema,
+  updateMeetingSchema,
+  updateTopicNoteSchema,
+} from "@/lib/validations/meeting";
 
-import { type ActionResult,runAction } from "./types";
+import { type ActionResult, runAction } from "./types";
 
 type MeetingWithRelations = Meeting & { topics: Topic[]; actionItems: ActionItem[] };
 
@@ -86,7 +94,21 @@ export async function updateMeeting(
       // 1. Verify meeting exists, update date, and get memberId
       const meeting = await tx.meeting.update({
         where: { id: validated.meetingId },
-        data: { date: new Date(validated.date) },
+        data: {
+          date: new Date(validated.date),
+          startedAt:
+            validated.startedAt === undefined
+              ? undefined
+              : validated.startedAt
+                ? new Date(validated.startedAt)
+                : null,
+          endedAt:
+            validated.endedAt === undefined
+              ? undefined
+              : validated.endedAt
+                ? new Date(validated.endedAt)
+                : null,
+        },
         select: { memberId: true },
       });
 
@@ -174,6 +196,18 @@ export async function deleteMeeting(id: string): Promise<ActionResult<Meeting>> 
   return runAction(async () => {
     if (!id) throw new Error("ミーティングIDが指定されていません");
     const result = await prisma.meeting.delete({ where: { id } });
+    revalidatePath("/", "layout");
+    return result;
+  });
+}
+
+export async function autoSaveTopicNote(input: UpdateTopicNoteInput): Promise<ActionResult<Topic>> {
+  return runAction(async () => {
+    const validated = updateTopicNoteSchema.parse(input);
+    const result = await prisma.topic.update({
+      where: { id: validated.topicId },
+      data: { notes: validated.notes },
+    });
     revalidatePath("/", "layout");
     return result;
   });

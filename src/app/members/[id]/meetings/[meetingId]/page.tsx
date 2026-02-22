@@ -45,6 +45,8 @@ export default async function MeetingDetailPage({ params }: Props) {
         meetingId={meetingId}
         memberId={id}
         date={meeting.date}
+        startedAt={meeting.startedAt}
+        endedAt={meeting.endedAt}
         topics={meeting.topics}
         actionItems={meeting.actionItems.map((a) => ({
           ...a,

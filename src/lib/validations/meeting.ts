@@ -46,9 +46,17 @@ export const updateMeetingSchema = z.object({
   actionItems: z.array(updateActionItemInputSchema),
   deletedTopicIds: z.array(z.string()).default([]),
   deletedActionItemIds: z.array(z.string()).default([]),
+  startedAt: z.string().nullable().optional(),
+  endedAt: z.string().nullable().optional(),
+});
+
+export const updateTopicNoteSchema = z.object({
+  topicId: z.string().min(1, "話題IDは必須です"),
+  notes: z.string(),
 });
 
 export type CreateMeetingInput = z.input<typeof createMeetingSchema>;
 export type UpdateMeetingInput = z.input<typeof updateMeetingSchema>;
 export type TopicInput = z.infer<typeof topicInputSchema>;
 export type ActionItemInput = z.infer<typeof actionItemInputSchema>;
+export type UpdateTopicNoteInput = z.infer<typeof updateTopicNoteSchema>;
