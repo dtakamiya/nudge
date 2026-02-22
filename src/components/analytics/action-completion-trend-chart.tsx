@@ -12,14 +12,22 @@ import {
   Legend,
 } from "recharts";
 import type { ActionMonthlyTrend } from "@/lib/actions/analytics-actions";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+function subscribe() {
+  return () => {};
+}
+
+function getSnapshot() {
+  return true;
+}
+
+function getServerSnapshot() {
+  return false;
+}
 
 export function ActionCompletionTrendChart({ data }: { data: ActionMonthlyTrend[] }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   if (!mounted) return null;
 

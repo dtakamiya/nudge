@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { ActionAnalyticsSection } from "../action-analytics-section";
 import * as analyticsActions from "@/lib/actions/analytics-actions";
+import type { ActionMonthlyTrend } from "@/lib/actions/analytics-actions";
 
 // Mock the server action
 vi.mock("@/lib/actions/analytics-actions", () => ({
@@ -10,7 +11,7 @@ vi.mock("@/lib/actions/analytics-actions", () => ({
 
 // Mock the custom charts so we don't need to test recharts internal rendering here
 vi.mock("../action-completion-trend-chart", () => ({
-  ActionCompletionTrendChart: ({ data }: { data: any }) => (
+  ActionCompletionTrendChart: ({ data }: { data: ActionMonthlyTrend[] }) => (
     <div data-testid="trend-chart">{JSON.stringify(data)}</div>
   ),
 }));

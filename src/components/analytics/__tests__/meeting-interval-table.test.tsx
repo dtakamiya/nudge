@@ -1,6 +1,10 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { render, screen, cleanup } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { MeetingIntervalTable } from "../meeting-interval-table";
+
+afterEach(() => {
+  cleanup();
+});
 
 vi.mock("@/components/ui/avatar-initial", () => ({
   AvatarInitial: ({ name }: { name: string }) => <div data-testid="avatar">{name[0]}</div>,
