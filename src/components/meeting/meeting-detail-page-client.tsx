@@ -179,6 +179,8 @@ export function MeetingDetailPageClient({
         </Button>
       </div>
       <MeetingDetail
+        meetingId={meetingId}
+        memberId={memberId}
         date={date}
         mood={mood}
         conditionHealth={conditionHealth}

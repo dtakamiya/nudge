@@ -128,3 +128,27 @@ export async function updateActionItem(
     return result;
   });
 }
+
+export async function createActionItemForMeeting(
+  meetingId: string,
+  memberId: string,
+  input: UpdateActionItemInput,
+): Promise<ActionResult<ActionItem>> {
+  return runAction(async () => {
+    const validated = updateActionItemSchema.parse(input);
+    const existingCount = await prisma.actionItem.count({ where: { meetingId } });
+    const dueDate = validated.dueDate ? new Date(validated.dueDate) : null;
+    const result = await prisma.actionItem.create({
+      data: {
+        meetingId,
+        memberId,
+        title: validated.title,
+        description: validated.description,
+        sortOrder: existingCount,
+        dueDate,
+      },
+    });
+    revalidatePath("/", "layout");
+    return result;
+  });
+}
