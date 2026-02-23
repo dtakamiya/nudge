@@ -22,13 +22,25 @@ import { TOAST_MESSAGES } from "@/lib/toast-messages";
 type Props = {
   readonly memberId: string;
   readonly memberName: string;
+  readonly open?: boolean;
+  readonly onOpenChange?: (open: boolean) => void;
 };
 
-export function MemberDeleteDialog({ memberId, memberName }: Props) {
-  const [open, setOpen] = useState(false);
+export function MemberDeleteDialog({ memberId, memberName, open: openProp, onOpenChange }: Props) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? openProp : internalOpen;
+
+  function handleOpenChange(value: boolean) {
+    if (!isControlled) {
+      setInternalOpen(value);
+    }
+    onOpenChange?.(value);
+  }
 
   async function handleDelete() {
     setLoading(true);
@@ -42,7 +54,7 @@ export function MemberDeleteDialog({ memberId, memberName }: Props) {
         return;
       }
       toast.success(TOAST_MESSAGES.member.deleteSuccess);
-      setOpen(false);
+      handleOpenChange(false);
       router.push("/");
     } catch {
       setError("削除に失敗しました。もう一度お試しください。");
@@ -52,8 +64,8 @@ export function MemberDeleteDialog({ memberId, memberName }: Props) {
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
+      <AlertDialogTrigger asChild style={isControlled ? { display: "none" } : undefined}>
         <Button variant="destructive" size="sm">
           <Trash2 className="w-4 h-4 mr-1.5" />
           削除
@@ -67,7 +79,9 @@ export function MemberDeleteDialog({ memberId, memberName }: Props) {
             のデータを削除します。関連するミーティング記録やアクションアイテムもすべて削除されます。この操作は取り消せません。
           </AlertDialogDescription>
         </AlertDialogHeader>
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        <p className="text-sm text-destructive" style={error ? undefined : { display: "none" }}>
+          {error}
+        </p>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={loading}>キャンセル</AlertDialogCancel>
           <Button variant="destructive" onClick={handleDelete} disabled={loading}>

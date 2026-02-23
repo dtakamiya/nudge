@@ -24,20 +24,32 @@ type MemberData = {
 
 type Props = {
   readonly member: MemberData;
+  readonly open?: boolean;
+  readonly onOpenChange?: (open: boolean) => void;
 };
 
-export function MemberEditDialog({ member }: Props) {
-  const [open, setOpen] = useState(false);
+export function MemberEditDialog({ member, open: openProp, onOpenChange }: Props) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const router = useRouter();
 
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? openProp : internalOpen;
+
+  function handleOpenChange(value: boolean) {
+    if (!isControlled) {
+      setInternalOpen(value);
+    }
+    onOpenChange?.(value);
+  }
+
   function handleSuccess() {
-    setOpen(false);
+    handleOpenChange(false);
     router.refresh();
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild style={isControlled ? { display: "none" } : undefined}>
         <Button variant="outline" size="sm">
           <Pencil className="w-4 h-4 mr-1.5" />
           編集
