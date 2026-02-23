@@ -63,6 +63,16 @@ describe("buildFilterUrl", () => {
   it("sort パラメータを設定できる", () => {
     expect(buildFilterUrl("", "sort", "createdAt")).toBe("/actions?sort=createdAt");
   });
+
+  it("フィルター変更時に page パラメータを削除する", () => {
+    expect(buildFilterUrl("status=TODO&page=3", "status", "IN_PROGRESS")).toBe(
+      "/actions?status=IN_PROGRESS",
+    );
+  });
+
+  it("フィルターが 'all' のときも page パラメータを削除する", () => {
+    expect(buildFilterUrl("status=TODO&page=2", "status", "all")).toBe("/actions?");
+  });
 });
 
 describe("ActionFilters", () => {

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import { ActionFilters } from "@/components/action/action-filters";
 import { ActionListFull } from "@/components/action/action-list-full";
+import { ActionPagination } from "@/components/action/action-pagination";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import type { DateFilterType, SortByType } from "@/lib/actions/action-item-actions";
@@ -14,6 +15,7 @@ export const dynamic = "force-dynamic";
 
 const DATE_FILTERS: DateFilterType[] = ["all", "overdue", "this-week", "this-month"];
 const SORT_OPTIONS: SortByType[] = ["dueDate", "createdAt", "memberName"];
+const PER_PAGE = 20;
 
 type Props = {
   searchParams: Promise<{
@@ -23,6 +25,7 @@ type Props = {
     q?: string;
     dateFilter?: string;
     sort?: string;
+    page?: string;
   }>;
 };
 
@@ -36,6 +39,8 @@ export default async function ActionsPage({ searchParams }: Props) {
     keyword?: string;
     dateFilter?: DateFilterType;
     sortBy?: SortByType;
+    page?: number;
+    perPage?: number;
   } = {};
 
   if (params.status && ["TODO", "IN_PROGRESS", "DONE"].includes(params.status)) {
@@ -57,7 +62,11 @@ export default async function ActionsPage({ searchParams }: Props) {
     filters.sortBy = params.sort as SortByType;
   }
 
-  const [actionItems, members, allTags] = await Promise.all([
+  const currentPage = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
+  filters.page = currentPage;
+  filters.perPage = PER_PAGE;
+
+  const [{ items: actionItems, total, totalPages }, members, allTags] = await Promise.all([
     getActionItems(filters),
     getMembers(),
     getTags(),
@@ -77,6 +86,19 @@ export default async function ActionsPage({ searchParams }: Props) {
     !!filters.keyword ||
     (!!filters.dateFilter && filters.dateFilter !== "all");
 
+  function buildPageUrl(page: number): string {
+    const p = new URLSearchParams();
+    if (params.status) p.set("status", params.status);
+    if (params.memberId) p.set("memberId", params.memberId);
+    if (params.tag) p.set("tag", params.tag);
+    if (params.q) p.set("q", params.q);
+    if (params.dateFilter) p.set("dateFilter", params.dateFilter);
+    if (params.sort) p.set("sort", params.sort);
+    if (page > 1) p.set("page", String(page));
+    const query = p.toString();
+    return `/actions${query ? `?${query}` : ""}`;
+  }
+
   return (
     <div className="animate-fade-in-up">
       <Breadcrumb items={[{ label: "ダッシュボード", href: "/" }, { label: "アクション一覧" }]} />
@@ -84,11 +106,11 @@ export default async function ActionsPage({ searchParams }: Props) {
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">アクション一覧</h1>
         {hasFilter ? (
           <Badge variant="secondary" className="text-sm">
-            {actionItemsWithTags.length} 件
+            {total} 件
           </Badge>
         ) : (
           <Badge variant="outline" className="text-sm text-muted-foreground">
-            {actionItemsWithTags.length} 件
+            {total} 件
           </Badge>
         )}
       </div>
@@ -96,6 +118,11 @@ export default async function ActionsPage({ searchParams }: Props) {
         <ActionFilters members={memberList} tags={tagList} />
       </Suspense>
       <ActionListFull actionItems={actionItemsWithTags} statusFilter={filters.status} />
+      <ActionPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        buildPageUrl={buildPageUrl}
+      />
     </div>
   );
 }

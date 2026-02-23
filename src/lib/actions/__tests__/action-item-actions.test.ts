@@ -41,9 +41,9 @@ describe("getActionItems", () => {
       topics: [],
       actionItems: [{ title: "Task A", description: "" }],
     });
-    const items = await getActionItems();
-    expect(items).toHaveLength(1);
-    expect(items[0].member).toBeDefined();
+    const result = await getActionItems();
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].member).toBeDefined();
   });
 
   it("filters by status", async () => {
@@ -56,12 +56,12 @@ describe("getActionItems", () => {
         { title: "Task B", description: "" },
       ],
     });
-    const items = await getActionItems();
-    expect(items).toHaveLength(2);
-    await updateActionItemStatus(items[0].id, "DONE");
-    const todoItems = await getActionItems({ status: "TODO" });
-    expect(todoItems).toHaveLength(1);
-    expect(todoItems[0].title).toBe("Task B");
+    const allResult = await getActionItems();
+    expect(allResult.items).toHaveLength(2);
+    await updateActionItemStatus(allResult.items[0].id, "DONE");
+    const todoResult = await getActionItems({ status: "TODO" });
+    expect(todoResult.items).toHaveLength(1);
+    expect(todoResult.items[0].title).toBe("Task B");
   });
 
   it("filters by member", async () => {
@@ -80,8 +80,49 @@ describe("getActionItems", () => {
       actionItems: [{ title: "Task B", description: "" }],
     });
     const filtered = await getActionItems({ memberId });
-    expect(filtered).toHaveLength(1);
-    expect(filtered[0].title).toBe("Task A");
+    expect(filtered.items).toHaveLength(1);
+    expect(filtered.items[0].title).toBe("Task A");
+  });
+
+  it("pagination: perPage=2 で2件のみ返す", async () => {
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [
+        { title: "Task A", description: "" },
+        { title: "Task B", description: "" },
+        { title: "Task C", description: "" },
+      ],
+    });
+    const result = await getActionItems({ page: 1, perPage: 2 });
+    expect(result.items).toHaveLength(2);
+    expect(result.total).toBe(3);
+    expect(result.totalPages).toBe(2);
+    expect(result.page).toBe(1);
+  });
+
+  it("pagination: page=2 で残りの件数を返す", async () => {
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [
+        { title: "Task A", description: "" },
+        { title: "Task B", description: "" },
+        { title: "Task C", description: "" },
+      ],
+    });
+    const result = await getActionItems({ page: 2, perPage: 2 });
+    expect(result.items).toHaveLength(1);
+    expect(result.total).toBe(3);
+    expect(result.totalPages).toBe(2);
+  });
+
+  it("ページを指定しない場合はデフォルトで page=1, perPage=20 を使用する", async () => {
+    const result = await getActionItems();
+    expect(result.page).toBe(1);
+    expect(result.perPage).toBe(20);
   });
 });
 
@@ -97,7 +138,7 @@ describe("getPendingActionItems", () => {
       ],
     });
     const all = await getActionItems();
-    await updateActionItemStatus(all.find((a) => a.title === "Done")!.id, "DONE");
+    await updateActionItemStatus(all.items.find((a) => a.title === "Done")!.id, "DONE");
     const pending = await getPendingActionItems(memberId);
     expect(pending).toHaveLength(1);
     expect(pending[0].title).toBe("Pending");
@@ -112,12 +153,12 @@ describe("updateActionItemStatus", () => {
       topics: [],
       actionItems: [{ title: "Task", description: "" }],
     });
-    const items = await getActionItems();
-    const result = await updateActionItemStatus(items[0].id, "IN_PROGRESS");
-    expect(result.success).toBe(true);
-    if (!result.success) return;
-    expect(result.data.status).toBe("IN_PROGRESS");
-    expect(result.data.completedAt).toBeNull();
+    const result = await getActionItems();
+    const updateResult = await updateActionItemStatus(result.items[0].id, "IN_PROGRESS");
+    expect(updateResult.success).toBe(true);
+    if (!updateResult.success) return;
+    expect(updateResult.data.status).toBe("IN_PROGRESS");
+    expect(updateResult.data.completedAt).toBeNull();
   });
 
   it("sets completedAt when marking DONE", async () => {
@@ -127,12 +168,12 @@ describe("updateActionItemStatus", () => {
       topics: [],
       actionItems: [{ title: "Task", description: "" }],
     });
-    const items = await getActionItems();
-    const result = await updateActionItemStatus(items[0].id, "DONE");
-    expect(result.success).toBe(true);
-    if (!result.success) return;
-    expect(result.data.status).toBe("DONE");
-    expect(result.data.completedAt).not.toBeNull();
+    const result = await getActionItems();
+    const updateResult = await updateActionItemStatus(result.items[0].id, "DONE");
+    expect(updateResult.success).toBe(true);
+    if (!updateResult.success) return;
+    expect(updateResult.data.status).toBe("DONE");
+    expect(updateResult.data.completedAt).not.toBeNull();
   });
 
   it("clears completedAt when reverting from DONE", async () => {
@@ -142,12 +183,12 @@ describe("updateActionItemStatus", () => {
       topics: [],
       actionItems: [{ title: "Task", description: "" }],
     });
-    const items = await getActionItems();
-    await updateActionItemStatus(items[0].id, "DONE");
-    const result = await updateActionItemStatus(items[0].id, "TODO");
-    expect(result.success).toBe(true);
-    if (!result.success) return;
-    expect(result.data.completedAt).toBeNull();
+    const result = await getActionItems();
+    await updateActionItemStatus(result.items[0].id, "DONE");
+    const revertResult = await updateActionItemStatus(result.items[0].id, "TODO");
+    expect(revertResult.success).toBe(true);
+    if (!revertResult.success) return;
+    expect(revertResult.data.completedAt).toBeNull();
   });
 
   it("returns error for invalid status", async () => {
@@ -157,9 +198,9 @@ describe("updateActionItemStatus", () => {
       topics: [],
       actionItems: [{ title: "Task", description: "" }],
     });
-    const items = await getActionItems();
-    const result = await updateActionItemStatus(items[0].id, "INVALID");
-    expect(result.success).toBe(false);
+    const result = await getActionItems();
+    const updateResult = await updateActionItemStatus(result.items[0].id, "INVALID");
+    expect(updateResult.success).toBe(false);
   });
 });
 
@@ -171,14 +212,14 @@ describe("updateActionItem", () => {
       topics: [],
       actionItems: [{ title: "Original", description: "" }],
     });
-    const items = await getActionItems();
-    const result = await updateActionItem(items[0].id, {
+    const result = await getActionItems();
+    const updateResult = await updateActionItem(result.items[0].id, {
       title: "Updated",
       description: "",
     });
-    expect(result.success).toBe(true);
-    if (!result.success) return;
-    expect(result.data.title).toBe("Updated");
+    expect(updateResult.success).toBe(true);
+    if (!updateResult.success) return;
+    expect(updateResult.data.title).toBe("Updated");
   });
 
   it("説明と期限日を更新できる", async () => {
@@ -188,16 +229,16 @@ describe("updateActionItem", () => {
       topics: [],
       actionItems: [{ title: "Task", description: "" }],
     });
-    const items = await getActionItems();
-    const result = await updateActionItem(items[0].id, {
+    const result = await getActionItems();
+    const updateResult = await updateActionItem(result.items[0].id, {
       title: "Task",
       description: "Added desc",
       dueDate: "2026-03-15",
     });
-    expect(result.success).toBe(true);
-    if (!result.success) return;
-    expect(result.data.description).toBe("Added desc");
-    expect(result.data.dueDate).not.toBeNull();
+    expect(updateResult.success).toBe(true);
+    if (!updateResult.success) return;
+    expect(updateResult.data.description).toBe("Added desc");
+    expect(updateResult.data.dueDate).not.toBeNull();
   });
 
   it("空のタイトルはバリデーションエラーになる", async () => {
@@ -207,12 +248,12 @@ describe("updateActionItem", () => {
       topics: [],
       actionItems: [{ title: "Task", description: "" }],
     });
-    const items = await getActionItems();
-    const result = await updateActionItem(items[0].id, {
+    const result = await getActionItems();
+    const updateResult = await updateActionItem(result.items[0].id, {
       title: "",
       description: "",
     });
-    expect(result.success).toBe(false);
+    expect(updateResult.success).toBe(false);
   });
 
   it("空文字の dueDate は null として保存される", async () => {
@@ -222,23 +263,23 @@ describe("updateActionItem", () => {
       topics: [],
       actionItems: [{ title: "Task", description: "", dueDate: "2026-03-01" }],
     });
-    const items = await getActionItems();
-    const result = await updateActionItem(items[0].id, {
+    const result = await getActionItems();
+    const updateResult = await updateActionItem(result.items[0].id, {
       title: "Task",
       description: "",
       dueDate: "",
     });
-    expect(result.success).toBe(true);
-    if (!result.success) return;
-    expect(result.data.dueDate).toBeNull();
+    expect(updateResult.success).toBe(true);
+    if (!updateResult.success) return;
+    expect(updateResult.data.dueDate).toBeNull();
   });
 
   it("存在しないIDはエラーになる", async () => {
-    const result = await updateActionItem("nonexistent-id", {
+    const updateResult = await updateActionItem("nonexistent-id", {
       title: "Task",
       description: "",
     });
-    expect(result.success).toBe(false);
+    expect(updateResult.success).toBe(false);
   });
 });
 

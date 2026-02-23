@@ -22,6 +22,8 @@ type ActionItemFilters = {
   keyword?: string;
   dateFilter?: DateFilterType;
   sortBy?: SortByType;
+  page?: number;
+  perPage?: number;
 };
 
 function buildDateFilter(dateFilter: DateFilterType): Prisma.ActionItemWhereInput {
@@ -71,16 +73,28 @@ export async function getActionItems(filters: ActionItemFilters = {}) {
   }
 
   const orderBy = buildOrderBy(filters.sortBy ?? "dueDate");
+  const page = Math.max(1, filters.page ?? 1);
+  const perPage = filters.perPage ?? 20;
+  const skip = (page - 1) * perPage;
 
-  return prisma.actionItem.findMany({
-    where,
-    orderBy,
-    include: {
-      member: { select: { id: true, name: true } },
-      meeting: { select: { id: true, date: true } },
-      tags: { include: { tag: true } },
-    },
-  });
+  const [items, total] = await Promise.all([
+    prisma.actionItem.findMany({
+      where,
+      orderBy,
+      skip,
+      take: perPage,
+      include: {
+        member: { select: { id: true, name: true } },
+        meeting: { select: { id: true, date: true } },
+        tags: { include: { tag: true } },
+      },
+    }),
+    prisma.actionItem.count({ where }),
+  ]);
+
+  const totalPages = Math.ceil(total / perPage);
+
+  return { items, total, page, perPage, totalPages };
 }
 
 export async function getPendingActionItems(memberId: string) {
