@@ -45,9 +45,9 @@ type EditFormState = {
   dueDate: string;
 };
 
-type Props = { actionItems: ActionItemRow[] };
+type Props = { actionItems: ActionItemRow[]; statusFilter?: string };
 
-export function ActionListFull({ actionItems }: Props) {
+export function ActionListFull({ actionItems, statusFilter }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -58,8 +58,14 @@ export function ActionListFull({ actionItems }: Props) {
   });
   const [optimisticItems, setOptimisticItems] = useOptimistic(
     actionItems,
-    (currentItems, { id, status }: { id: string; status: string }) =>
-      currentItems.map((item) => (item.id === id ? { ...item, status } : item)),
+    (currentItems, { id, status }: { id: string; status: string }) => {
+      const updated = currentItems.map((item) => (item.id === id ? { ...item, status } : item));
+      // statusFilter が有効な場合、条件に合わないアイテムを楽観的に除外する
+      if (statusFilter) {
+        return updated.filter((item) => item.status === statusFilter);
+      }
+      return updated;
+    },
   );
 
   if (actionItems.length === 0) {
