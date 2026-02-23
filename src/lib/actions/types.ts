@@ -1,5 +1,7 @@
 "use server";
 
+import { ZodError } from "zod";
+
 /**
  * Server Action の統一エラーハンドリング型。
  * すべての書き込み系 Server Action はこの型を返却する。
@@ -15,7 +17,15 @@ export async function runAction<T>(fn: () => Promise<T>): Promise<ActionResult<T
     const data = await fn();
     return { success: true, data };
   } catch (err) {
-    const message = err instanceof Error ? err.message : "予期しないエラーが発生しました";
+    console.error("[Server Action Error]", err);
+    let message: string;
+    if (err instanceof ZodError) {
+      message = err.issues.map((issue) => issue.message).join("、");
+    } else if (err instanceof Error) {
+      message = err.message;
+    } else {
+      message = "予期しないエラーが発生しました";
+    }
     return { success: false, error: message };
   }
 }
