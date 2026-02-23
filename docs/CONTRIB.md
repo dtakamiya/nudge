@@ -25,7 +25,7 @@ cp .env.example .env
 
 # データベースのセットアップ
 npx prisma migrate dev
-npx prisma db seed
+npm run db:seed
 
 # Prisma クライアントの生成
 npx prisma generate

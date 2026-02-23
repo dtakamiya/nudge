@@ -37,7 +37,7 @@ npx prisma generate
 npx prisma migrate deploy
 
 # シードデータの投入
-npx prisma db seed
+npm run db:seed
 ```
 
 ## トラブルシューティング
