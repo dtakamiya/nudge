@@ -26,6 +26,8 @@ export function buildFilterUrl(currentParams: string, key: string, value: string
   } else {
     params.set(key, value);
   }
+  // フィルター変更時はページを1にリセット
+  params.delete("page");
   return `/actions?${params.toString()}`;
 }
 
