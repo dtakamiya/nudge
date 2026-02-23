@@ -46,9 +46,9 @@ export function ClosingDialog({ open, onOpenChange, onConfirm, summaryProps }: C
           {hasNoAction ? (
             <>
               <Button variant="outline" onClick={handleClose}>
-                追加してから保存
+                戻って追加する
               </Button>
-              <Button onClick={onConfirm}>このまま保存</Button>
+              <Button onClick={onConfirm}>アクションなしで保存</Button>
             </>
           ) : (
             <>

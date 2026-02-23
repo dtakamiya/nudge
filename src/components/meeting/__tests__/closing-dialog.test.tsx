@@ -119,7 +119,7 @@ describe("ClosingDialog", () => {
       ).toBeDefined();
     });
 
-    it("「このまま保存」ボタンが表示されること", () => {
+    it("「アクションなしで保存」ボタンが表示されること", () => {
       render(
         <ClosingDialog
           open={true}
@@ -128,10 +128,10 @@ describe("ClosingDialog", () => {
           summaryProps={noActionProps}
         />,
       );
-      expect(screen.getByRole("button", { name: "このまま保存" })).toBeDefined();
+      expect(screen.getByRole("button", { name: "アクションなしで保存" })).toBeDefined();
     });
 
-    it("「追加してから保存」ボタンが表示されること", () => {
+    it("「戻って追加する」ボタンが表示されること", () => {
       render(
         <ClosingDialog
           open={true}
@@ -140,10 +140,10 @@ describe("ClosingDialog", () => {
           summaryProps={noActionProps}
         />,
       );
-      expect(screen.getByRole("button", { name: "追加してから保存" })).toBeDefined();
+      expect(screen.getByRole("button", { name: "戻って追加する" })).toBeDefined();
     });
 
-    it("「このまま保存」ボタンクリックで onConfirm が呼ばれること", async () => {
+    it("「アクションなしで保存」ボタンクリックで onConfirm が呼ばれること", async () => {
       const user = userEvent.setup();
       const onConfirm = vi.fn();
       render(
@@ -154,11 +154,11 @@ describe("ClosingDialog", () => {
           summaryProps={noActionProps}
         />,
       );
-      await user.click(screen.getByRole("button", { name: "このまま保存" }));
+      await user.click(screen.getByRole("button", { name: "アクションなしで保存" }));
       expect(onConfirm).toHaveBeenCalledOnce();
     });
 
-    it("「追加してから保存」ボタンクリックで onOpenChange(false) が呼ばれること", async () => {
+    it("「戻って追加する」ボタンクリックで onOpenChange(false) が呼ばれること", async () => {
       const user = userEvent.setup();
       const onOpenChange = vi.fn();
       render(
@@ -169,7 +169,7 @@ describe("ClosingDialog", () => {
           summaryProps={noActionProps}
         />,
       );
-      await user.click(screen.getByRole("button", { name: "追加してから保存" }));
+      await user.click(screen.getByRole("button", { name: "戻って追加する" }));
       expect(onOpenChange).toHaveBeenCalledWith(false);
     });
   });
