@@ -45,7 +45,7 @@ export function ActionCompletionTrendChart({ data }: { data: ActionMonthlyTrend[
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data} margin={{ top: 5, right: 30, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
               <XAxis
                 dataKey="month"
                 fontSize={12}
@@ -55,20 +55,20 @@ export function ActionCompletionTrendChart({ data }: { data: ActionMonthlyTrend[
                   const parts = val.split("-");
                   return parts.length === 2 ? `${parseInt(parts[1], 10)}月` : val;
                 }}
-                stroke="hsl(var(--muted-foreground))"
+                stroke="var(--muted-foreground)"
               />
               <YAxis
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
-                stroke="hsl(var(--muted-foreground))"
+                stroke="var(--muted-foreground)"
                 allowDecimals={false}
               />
               <Tooltip
-                cursor={{ stroke: "hsl(var(--muted))", strokeWidth: 2 }}
+                cursor={{ stroke: "var(--muted)", strokeWidth: 2 }}
                 contentStyle={{
-                  backgroundColor: "hsl(var(--background))",
-                  border: "1px solid hsl(var(--border))",
+                  backgroundColor: "var(--background)",
+                  border: "1px solid var(--border)",
                   borderRadius: "var(--radius)",
                   fontSize: "12px",
                 }}
@@ -78,19 +78,19 @@ export function ActionCompletionTrendChart({ data }: { data: ActionMonthlyTrend[
                 name="完了数"
                 type="monotone"
                 dataKey="completed"
-                stroke="hsl(var(--primary))"
+                stroke="var(--primary)"
                 strokeWidth={2}
-                dot={{ r: 4, fill: "hsl(var(--background))", strokeWidth: 2 }}
+                dot={{ r: 4, fill: "var(--background)", strokeWidth: 2 }}
                 activeDot={{ r: 6 }}
               />
               <Line
                 name="作成数"
                 type="monotone"
                 dataKey="created"
-                stroke="hsl(var(--muted-foreground))"
+                stroke="var(--muted-foreground)"
                 strokeWidth={2}
                 strokeDasharray="4 4"
-                dot={{ r: 4, fill: "hsl(var(--background))", strokeWidth: 2 }}
+                dot={{ r: 4, fill: "var(--background)", strokeWidth: 2 }}
               />
             </LineChart>
           </ResponsiveContainer>

@@ -19,13 +19,13 @@ export function MeetingFrequencyChart({ data }: { data: MeetingFrequencyMonth[] 
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
               <XAxis
                 dataKey="month"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
-                stroke="hsl(var(--muted-foreground))"
+                stroke="var(--muted-foreground)"
                 tickFormatter={(val: string) => {
                   const parts = val.split("-");
                   return parts.length === 2 ? `${parseInt(parts[1], 10)}月` : val;
@@ -35,25 +35,20 @@ export function MeetingFrequencyChart({ data }: { data: MeetingFrequencyMonth[] 
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
-                stroke="hsl(var(--muted-foreground))"
+                stroke="var(--muted-foreground)"
                 allowDecimals={false}
               />
               <Tooltip
-                cursor={{ fill: "hsl(var(--muted))" }}
+                cursor={{ fill: "var(--muted)" }}
                 contentStyle={{
-                  backgroundColor: "hsl(var(--background))",
-                  border: "1px solid hsl(var(--border))",
+                  backgroundColor: "var(--background)",
+                  border: "1px solid var(--border)",
                   borderRadius: "var(--radius)",
                   fontSize: "12px",
                 }}
                 formatter={(value: number | undefined) => [value ?? 0, "実施回数"]}
               />
-              <Bar
-                dataKey="count"
-                name="実施回数"
-                fill="hsl(var(--primary))"
-                radius={[4, 4, 0, 0]}
-              />
+              <Bar dataKey="count" name="実施回数" fill="var(--primary)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}

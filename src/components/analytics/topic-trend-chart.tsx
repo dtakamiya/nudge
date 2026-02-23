@@ -59,22 +59,22 @@ export function TopicTrendChart({ data }: Props) {
       <CardContent className="flex-1 min-h-[250px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
             <XAxis
               dataKey="name"
               tickLine={false}
               axisLine={false}
-              tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
               dy={10}
             />
             <YAxis
               tickLine={false}
               axisLine={false}
-              tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
             />
             <Tooltip
-              cursor={{ fill: "hsl(var(--muted))", opacity: 0.2 }}
-              contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))" }}
+              cursor={{ fill: "var(--muted)", opacity: 0.2 }}
+              contentStyle={{ borderRadius: "8px", border: "1px solid var(--border)" }}
               formatter={(value: unknown, name: unknown) => {
                 const category = categories.find((c) => c === name);
                 return [`${String(value)}件`, category ? CATEGORY_LABELS[category] : String(name)];

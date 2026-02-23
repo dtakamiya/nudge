@@ -16,11 +16,11 @@ export const CATEGORY_LABELS: Record<TopicCategory, string> = {
 };
 
 export const CATEGORY_COLORS: Record<TopicCategory, string> = {
-  WORK_PROGRESS: "hsl(var(--chart-1))",
-  CAREER: "hsl(var(--chart-2))",
-  ISSUES: "hsl(var(--chart-3))",
-  FEEDBACK: "hsl(var(--chart-4))",
-  OTHER: "hsl(var(--chart-5))",
+  WORK_PROGRESS: "var(--chart-1)",
+  CAREER: "var(--chart-2)",
+  ISSUES: "var(--chart-3)",
+  FEEDBACK: "var(--chart-4)",
+  OTHER: "var(--chart-5)",
 };
 
 type Props = {
@@ -74,7 +74,7 @@ export function TopicDistributionChart({ data }: Props) {
             </Pie>
             <Tooltip
               formatter={(value: unknown) => [`${String(value)}件`, "件数"]}
-              contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))" }}
+              contentStyle={{ borderRadius: "8px", border: "1px solid var(--border)" }}
             />
             <Legend verticalAlign="bottom" height={36} />
           </PieChart>
