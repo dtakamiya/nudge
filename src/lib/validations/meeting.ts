@@ -81,7 +81,7 @@ export const endMeetingSchema = z.object({
 
 export const updateTopicNotesSchema = z.object({
   topicId: z.string().min(1, "トピックIDは必須です"),
-  notes: z.string(),
+  notes: z.string().max(10000, "ノートは10000文字以内で入力してください"),
 });
 
 export type StartMeetingInput = z.input<typeof startMeetingSchema>;
