@@ -57,10 +57,10 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
         </div>
         <div className="flex gap-2">
           <Link href={`/members/${id}/meetings/prepare`}>
-            <Button variant="outline">1on1 を準備</Button>
+            <Button>1on1 を準備</Button>
           </Link>
           <Link href={`/members/${id}/meetings/new`}>
-            <Button>新規1on1</Button>
+            <Button variant="outline">新規1on1</Button>
           </Link>
           <MemberActionsDropdown
             member={{
