@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { PastMeetingsAccordion } from "@/components/meeting/past-meetings-accordion";
@@ -61,6 +61,7 @@ function createEmptyTopic(sortOrder: number): TopicDraft {
 export function MeetingPrepare({ memberId, recentMeetings, pendingActions }: Props) {
   const [topics, setTopics] = useState<TopicDraft[]>([createEmptyTopic(0)]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>();
+  const agendaRef = useRef<HTMLDivElement>(null);
 
   function handleTemplateSelect(template: MeetingTemplate) {
     setSelectedTemplateId(template.id);
@@ -101,6 +102,7 @@ export function MeetingPrepare({ memberId, recentMeetings, pendingActions }: Pro
       },
     ]);
     toast.success(TOAST_MESSAGES.prepare.topicCopied);
+    agendaRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   function buildStartUrl(): string {
@@ -143,69 +145,71 @@ export function MeetingPrepare({ memberId, recentMeetings, pendingActions }: Pro
           <TemplateSelector onSelect={handleTemplateSelect} selectedId={selectedTemplateId} />
         </div>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-sm font-medium">アジェンダ</CardTitle>
-              <Button type="button" variant="outline" size="sm" onClick={addTopic}>
-                + 話題を追加
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            {topics.map((topic, index) => (
-              <div key={index} className="border rounded p-3 flex flex-col gap-2">
-                <div className="flex gap-2 items-end">
-                  <div className="flex-1">
-                    <Label>カテゴリ</Label>
-                    <Select
-                      value={topic.category}
-                      onValueChange={(val) => updateTopic(index, "category", val)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categoryOptions.map((opt) => (
-                          <SelectItem key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+        <div ref={agendaRef}>
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-sm font-medium">アジェンダ</CardTitle>
+                <Button type="button" variant="outline" size="sm" onClick={addTopic}>
+                  + 話題を追加
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              {topics.map((topic, index) => (
+                <div key={index} className="border rounded p-3 flex flex-col gap-2">
+                  <div className="flex gap-2 items-end">
+                    <div className="flex-1">
+                      <Label>カテゴリ</Label>
+                      <Select
+                        value={topic.category}
+                        onValueChange={(val) => updateTopic(index, "category", val)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categoryOptions.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex-[2]">
+                      <Label>タイトル</Label>
+                      <Input
+                        value={topic.title}
+                        onChange={(e) => updateTopic(index, "title", e.target.value)}
+                        placeholder="話題のタイトル"
+                      />
+                    </div>
+                    {topics.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeTopic(index)}
+                      >
+                        削除
+                      </Button>
+                    )}
                   </div>
-                  <div className="flex-[2]">
-                    <Label>タイトル</Label>
-                    <Input
-                      value={topic.title}
-                      onChange={(e) => updateTopic(index, "title", e.target.value)}
-                      placeholder="話題のタイトル"
+                  <div>
+                    <Label>メモ</Label>
+                    <Textarea
+                      value={topic.notes}
+                      onChange={(e) => updateTopic(index, "notes", e.target.value)}
+                      placeholder="事前メモ（任意）"
+                      rows={2}
                     />
                   </div>
-                  {topics.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeTopic(index)}
-                    >
-                      削除
-                    </Button>
-                  )}
                 </div>
-                <div>
-                  <Label>メモ</Label>
-                  <Textarea
-                    value={topic.notes}
-                    onChange={(e) => updateTopic(index, "notes", e.target.value)}
-                    placeholder="事前メモ（任意）"
-                    rows={2}
-                  />
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
 
         <Link href={buildStartUrl()}>
           <Button className="w-full">ミーティングを開始 →</Button>

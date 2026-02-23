@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -49,7 +49,10 @@ const mockMeetings = [
 ];
 
 describe("PastMeetingsAccordion", () => {
-  afterEach(() => cleanup());
+  afterEach(() => {
+    vi.useRealTimers();
+    cleanup();
+  });
 
   it("renders meeting dates as accordion items", () => {
     render(<PastMeetingsAccordion meetings={mockMeetings} onCopyTopic={vi.fn()} />);
@@ -69,22 +72,42 @@ describe("PastMeetingsAccordion", () => {
     expect(screen.getByText("キャリア相談")).toBeDefined();
   });
 
-  it("renders copy button for each topic", () => {
+  it("renders add-to-agenda button for each topic", () => {
     render(<PastMeetingsAccordion meetings={mockMeetings} onCopyTopic={vi.fn()} />);
-    const copyButtons = screen.getAllByRole("button", { name: /コピー/ });
-    expect(copyButtons.length).toBeGreaterThanOrEqual(2);
+    const addButtons = screen.getAllByRole("button", { name: /アジェンダに追加/ });
+    expect(addButtons.length).toBeGreaterThanOrEqual(2);
   });
 
-  it("calls onCopyTopic with topic data when copy button is clicked", async () => {
+  it("calls onCopyTopic with topic data when add button is clicked", async () => {
     const user = userEvent.setup();
     const onCopyTopic = vi.fn();
     render(<PastMeetingsAccordion meetings={mockMeetings} onCopyTopic={onCopyTopic} />);
-    const copyButtons = screen.getAllByRole("button", { name: /コピー/ });
-    await user.click(copyButtons[0]);
+    const addButtons = screen.getAllByRole("button", { name: /アジェンダに追加/ });
+    await user.click(addButtons[0]);
     expect(onCopyTopic).toHaveBeenCalledTimes(1);
     expect(onCopyTopic).toHaveBeenCalledWith(
       expect.objectContaining({ title: "進捗報告", category: "WORK_PROGRESS" }),
     );
+  });
+
+  it("shows added feedback state after button click", () => {
+    render(<PastMeetingsAccordion meetings={mockMeetings} onCopyTopic={vi.fn()} />);
+    const addButtons = screen.getAllByRole("button", { name: /アジェンダに追加/ });
+    fireEvent.click(addButtons[0]);
+    expect(screen.getByRole("button", { name: /追加済み/ })).toBeDefined();
+  });
+
+  it("resets button to normal state after 2 seconds", () => {
+    vi.useFakeTimers();
+    render(<PastMeetingsAccordion meetings={mockMeetings} onCopyTopic={vi.fn()} />);
+    const addButtons = screen.getAllByRole("button", { name: /アジェンダに追加/ });
+    fireEvent.click(addButtons[0]);
+    expect(screen.getByRole("button", { name: /追加済み/ })).toBeDefined();
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+    const resetButtons = screen.getAllByRole("button", { name: /アジェンダに追加/ });
+    expect(resetButtons.length).toBeGreaterThanOrEqual(2);
   });
 
   it("shows empty state when no meetings", () => {
