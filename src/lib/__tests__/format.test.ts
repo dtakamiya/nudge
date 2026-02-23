@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { formatDateLong, formatDaysElapsed, formatRelativeDate } from "@/lib/format";
+import {
+  formatDateLong,
+  formatDaysElapsed,
+  formatDuration,
+  formatRelativeDate,
+} from "@/lib/format";
 
 describe("formatRelativeDate", () => {
   it("returns '未実施' for null", () => {
@@ -122,8 +127,6 @@ describe("formatDateLong", () => {
     expect(formatDateLong("2026-01-05")).toBe("2026年1月5日");
   });
 });
-
-import { formatDuration } from "@/lib/format";
 
 describe("formatDuration", () => {
   it("45分間の所要時間を「45分」と表示する", () => {

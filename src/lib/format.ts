@@ -49,7 +49,7 @@ export function formatDateLong(date: Date | string | null): string {
 
 export function formatDuration(startedAt: Date, endedAt: Date | null): string {
   const end = endedAt ?? new Date();
-  const diffMs = end.getTime() - startedAt.getTime();
+  const diffMs = Math.max(0, end.getTime() - startedAt.getTime());
   const totalMinutes = Math.floor(diffMs / (1000 * 60));
 
   if (totalMinutes < 1) return "1分未満";

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-type ElapsedTime = {
+export type ElapsedTime = {
   minutes: number;
   seconds: number;
   formatted: string;
