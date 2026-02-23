@@ -12,11 +12,46 @@ import {
 
 import { type ActionResult, runAction } from "./types";
 
+export type DateFilterType = "all" | "overdue" | "this-week" | "this-month";
+export type SortByType = "dueDate" | "createdAt" | "memberName";
+
 type ActionItemFilters = {
   status?: ActionItemStatusType;
   memberId?: string;
   tagIds?: string[];
+  keyword?: string;
+  dateFilter?: DateFilterType;
+  sortBy?: SortByType;
 };
+
+function buildDateFilter(dateFilter: DateFilterType): Prisma.ActionItemWhereInput {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  if (dateFilter === "overdue") {
+    return { dueDate: { lt: today }, status: { not: "DONE" } };
+  }
+  if (dateFilter === "this-week") {
+    const dayOfWeek = today.getDay();
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - dayOfWeek);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 7);
+    return { dueDate: { gte: weekStart, lt: weekEnd } };
+  }
+  if (dateFilter === "this-month") {
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    return { dueDate: { gte: monthStart, lt: monthEnd } };
+  }
+  return {};
+}
+
+function buildOrderBy(sortBy: SortByType): Prisma.ActionItemOrderByWithRelationInput[] {
+  if (sortBy === "createdAt") return [{ createdAt: "desc" }];
+  if (sortBy === "memberName") return [{ member: { name: "asc" } }, { dueDate: "asc" }];
+  return [{ dueDate: "asc" }, { createdAt: "desc" }];
+}
 
 export async function getActionItems(filters: ActionItemFilters = {}) {
   const where: Prisma.ActionItemWhereInput = {};
@@ -25,9 +60,21 @@ export async function getActionItems(filters: ActionItemFilters = {}) {
   if (filters.tagIds && filters.tagIds.length > 0) {
     where.tags = { some: { tagId: { in: filters.tagIds } } };
   }
+  if (filters.keyword) {
+    where.OR = [
+      { title: { contains: filters.keyword } },
+      { description: { contains: filters.keyword } },
+    ];
+  }
+  if (filters.dateFilter && filters.dateFilter !== "all") {
+    Object.assign(where, buildDateFilter(filters.dateFilter));
+  }
+
+  const orderBy = buildOrderBy(filters.sortBy ?? "dueDate");
+
   return prisma.actionItem.findMany({
     where,
-    orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
+    orderBy,
     include: {
       member: { select: { id: true, name: true } },
       meeting: { select: { id: true, date: true } },

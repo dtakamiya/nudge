@@ -30,6 +30,10 @@ describe("buildFilterUrl", () => {
     expect(buildFilterUrl("status=TODO", "status", "all")).toBe("/actions?");
   });
 
+  it("value が空文字のとき該当キーを削除する", () => {
+    expect(buildFilterUrl("status=TODO&memberId=abc", "status", "")).toBe("/actions?memberId=abc");
+  });
+
   it("value が 'all' でないとき該当キーをセットする", () => {
     expect(buildFilterUrl("", "status", "TODO")).toBe("/actions?status=TODO");
   });
@@ -47,19 +51,36 @@ describe("buildFilterUrl", () => {
   it("空のパラメータに値を追加する", () => {
     expect(buildFilterUrl("", "memberId", "member-1")).toBe("/actions?memberId=member-1");
   });
+
+  it("dateFilter パラメータを設定できる", () => {
+    expect(buildFilterUrl("", "dateFilter", "overdue")).toBe("/actions?dateFilter=overdue");
+  });
+
+  it("dateFilter が 'all' のときパラメータを削除する", () => {
+    expect(buildFilterUrl("dateFilter=overdue", "dateFilter", "all")).toBe("/actions?");
+  });
+
+  it("sort パラメータを設定できる", () => {
+    expect(buildFilterUrl("", "sort", "createdAt")).toBe("/actions?sort=createdAt");
+  });
 });
 
 describe("ActionFilters", () => {
-  it("2つのフィルターセレクトが表示される", () => {
+  it("4つのフィルターセレクトが表示される（ステータス・メンバー・期限・並び順）", () => {
     render(<ActionFilters members={mockMembers} />);
     const triggers = screen.getAllByRole("combobox");
-    expect(triggers.length).toBe(2);
+    expect(triggers.length).toBe(4);
   });
 
   it("空のメンバーリストでもレンダリングされる", () => {
     render(<ActionFilters members={[]} />);
     const triggers = screen.getAllByRole("combobox");
-    expect(triggers.length).toBe(2);
+    expect(triggers.length).toBe(4);
+  });
+
+  it("キーワード検索のインプットが表示される", () => {
+    render(<ActionFilters members={mockMembers} />);
+    expect(screen.getByPlaceholderText("アクション名・内容で検索...")).toBeDefined();
   });
 
   it("searchParams にステータスがないとき 'すべて' がデフォルト表示される", () => {
@@ -72,6 +93,18 @@ describe("ActionFilters", () => {
     mockSearchParamsGet.mockReturnValue(null);
     render(<ActionFilters members={mockMembers} />);
     expect(screen.getByText("全メンバー")).toBeDefined();
+  });
+
+  it("期限フィルタのデフォルトとして 'すべての期限' が表示される", () => {
+    mockSearchParamsGet.mockReturnValue(null);
+    render(<ActionFilters members={mockMembers} />);
+    expect(screen.getByText("すべての期限")).toBeDefined();
+  });
+
+  it("ソートのデフォルトとして '期限日順' が表示される", () => {
+    mockSearchParamsGet.mockReturnValue(null);
+    render(<ActionFilters members={mockMembers} />);
+    expect(screen.getByText("期限日順")).toBeDefined();
   });
 
   // Note: Radix UI Select の onValueChange テストは jsdom 環境では
