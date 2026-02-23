@@ -345,15 +345,26 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
   return (
     <>
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="date">日付 *</Label>
-          <Input
-            id="date"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
-          />
+        <div className="flex items-end justify-between gap-4">
+          <div className="flex flex-col gap-2 flex-1">
+            <Label htmlFor="date">日付 *</Label>
+            <Input
+              id="date"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
+            />
+          </div>
+          <Button type="submit" variant="outline" disabled={isSubmitting}>
+            {isSubmitting
+              ? isEditing
+                ? "更新中..."
+                : "保存中..."
+              : isEditing
+                ? "1on1を更新"
+                : "1on1を保存"}
+          </Button>
         </div>
 
         <CheckinSection
