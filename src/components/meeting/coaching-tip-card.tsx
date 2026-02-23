@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import {
   type CoachingCategory,
   type CoachingTip,
   getRandomTipByCategory,
+  getTipsByCategory,
 } from "@/lib/coaching-tips";
 
 interface CoachingTipCardProps {
@@ -16,7 +17,11 @@ interface CoachingTipCardProps {
 }
 
 export function CoachingTipCard({ category, className }: CoachingTipCardProps) {
-  const [current, setCurrent] = useState<CoachingTip>(() => getRandomTipByCategory(category));
+  const [current, setCurrent] = useState<CoachingTip>(() => getTipsByCategory(category)[0]);
+
+  useEffect(() => {
+    setCurrent(getRandomTipByCategory(category));
+  }, [category]);
 
   const handleRefresh = () => {
     setCurrent((prev) => getRandomTipByCategory(category, prev.id));
