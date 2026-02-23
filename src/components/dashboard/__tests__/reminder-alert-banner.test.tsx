@@ -61,6 +61,29 @@ describe("ReminderAlertBanner", () => {
     expect(screen.getByText("鈴木花子")).toBeDefined();
   });
 
+  it("メンバー名がメンバー詳細ページへのリンクになっている", () => {
+    render(
+      <ReminderAlertBanner
+        reminders={[makeReminder({ memberId: "member-1", memberName: "テストメンバー" })]}
+      />,
+    );
+    const link = screen.getByRole("link", { name: "テストメンバー" });
+    expect(link).toBeDefined();
+    expect((link as HTMLAnchorElement).getAttribute("href")).toContain("/members/member-1");
+  });
+
+  it("複数リマインダーの場合、各メンバー名がそれぞれの詳細ページへリンクする", () => {
+    const reminders = [
+      makeReminder({ memberId: "m1", memberName: "田中太郎" }),
+      makeReminder({ memberId: "m2", memberName: "鈴木花子" }),
+    ];
+    render(<ReminderAlertBanner reminders={reminders} />);
+    const link1 = screen.getByRole("link", { name: "田中太郎" });
+    const link2 = screen.getByRole("link", { name: "鈴木花子" });
+    expect((link1 as HTMLAnchorElement).getAttribute("href")).toContain("/members/m1");
+    expect((link2 as HTMLAnchorElement).getAttribute("href")).toContain("/members/m2");
+  });
+
   it("「1on1準備」リンクが各メンバーに表示される", () => {
     render(<ReminderAlertBanner reminders={[makeReminder({ memberId: "member-abc" })]} />);
     const link = screen.getByRole("link", { name: /1on1準備/ });

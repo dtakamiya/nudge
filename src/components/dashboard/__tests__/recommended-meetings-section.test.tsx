@@ -41,6 +41,13 @@ describe("RecommendedMeetingsSection", () => {
     expect(screen.getByText(/次回:/)).toBeDefined();
   });
 
+  it("メンバー名がメンバー詳細ページへのリンクになっている", () => {
+    render(<RecommendedMeetingsSection members={mockMembers} />);
+    const link = screen.getByRole("link", { name: "山田 太郎" });
+    expect(link).toBeDefined();
+    expect((link as HTMLAnchorElement).getAttribute("href")).toBe("/members/m1");
+  });
+
   it("shows empty message when no members need meetings", () => {
     render(<RecommendedMeetingsSection members={[]} />);
     expect(screen.getByText("全員と最近1on1を実施済みです")).toBeDefined();

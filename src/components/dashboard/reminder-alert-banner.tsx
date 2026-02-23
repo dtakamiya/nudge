@@ -40,7 +40,12 @@ export function ReminderAlertBanner({ reminders }: Props) {
             className="flex items-center justify-between gap-3 rounded-lg bg-background/60 px-3 py-2 text-sm"
           >
             <div className="flex items-center gap-2 min-w-0">
-              <span className="font-medium text-foreground truncate">{reminder.memberName}</span>
+              <Link
+                href={`/members/${reminder.memberId}`}
+                className="font-medium text-foreground truncate hover:underline"
+              >
+                {reminder.memberName}
+              </Link>
               <span className="text-muted-foreground shrink-0">
                 {reminder.daysSinceLastMeeting === null
                   ? "未実施"

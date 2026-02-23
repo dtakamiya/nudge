@@ -60,7 +60,12 @@ export function ScheduledMeetingsSection({ meetings }: Props) {
             <AvatarInitial name={meeting.name} size="sm" />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <p className="text-sm font-medium truncate">{meeting.name}</p>
+                <Link
+                  href={`/members/${meeting.id}`}
+                  className="text-sm font-medium truncate hover:underline"
+                >
+                  {meeting.name}
+                </Link>
                 <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">
                   {getMeetingIntervalLabel(meeting.meetingIntervalDays)}
                 </span>

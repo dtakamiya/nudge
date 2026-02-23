@@ -30,7 +30,12 @@ export function RecommendedMeetingsSection({ members }: { members: RecommendedMe
           <AvatarInitial name={member.name} size="sm" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <p className="text-sm font-medium truncate">{member.name}</p>
+              <Link
+                href={`/members/${member.id}`}
+                className="text-sm font-medium truncate hover:underline"
+              >
+                {member.name}
+              </Link>
               <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">
                 {getMeetingIntervalLabel(member.meetingIntervalDays)}
               </span>
