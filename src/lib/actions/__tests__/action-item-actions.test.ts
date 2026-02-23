@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/prisma";
 
 import {
+  createActionItemForMeeting,
   getActionItems,
   getPendingActionItems,
   updateActionItem,
@@ -12,6 +13,7 @@ import { createMeeting } from "../meeting-actions";
 import { createMember } from "../member-actions";
 
 let memberId: string;
+let meetingId: string;
 
 beforeEach(async () => {
   await prisma.actionItem.deleteMany();
@@ -21,6 +23,14 @@ beforeEach(async () => {
   const result = await createMember({ name: "Test Member" });
   if (!result.success) throw new Error(result.error);
   memberId = result.data.id;
+  const meetingResult = await createMeeting({
+    memberId,
+    date: new Date().toISOString(),
+    topics: [],
+    actionItems: [],
+  });
+  if (!meetingResult.success) throw new Error(meetingResult.error);
+  meetingId = meetingResult.data.id;
 });
 
 describe("getActionItems", () => {
@@ -229,5 +239,52 @@ describe("updateActionItem", () => {
       description: "",
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe("createActionItemForMeeting", () => {
+  it("アクションアイテムを追加できる", async () => {
+    const result = await createActionItemForMeeting(meetingId, memberId, {
+      title: "新しいアクション",
+      description: "",
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.title).toBe("新しいアクション");
+    expect(result.data.meetingId).toBe(meetingId);
+    expect(result.data.memberId).toBe(memberId);
+  });
+
+  it("期限日を設定できる", async () => {
+    const result = await createActionItemForMeeting(meetingId, memberId, {
+      title: "期限付きアクション",
+      description: "",
+      dueDate: "2026-04-01",
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.dueDate).not.toBeNull();
+  });
+
+  it("空のタイトルはバリデーションエラーになる", async () => {
+    const result = await createActionItemForMeeting(meetingId, memberId, {
+      title: "",
+      description: "",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("sortOrder は既存アイテム数に基づいて設定される", async () => {
+    await createActionItemForMeeting(meetingId, memberId, {
+      title: "アクション1",
+      description: "",
+    });
+    const result = await createActionItemForMeeting(meetingId, memberId, {
+      title: "アクション2",
+      description: "",
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.sortOrder).toBe(1);
   });
 });

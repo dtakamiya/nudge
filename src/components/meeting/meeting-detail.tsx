@@ -26,6 +26,8 @@ type ActionItem = {
 };
 
 type Props = {
+  meetingId: string;
+  memberId: string;
   date: Date;
   mood?: number | null;
   conditionHealth?: number | null;
@@ -39,6 +41,8 @@ type Props = {
 };
 
 export function MeetingDetail({
+  meetingId,
+  memberId,
   date,
   mood,
   conditionHealth,
@@ -143,6 +147,8 @@ export function MeetingDetail({
             ...a,
             meeting: { date: a.meeting.date },
           }))}
+          meetingId={meetingId}
+          memberId={memberId}
         />
       </div>
     </div>

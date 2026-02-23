@@ -16,6 +16,8 @@ vi.mock("@/lib/mood", () => ({
 }));
 
 const baseProps = {
+  meetingId: "meeting-1",
+  memberId: "member-1",
   date: new Date("2026-02-20T10:00:00.000Z"),
   topics: [
     {

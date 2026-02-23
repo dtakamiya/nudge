@@ -25,10 +25,12 @@ vi.mock("sonner", () => ({
 
 const mockUpdateActionItemStatus = vi.fn();
 const mockUpdateActionItem = vi.fn();
+const mockCreateActionItemForMeeting = vi.fn();
 
 vi.mock("@/lib/actions/action-item-actions", () => ({
   updateActionItemStatus: (...args: unknown[]) => mockUpdateActionItemStatus(...args),
   updateActionItem: (...args: unknown[]) => mockUpdateActionItem(...args),
+  createActionItemForMeeting: (...args: unknown[]) => mockCreateActionItemForMeeting(...args),
 }));
 
 afterEach(() => {
@@ -211,6 +213,95 @@ describe("ActionListCompact", () => {
     const saveBtn = screen.getByRole("button", { name: /保存/ });
     await user.click(saveBtn);
     expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.actionItem.updateError);
+  });
+
+  describe("アクション追加フォーム", () => {
+    it("meetingId が指定されたとき追加ボタンが表示される", () => {
+      render(
+        <ActionListCompact actionItems={baseItems} meetingId="meeting-1" memberId="member-1" />,
+      );
+      expect(screen.getByRole("button", { name: /アクション追加/ })).toBeDefined();
+    });
+
+    it("meetingId が指定されないとき追加ボタンが表示されない", () => {
+      render(<ActionListCompact actionItems={baseItems} />);
+      expect(screen.queryByRole("button", { name: /アクション追加/ })).toBeNull();
+    });
+
+    it("追加ボタンクリックでインラインフォームが表示される", async () => {
+      const user = userEvent.setup();
+      render(
+        <ActionListCompact actionItems={baseItems} meetingId="meeting-1" memberId="member-1" />,
+      );
+      await user.click(screen.getByRole("button", { name: /アクション追加/ }));
+      expect(screen.getByPlaceholderText("アクションのタイトル")).toBeDefined();
+    });
+
+    it("タイトルが空の場合、保存ボタンが無効になる", async () => {
+      const user = userEvent.setup();
+      render(
+        <ActionListCompact actionItems={baseItems} meetingId="meeting-1" memberId="member-1" />,
+      );
+      await user.click(screen.getByRole("button", { name: /アクション追加/ }));
+      const addBtn = screen.getByRole("button", { name: /追加/ });
+      expect(addBtn).toHaveProperty("disabled", true);
+    });
+
+    it("保存ボタンクリックで createActionItemForMeeting が呼ばれる", async () => {
+      const user = userEvent.setup();
+      mockCreateActionItemForMeeting.mockResolvedValue({ success: true, data: {} });
+      render(
+        <ActionListCompact actionItems={baseItems} meetingId="meeting-1" memberId="member-1" />,
+      );
+      await user.click(screen.getByRole("button", { name: /アクション追加/ }));
+      await user.type(screen.getByPlaceholderText("アクションのタイトル"), "新しいタスク");
+      await user.click(screen.getByRole("button", { name: /追加/ }));
+      expect(mockCreateActionItemForMeeting).toHaveBeenCalledWith(
+        "meeting-1",
+        "member-1",
+        expect.objectContaining({ title: "新しいタスク" }),
+      );
+    });
+
+    it("追加成功時にトーストが表示される", async () => {
+      const user = userEvent.setup();
+      mockCreateActionItemForMeeting.mockResolvedValue({ success: true, data: {} });
+      render(
+        <ActionListCompact actionItems={baseItems} meetingId="meeting-1" memberId="member-1" />,
+      );
+      await user.click(screen.getByRole("button", { name: /アクション追加/ }));
+      await user.type(screen.getByPlaceholderText("アクションのタイトル"), "新しいタスク");
+      await user.click(screen.getByRole("button", { name: /追加/ }));
+      expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.actionItem.createSuccess);
+    });
+
+    it("追加失敗時にエラートーストが表示される", async () => {
+      const user = userEvent.setup();
+      mockCreateActionItemForMeeting.mockResolvedValue({ success: false, error: "Error" });
+      render(
+        <ActionListCompact actionItems={baseItems} meetingId="meeting-1" memberId="member-1" />,
+      );
+      await user.click(screen.getByRole("button", { name: /アクション追加/ }));
+      await user.type(screen.getByPlaceholderText("アクションのタイトル"), "新しいタスク");
+      await user.click(screen.getByRole("button", { name: /追加/ }));
+      expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.actionItem.createError);
+    });
+
+    it("キャンセルボタンでフォームが閉じる", async () => {
+      const user = userEvent.setup();
+      render(
+        <ActionListCompact actionItems={baseItems} meetingId="meeting-1" memberId="member-1" />,
+      );
+      await user.click(screen.getByRole("button", { name: /アクション追加/ }));
+      expect(screen.getByPlaceholderText("アクションのタイトル")).toBeDefined();
+      await user.click(screen.getByRole("button", { name: /キャンセル/ }));
+      expect(screen.queryByPlaceholderText("アクションのタイトル")).toBeNull();
+    });
+
+    it("アイテムが空のとき meetingId があれば追加ボタンが表示される", () => {
+      render(<ActionListCompact actionItems={[]} meetingId="meeting-1" memberId="member-1" />);
+      expect(screen.getByRole("button", { name: /アクション追加/ })).toBeDefined();
+    });
   });
 
   describe("期限日バッジ", () => {

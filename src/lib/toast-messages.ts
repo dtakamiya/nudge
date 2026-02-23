@@ -24,6 +24,8 @@ export const TOAST_MESSAGES = {
     statusChangeError: "ステータスの更新に失敗しました",
     updateSuccess: "アクションアイテムを更新しました",
     updateError: "アクションアイテムの更新に失敗しました",
+    createSuccess: "アクションアイテムを追加しました",
+    createError: "アクションアイテムの追加に失敗しました",
   },
   prepare: {
     topicCopied: "話題をアジェンダにコピーしました",
