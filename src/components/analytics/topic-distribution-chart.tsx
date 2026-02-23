@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
+import { useMemo } from "react";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TopicCategory } from "@/generated/prisma/client";
+import { useChartMounted } from "@/hooks/use-chart-mounted";
 import { type CategoryTrend } from "@/lib/actions/analytics-actions";
 
 export const CATEGORY_LABELS: Record<TopicCategory, string> = {
@@ -27,20 +28,8 @@ type Props = {
   data: CategoryTrend[];
 };
 
-function subscribe() {
-  return () => {};
-}
-
-function getSnapshot() {
-  return true;
-}
-
-function getServerSnapshot() {
-  return false;
-}
-
 export function TopicDistributionChart({ data }: Props) {
-  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const mounted = useChartMounted();
   const chartData = useMemo(() => {
     return data.map((item) => ({
       name: CATEGORY_LABELS[item.category],

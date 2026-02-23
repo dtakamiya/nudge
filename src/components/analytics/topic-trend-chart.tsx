@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
+import { useMemo } from "react";
 import {
   Bar,
   BarChart,
@@ -14,6 +14,7 @@ import {
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TopicCategory } from "@/generated/prisma/client";
+import { useChartMounted } from "@/hooks/use-chart-mounted";
 import { type MonthlyTrend } from "@/lib/actions/analytics-actions";
 
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "./topic-distribution-chart";
@@ -22,20 +23,8 @@ type Props = {
   data: MonthlyTrend[];
 };
 
-function subscribe() {
-  return () => {};
-}
-
-function getSnapshot() {
-  return true;
-}
-
-function getServerSnapshot() {
-  return false;
-}
-
 export function TopicTrendChart({ data }: Props) {
-  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const mounted = useChartMounted();
   const chartData = useMemo(() => {
     return data.map((item) => {
       // month を整形 (YYYY-MM -> YYYY/MM)
