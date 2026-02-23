@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart2, LayoutDashboard, ListChecks, Menu, UserPlus, X } from "lucide-react";
+import { BarChart2, LayoutDashboard, ListChecks, Menu, UserPlus, Users, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -23,6 +23,7 @@ type SidebarProps = {
 
 const navItems = [
   { href: "/", label: "ダッシュボード", icon: LayoutDashboard },
+  { href: "/members", label: "メンバー一覧", icon: Users },
   { href: "/members/new", label: "メンバー追加", icon: UserPlus },
   { href: "/actions", label: "アクション一覧", icon: ListChecks },
   { href: "/analytics", label: "ミーティング分析", icon: BarChart2 },
@@ -40,7 +41,10 @@ function NavLinks({
   return (
     <nav className="flex flex-col gap-1">
       {navItems.map((item) => {
-        const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+        const isActive =
+          item.href === "/" || item.href === "/members"
+            ? pathname === item.href
+            : pathname.startsWith(item.href);
         const badge = item.href === "/actions" && actionCount != null && actionCount > 0;
         return (
           <Link

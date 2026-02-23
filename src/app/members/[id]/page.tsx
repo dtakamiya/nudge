@@ -38,7 +38,13 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
 
   return (
     <div className="animate-fade-in-up">
-      <Breadcrumb items={[{ label: "ダッシュボード", href: "/" }, { label: member.name }]} />
+      <Breadcrumb
+        items={[
+          { label: "ダッシュボード", href: "/" },
+          { label: "メンバー一覧", href: "/members" },
+          { label: member.name },
+        ]}
+      />
       <div className="flex justify-between items-start mb-8">
         <div className="flex items-center gap-4">
           <AvatarInitial name={member.name} size="lg" />
