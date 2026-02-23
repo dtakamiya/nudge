@@ -56,8 +56,13 @@ npm install
 cp .env.example .env
 # .env の DATABASE_URL を確認（デフォルト: file:./dev.db）
 
-# データベースをセットアップ
-npx prisma migrate dev
+# Prisma クライアントを生成
+npx prisma generate
+
+# データベースマイグレーションを適用
+npx prisma migrate deploy
+
+# シードデータを投入
 npx prisma db seed
 
 # 開発サーバーを起動

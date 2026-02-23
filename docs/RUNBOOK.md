@@ -30,9 +30,14 @@ npm run start
 # 環境変数の設定
 cp .env.example .env
 
-# データベース初期化（マイグレーション + シード）
-npx prisma migrate dev
-npm run db:seed
+# Prisma クライアント生成
+npx prisma generate
+
+# データベースマイグレーションを適用
+npx prisma migrate deploy
+
+# シードデータの投入
+npx prisma db seed
 ```
 
 ## トラブルシューティング
