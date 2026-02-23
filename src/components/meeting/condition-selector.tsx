@@ -8,6 +8,8 @@ interface ConditionAxis {
   icon: string;
   minLabel: string;
   maxLabel: string;
+  minEmoji: string;
+  maxEmoji: string;
   options: { value: number; label: string }[];
 }
 
@@ -18,6 +20,8 @@ const CONDITION_AXES: ConditionAxis[] = [
     icon: "🏥",
     minLabel: "悪い",
     maxLabel: "良い",
+    minEmoji: "😞",
+    maxEmoji: "😊",
     options: [
       { value: 1, label: "とても悪い" },
       { value: 2, label: "悪い" },
@@ -32,6 +36,8 @@ const CONDITION_AXES: ConditionAxis[] = [
     icon: "💭",
     minLabel: "悪い",
     maxLabel: "良い",
+    minEmoji: "😞",
+    maxEmoji: "😊",
     options: [
       { value: 1, label: "とても悪い" },
       { value: 2, label: "悪い" },
@@ -46,6 +52,8 @@ const CONDITION_AXES: ConditionAxis[] = [
     icon: "📊",
     minLabel: "少ない",
     maxLabel: "多い",
+    minEmoji: "😌",
+    maxEmoji: "😰",
     options: [
       { value: 1, label: "とても少ない" },
       { value: 2, label: "少ない" },
@@ -91,9 +99,12 @@ export function ConditionSelector({
               <span className="text-sm font-medium text-slate-700">{axis.label}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-10 shrink-0 text-right text-xs text-slate-400">
-                {axis.minLabel}
-              </span>
+              <div className="flex w-14 shrink-0 flex-col items-end">
+                <span aria-hidden="true" className="text-base leading-none">
+                  {axis.minEmoji}
+                </span>
+                <span className="text-xs text-slate-400">{axis.minLabel}</span>
+              </div>
               <div className="flex items-center gap-1">
                 {axis.options.map((option) => (
                   <button
@@ -104,7 +115,7 @@ export function ConditionSelector({
                     onClick={() => handleSelect(axis.field, option.value)}
                     className={`flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary ${
                       currentValue === option.value
-                        ? "bg-primary text-white ring-2 ring-primary scale-105"
+                        ? "scale-105 bg-primary text-white ring-2 ring-primary"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                     }`}
                   >
@@ -112,7 +123,12 @@ export function ConditionSelector({
                   </button>
                 ))}
               </div>
-              <span className="w-8 shrink-0 text-xs text-slate-400">{axis.maxLabel}</span>
+              <div className="flex w-10 shrink-0 flex-col items-start">
+                <span aria-hidden="true" className="text-base leading-none">
+                  {axis.maxEmoji}
+                </span>
+                <span className="text-xs text-slate-400">{axis.maxLabel}</span>
+              </div>
             </div>
           </div>
         );
