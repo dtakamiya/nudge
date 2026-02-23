@@ -1,5 +1,8 @@
+import { Suspense } from "react";
+
 import { BrowserNotification } from "@/components/dashboard/browser-notification";
 import { DashboardSummary } from "@/components/dashboard/dashboard-summary";
+import { FlashToast } from "@/components/dashboard/flash-toast";
 import { OnboardingCard } from "@/components/dashboard/onboarding-card";
 import { RecentActivityFeed } from "@/components/dashboard/recent-activity-feed";
 import { RecommendedMeetingsSection } from "@/components/dashboard/recommended-meetings-section";
@@ -44,6 +47,9 @@ export default async function DashboardPage() {
 
   return (
     <div>
+      <Suspense>
+        <FlashToast />
+      </Suspense>
       <h1 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">ダッシュボード</h1>
 
       {!isFirstTime && <ReminderAlertBanner reminders={overdueReminders} />}
