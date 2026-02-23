@@ -2,7 +2,7 @@ import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 /**
- * テスト用メンバーを作成してダッシュボードに戻る
+ * テスト用メンバーを作成してメンバー詳細ページに遷移する
  */
 export async function createMember(
   page: Page,
@@ -18,7 +18,7 @@ export async function createMember(
     await page.getByLabel("役職").fill(options.position);
   }
   await page.getByRole("button", { name: "登録する" }).click();
-  await expect(page).toHaveURL("/", { timeout: 15000 });
+  await expect(page).toHaveURL(/\/members\/[^/]+$/, { timeout: 15000 });
 }
 
 /**
@@ -50,6 +50,7 @@ export async function navigateToMemberDetail(page: Page, name: string) {
 
 /**
  * テスト用メンバーを作成してメンバー詳細ページに遷移する
+ * createMember 後はすでにメンバー詳細ページにいるため、見出しを確認するだけ
  */
 export async function createMemberAndNavigateToDetail(
   page: Page,
@@ -60,7 +61,23 @@ export async function createMemberAndNavigateToDetail(
     department: options?.department ?? "テスト部",
     position: options?.position,
   });
-  await navigateToMemberDetail(page, name);
+  await expect(page.getByRole("heading", { name })).toBeVisible({ timeout: 10000 });
+}
+
+/**
+ * ClosingDialog の確認ボタンをクリックして保存を確定する
+ * アクションアイテムの有無でボタンラベルが変わるため両方に対応する
+ */
+export async function confirmSaveMeeting(page: Page) {
+  const saveBtn = page.getByRole("button", { name: "保存する" });
+  const saveWithoutActionBtn = page.getByRole("button", { name: "アクションなしで保存" });
+  await saveBtn.or(saveWithoutActionBtn).first().waitFor({ timeout: 5000 });
+  const hasSaveBtn = await saveBtn.isVisible();
+  if (hasSaveBtn) {
+    await saveBtn.click();
+  } else {
+    await saveWithoutActionBtn.click();
+  }
 }
 
 /**
@@ -85,8 +102,9 @@ export async function createMeetingFromDetail(
     await page.getByPlaceholder("アクションのタイトル").first().fill(options.actionTitle);
   }
 
-  // 保存
+  // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
   await page.getByRole("button", { name: "1on1を保存" }).click();
+  await confirmSaveMeeting(page);
   await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
 }
 

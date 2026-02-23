@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { createMemberAndNavigateToDetail } from "./helpers";
+import { confirmSaveMeeting, createMemberAndNavigateToDetail } from "./helpers";
 
 test.describe("ミーティング管理", () => {
   test("メンバー詳細から新規1on1ページに遷移できる", async ({ page }) => {
@@ -30,8 +30,9 @@ test.describe("ミーティング管理", () => {
     // 話題を入力
     await page.getByPlaceholder("話題のタイトル").first().fill("プロジェクト進捗");
 
-    // 保存
+    // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
     await page.getByRole("button", { name: "1on1を保存" }).click();
+    await confirmSaveMeeting(page);
 
     // メンバー詳細ページに遷移
     await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
@@ -60,8 +61,9 @@ test.describe("ミーティング管理", () => {
     // 2つ目のトピックを入力
     await topicInputs.nth(1).fill("2つ目の話題");
 
-    // 保存
+    // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
     await page.getByRole("button", { name: "1on1を保存" }).click();
+    await confirmSaveMeeting(page);
 
     // メンバー詳細ページに遷移
     await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
@@ -87,8 +89,9 @@ test.describe("ミーティング管理", () => {
     // アクションアイテムを入力
     await actionTitleInput.first().fill("テストレポートを作成する");
 
-    // 保存
+    // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
     await page.getByRole("button", { name: "1on1を保存" }).click();
+    await confirmSaveMeeting(page);
 
     // メンバー詳細ページに遷移
     await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
@@ -104,7 +107,9 @@ test.describe("ミーティング管理", () => {
     // ミーティングを作成
     await page.getByRole("link", { name: "新規1on1" }).click();
     await page.getByPlaceholder("話題のタイトル").first().fill("詳細表示テスト用トピック");
+    // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
     await page.getByRole("button", { name: "1on1を保存" }).click();
+    await confirmSaveMeeting(page);
     await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
 
     // 1on1履歴セクションの最初のリンクをクリック
