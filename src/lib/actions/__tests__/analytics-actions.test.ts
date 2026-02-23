@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/prisma";
 
 import {
+  getAllMembersWithInterval,
+  getDepartments,
   getMeetingFrequencyByMonth,
   getMemberActionTrends,
   getMemberMeetingHeatmap,
@@ -170,6 +172,66 @@ describe("getMeetingFrequencyByMonth", () => {
     expect(jan?.count).toBe(2);
     expect(feb?.count).toBe(1);
   });
+
+  it("monthCount=3 で直近3ヶ月のみ集計する", async () => {
+    const member = await createMember({
+      name: "Test3Month",
+      department: undefined,
+      position: undefined,
+    });
+    if (!member.success) throw new Error("Member creation failed");
+
+    const now = new Date();
+    const twoMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, 15);
+    const fourMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 4, 15);
+
+    await prisma.meeting.createMany({
+      data: [
+        { memberId: member.data.id, date: twoMonthsAgo },
+        { memberId: member.data.id, date: fourMonthsAgo },
+      ],
+    });
+
+    const result = await getMeetingFrequencyByMonth(3);
+    const twoMonthKey = `${twoMonthsAgo.getFullYear()}-${String(twoMonthsAgo.getMonth() + 1).padStart(2, "0")}`;
+    const fourMonthKey = `${fourMonthsAgo.getFullYear()}-${String(fourMonthsAgo.getMonth() + 1).padStart(2, "0")}`;
+
+    expect(result.find((r) => r.month === twoMonthKey)).toBeDefined();
+    expect(result.find((r) => r.month === fourMonthKey)).toBeUndefined();
+  });
+
+  it("部署フィルタでその部署のメンバーのミーティングのみカウントする", async () => {
+    const engMember = await createMember({
+      name: "EngMember",
+      department: "Engineering",
+      position: undefined,
+    });
+    const salesMember = await createMember({
+      name: "SalesMember",
+      department: "Sales",
+      position: undefined,
+    });
+    if (!engMember.success || !salesMember.success) throw new Error("Member creation failed");
+
+    const now = new Date();
+    const thisMonth = new Date(now.getFullYear(), now.getMonth(), 10);
+
+    await prisma.meeting.createMany({
+      data: [
+        { memberId: engMember.data.id, date: thisMonth },
+        { memberId: engMember.data.id, date: thisMonth },
+        { memberId: salesMember.data.id, date: thisMonth },
+      ],
+    });
+
+    const thisMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    const allResult = await getMeetingFrequencyByMonth(12);
+    const engResult = await getMeetingFrequencyByMonth(12, "Engineering");
+
+    expect(allResult.find((r) => r.month === thisMonthKey)?.count).toBe(3);
+    expect(engResult.find((r) => r.month === thisMonthKey)?.count).toBe(2);
+  });
 });
 
 describe("getRecommendedMeetings", () => {
@@ -318,6 +380,29 @@ describe("getScheduledMeetingsThisWeek", () => {
   });
 });
 
+describe("getDepartments", () => {
+  it("部署なしのメンバーのみの場合は空配列を返す", async () => {
+    await createMember({ name: "NoDept", department: undefined, position: undefined });
+    const result = await getDepartments();
+    expect(result).toEqual([]);
+  });
+
+  it("重複なしで部署一覧をソートして返す", async () => {
+    await createMember({ name: "A", department: "Engineering", position: undefined });
+    await createMember({ name: "B", department: "Engineering", position: undefined });
+    await createMember({ name: "C", department: "Sales", position: undefined });
+    const result = await getDepartments();
+    expect(result).toHaveLength(2);
+    expect(result).toContain("Engineering");
+    expect(result).toContain("Sales");
+  });
+
+  it("メンバーがいない場合は空配列を返す", async () => {
+    const result = await getDepartments();
+    expect(result).toEqual([]);
+  });
+});
+
 describe("getMemberMeetingHeatmap", () => {
   it("メンバーがいない場合は空配列を返す", async () => {
     const result = await getMemberMeetingHeatmap();
@@ -402,5 +487,132 @@ describe("getMemberMeetingHeatmap", () => {
     expect(found).toBeDefined();
     const totalCount = found!.months.reduce((sum, m) => sum + m.count, 0);
     expect(totalCount).toBe(0);
+  });
+
+  it("monthCount=3 で直近3ヶ月分の月キーを返す", async () => {
+    const result = await getMemberMeetingHeatmap(3);
+    expect(result.months).toHaveLength(3);
+    const now = new Date();
+    const expectedLatest = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    expect(result.months[2]).toBe(expectedLatest);
+  });
+
+  it("部署フィルタでその部署のメンバーのみ返す", async () => {
+    const engMember = await createMember({
+      name: "EngMemberHeatmap",
+      department: "Engineering",
+      position: undefined,
+    });
+    const salesMember = await createMember({
+      name: "SalesMemberHeatmap",
+      department: "Sales",
+      position: undefined,
+    });
+    if (!engMember.success || !salesMember.success) throw new Error("Member creation failed");
+
+    const result = await getMemberMeetingHeatmap(12, "Engineering");
+    expect(result.members.find((m) => m.memberName === "EngMemberHeatmap")).toBeDefined();
+    expect(result.members.find((m) => m.memberName === "SalesMemberHeatmap")).toBeUndefined();
+  });
+
+  it("MemberMeetingHeatmapEntry に department フィールドが含まれる", async () => {
+    const member = await createMember({
+      name: "DeptMember",
+      department: "Engineering",
+      position: undefined,
+    });
+    if (!member.success) throw new Error("Member creation failed");
+
+    const result = await getMemberMeetingHeatmap();
+    const found = result.members.find((m) => m.memberName === "DeptMember");
+    expect(found).toBeDefined();
+    expect(found?.department).toBe("Engineering");
+  });
+});
+
+describe("getAllMembersWithInterval with options", () => {
+  it("部署フィルタでその部署のメンバーのみ返す", async () => {
+    const engMember = await createMember({
+      name: "EngInterval",
+      department: "Engineering",
+      position: undefined,
+    });
+    const salesMember = await createMember({
+      name: "SalesInterval",
+      department: "Sales",
+      position: undefined,
+    });
+    if (!engMember.success || !salesMember.success) throw new Error("Member creation failed");
+
+    const result = await getAllMembersWithInterval({ department: "Engineering" });
+    expect(result.find((m) => m.name === "EngInterval")).toBeDefined();
+    expect(result.find((m) => m.name === "SalesInterval")).toBeUndefined();
+  });
+
+  it("sort=last_meeting で最終ミーティング日の降順にソートする", async () => {
+    const memberA = await createMember({
+      name: "SortMemberA",
+      department: undefined,
+      position: undefined,
+    });
+    const memberB = await createMember({
+      name: "SortMemberB",
+      department: undefined,
+      position: undefined,
+    });
+    if (!memberA.success || !memberB.success) throw new Error("Member creation failed");
+
+    const recentDate = new Date();
+    recentDate.setDate(recentDate.getDate() - 3);
+    const oldDate = new Date();
+    oldDate.setDate(oldDate.getDate() - 10);
+
+    await prisma.meeting.create({ data: { memberId: memberA.data.id, date: recentDate } });
+    await prisma.meeting.create({ data: { memberId: memberB.data.id, date: oldDate } });
+
+    const result = await getAllMembersWithInterval({ sort: "last_meeting" });
+    const indexA = result.findIndex((m) => m.name === "SortMemberA");
+    const indexB = result.findIndex((m) => m.name === "SortMemberB");
+    // A は最近のミーティング（daysSinceLast が小さい）→ 降順では後ろ
+    // B は古いミーティング（daysSinceLast が大きい）→ 降順では前
+    expect(indexB).toBeLessThan(indexA);
+  });
+
+  it("sort=department で部署→名前順にソートする", async () => {
+    const memberZ = await createMember({
+      name: "ZMember",
+      department: "Zebra",
+      position: undefined,
+    });
+    const memberA = await createMember({
+      name: "AMember",
+      department: "Apple",
+      position: undefined,
+    });
+    if (!memberZ.success || !memberA.success) throw new Error("Member creation failed");
+
+    const result = await getAllMembersWithInterval({ sort: "department" });
+    const indexA = result.findIndex((m) => m.name === "AMember");
+    const indexZ = result.findIndex((m) => m.name === "ZMember");
+    expect(indexA).toBeLessThan(indexZ);
+  });
+
+  it("デフォルト（引数なし）で名前順に全メンバーを返す", async () => {
+    const memberB = await createMember({
+      name: "BbbMember",
+      department: undefined,
+      position: undefined,
+    });
+    const memberA = await createMember({
+      name: "AaaMember",
+      department: undefined,
+      position: undefined,
+    });
+    if (!memberB.success || !memberA.success) throw new Error("Member creation failed");
+
+    const result = await getAllMembersWithInterval();
+    const indexA = result.findIndex((m) => m.name === "AaaMember");
+    const indexB = result.findIndex((m) => m.name === "BbbMember");
+    expect(indexA).toBeLessThan(indexB);
   });
 });
