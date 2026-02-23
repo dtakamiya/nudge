@@ -131,7 +131,7 @@ describe("MeetingPrepare", () => {
     expect(screen.getByText("未完了のアクションはありません")).toBeDefined();
   });
 
-  it("copies topic to agenda when copy button is clicked", async () => {
+  it("copies topic to agenda when add-to-agenda button is clicked", async () => {
     const user = userEvent.setup();
     render(
       <MeetingPrepare
@@ -141,7 +141,7 @@ describe("MeetingPrepare", () => {
         carryoverData={null}
       />,
     );
-    const copyButtons = screen.getAllByRole("button", { name: /コピー/ });
+    const copyButtons = screen.getAllByRole("button", { name: /アジェンダに追加/ });
     await user.click(copyButtons[0]);
     // コピーされた話題がアジェンダに追加される（複数のplaceholderが存在するはず）
     const inputs = screen.getAllByPlaceholderText("話題のタイトル");
