@@ -30,7 +30,7 @@ test.describe("メンバー管理", () => {
     await expect(page).toHaveURL("/members/new");
   });
 
-  test("新規メンバーを作成してダッシュボードに遷移する", async ({ page }) => {
+  test("新規メンバーを作成してメンバー詳細ページに遷移する", async ({ page }) => {
     const memberName = `テストメンバー_${Date.now()}`;
 
     await createMember(page, memberName, {
@@ -38,11 +38,11 @@ test.describe("メンバー管理", () => {
       position: "シニアエンジニア",
     });
 
-    // ダッシュボードに遷移済み
-    await expect(page).toHaveURL("/");
+    // メンバー詳細ページに遷移済み
+    await expect(page).toHaveURL(/\/members\/[^/]+$/);
 
-    // 作成したメンバーがメインコンテンツのテーブルに表示される
-    await expect(page.locator("main").getByText(memberName).first()).toBeVisible();
+    // 作成したメンバーの見出しが表示される
+    await expect(page.getByRole("heading", { name: memberName })).toBeVisible();
   });
 
   test("作成したメンバーの詳細ページを表示できる", async ({ page }) => {
