@@ -2,7 +2,8 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical } from "lucide-react";
+import { ChevronDown, ChevronUp, GripVertical } from "lucide-react";
+import { useState } from "react";
 
 import { TagBadge } from "@/components/tag/tag-badge";
 import { TagInput } from "@/components/tag/tag-input";
@@ -61,6 +62,8 @@ export function SortableTopicItem({
     id,
   });
 
+  const [isExpanded, setIsExpanded] = useState(() => notes.length > 0 || tags.length > 0);
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -117,29 +120,57 @@ export function SortableTopicItem({
           </Button>
         )}
       </div>
-      <div>
-        <Label>メモ</Label>
-        <Textarea
-          value={notes}
-          onChange={(e) => onUpdate(index, "notes", e.target.value)}
-          placeholder="詳細メモ"
-          rows={2}
-        />
-      </div>
-      <div>
-        <Label>タグ</Label>
-        {onTagsChange ? (
-          <TagInput selectedTags={tags} onTagsChange={handleTagsChange} />
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="self-start h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+        onClick={() => setIsExpanded((prev) => !prev)}
+      >
+        {isExpanded ? (
+          <>
+            <ChevronUp className="w-3 h-3 mr-1" />
+            詳細を隠す
+          </>
         ) : (
-          tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-1">
-              {tags.map((tag) => (
-                <TagBadge key={tag.id ?? tag.name} name={tag.name} color={tag.color} size="sm" />
-              ))}
-            </div>
-          )
+          <>
+            <ChevronDown className="w-3 h-3 mr-1" />
+            詳細を追加
+          </>
         )}
-      </div>
+      </Button>
+      {isExpanded && (
+        <>
+          <div>
+            <Label>メモ</Label>
+            <Textarea
+              value={notes}
+              onChange={(e) => onUpdate(index, "notes", e.target.value)}
+              placeholder="詳細メモ"
+              rows={2}
+            />
+          </div>
+          <div>
+            <Label>タグ</Label>
+            {onTagsChange ? (
+              <TagInput selectedTags={tags} onTagsChange={handleTagsChange} />
+            ) : (
+              tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {tags.map((tag) => (
+                    <TagBadge
+                      key={tag.id ?? tag.name}
+                      name={tag.name}
+                      color={tag.color}
+                      size="sm"
+                    />
+                  ))}
+                </div>
+              )
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
