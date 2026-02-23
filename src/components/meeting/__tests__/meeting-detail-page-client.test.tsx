@@ -1,22 +1,12 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { toast } from "sonner";
 import { afterEach, describe, expect, it, vi } from "vitest";
-
-import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 import { MeetingDetailPageClient } from "../meeting-detail-page-client";
 
 const mockRefresh = vi.fn();
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), refresh: mockRefresh }),
-}));
-
-vi.mock("sonner", () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
 }));
 
 vi.mock("@/lib/actions/meeting-actions", () => ({
@@ -137,13 +127,12 @@ describe("MeetingDetailPageClient", () => {
     expect(screen.queryByTestId("meeting-form")).toBeNull();
   });
 
-  it("switches back to view mode, refreshes, and shows toast on successful save", async () => {
+  it("switches back to view mode and refreshes on successful save", async () => {
     const user = userEvent.setup();
     render(<MeetingDetailPageClient {...defaultProps} />);
     await user.click(screen.getByRole("button", { name: /編集/ }));
     await user.click(screen.getByRole("button", { name: "mock-save" }));
     expect(screen.getByTestId("meeting-detail")).toBeTruthy();
     expect(mockRefresh).toHaveBeenCalledTimes(1);
-    expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.meeting.updateSuccess);
   });
 });

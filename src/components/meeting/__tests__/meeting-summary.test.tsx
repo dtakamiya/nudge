@@ -1,0 +1,93 @@
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+
+import { MeetingSummary } from "../meeting-summary";
+
+afterEach(() => {
+  cleanup();
+});
+
+const baseProps = {
+  date: "2026-02-23",
+  conditionHealth: null,
+  conditionMood: null,
+  conditionWorkload: null,
+  checkinNote: "",
+  topicCount: 2,
+  actionItemCount: 3,
+};
+
+describe("MeetingSummary", () => {
+  describe("日付表示", () => {
+    it("日付が表示されること", () => {
+      render(<MeetingSummary {...baseProps} />);
+      expect(screen.getByText(/2026/)).toBeDefined();
+    });
+  });
+
+  describe("コンディション表示", () => {
+    it("コンディションが設定されている場合に体調が表示されること", () => {
+      render(<MeetingSummary {...baseProps} conditionHealth={3} />);
+      expect(screen.getByText(/体調/)).toBeDefined();
+    });
+
+    it("コンディションが設定されている場合に気分が表示されること", () => {
+      render(<MeetingSummary {...baseProps} conditionMood={4} />);
+      expect(screen.getByText(/気分/)).toBeDefined();
+    });
+
+    it("コンディションが設定されている場合に業務量が表示されること", () => {
+      render(<MeetingSummary {...baseProps} conditionWorkload={2} />);
+      expect(screen.getByText(/業務量/)).toBeDefined();
+    });
+
+    it("体調が null の場合は体調が表示されないこと", () => {
+      render(<MeetingSummary {...baseProps} conditionHealth={null} />);
+      expect(screen.queryByText(/体調/)).toBeNull();
+    });
+
+    it("気分が null の場合は気分が表示されないこと", () => {
+      render(<MeetingSummary {...baseProps} conditionMood={null} />);
+      expect(screen.queryByText(/気分/)).toBeNull();
+    });
+
+    it("業務量が null の場合は業務量が表示されないこと", () => {
+      render(<MeetingSummary {...baseProps} conditionWorkload={null} />);
+      expect(screen.queryByText(/業務量/)).toBeNull();
+    });
+
+    it("コンディション値がビジュアルバーで表示されること（3/5）", () => {
+      render(<MeetingSummary {...baseProps} conditionHealth={3} />);
+      expect(screen.getByText(/3\/5/)).toBeDefined();
+    });
+  });
+
+  describe("トピック・アクションアイテム数", () => {
+    it("トピック数が表示されること", () => {
+      render(<MeetingSummary {...baseProps} topicCount={2} />);
+      expect(screen.getByText("2件", { selector: "span.font-medium" })).toBeDefined();
+    });
+
+    it("アクションアイテム数が表示されること", () => {
+      render(<MeetingSummary {...baseProps} actionItemCount={3} />);
+      expect(screen.getByText("3件", { selector: "span.font-medium" })).toBeDefined();
+    });
+  });
+
+  describe("アクションアイテム警告", () => {
+    it("アクションアイテムが0件の場合に警告が表示されること", () => {
+      render(<MeetingSummary {...baseProps} actionItemCount={0} />);
+      expect(screen.getByText(/アクションアイテムが設定されていません/)).toBeDefined();
+    });
+
+    it("アクションアイテムが1件以上の場合は警告が表示されないこと", () => {
+      render(<MeetingSummary {...baseProps} actionItemCount={1} />);
+      expect(screen.queryByText(/アクションアイテムが設定されていません/)).toBeNull();
+    });
+
+    it("アクションアイテムが複数件の場合は警告が表示されないこと", () => {
+      render(<MeetingSummary {...baseProps} actionItemCount={5} />);
+      expect(screen.queryByText(/アクションアイテムが設定されていません/)).toBeNull();
+    });
+  });
+});

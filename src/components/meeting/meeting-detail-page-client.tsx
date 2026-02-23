@@ -3,10 +3,8 @@
 import { Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 import { MeetingDetail } from "./meeting-detail";
 import { MeetingForm } from "./meeting-form";
@@ -42,6 +40,10 @@ type Props = {
   readonly memberId: string;
   readonly date: Date;
   readonly mood?: number | null;
+  readonly conditionHealth?: number | null;
+  readonly conditionMood?: number | null;
+  readonly conditionWorkload?: number | null;
+  readonly checkinNote?: string | null;
   readonly topics: ReadonlyArray<Topic>;
   readonly actionItems: ReadonlyArray<ActionItem>;
 };
@@ -51,6 +53,10 @@ export function MeetingDetailPageClient({
   memberId,
   date,
   mood,
+  conditionHealth,
+  conditionMood,
+  conditionWorkload,
+  checkinNote,
   topics,
   actionItems,
 }: Props) {
@@ -59,7 +65,6 @@ export function MeetingDetailPageClient({
 
   function handleEditSuccess() {
     setIsEditing(false);
-    toast.success(TOAST_MESSAGES.meeting.updateSuccess);
     router.refresh();
   }
 
@@ -77,6 +82,10 @@ export function MeetingDetailPageClient({
             meetingId,
             date: date.toISOString(),
             mood,
+            conditionHealth,
+            conditionMood,
+            conditionWorkload,
+            checkinNote: checkinNote ?? "",
             topics: topics.map((t) => ({
               id: t.id,
               category: t.category,
@@ -109,7 +118,16 @@ export function MeetingDetailPageClient({
           編集
         </Button>
       </div>
-      <MeetingDetail date={date} mood={mood} topics={[...topics]} actionItems={[...actionItems]} />
+      <MeetingDetail
+        date={date}
+        mood={mood}
+        conditionHealth={conditionHealth}
+        conditionMood={conditionMood}
+        conditionWorkload={conditionWorkload}
+        checkinNote={checkinNote}
+        topics={[...topics]}
+        actionItems={[...actionItems]}
+      />
     </div>
   );
 }

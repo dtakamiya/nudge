@@ -46,6 +46,10 @@ export default async function MeetingDetailPage({ params }: Props) {
         memberId={id}
         date={meeting.date}
         mood={meeting.mood}
+        conditionHealth={meeting.conditionHealth}
+        conditionMood={meeting.conditionMood}
+        conditionWorkload={meeting.conditionWorkload}
+        checkinNote={meeting.checkinNote}
         topics={meeting.topics.map((t) => ({
           id: t.id,
           category: t.category,
