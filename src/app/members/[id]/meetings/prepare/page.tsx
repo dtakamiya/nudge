@@ -2,7 +2,10 @@ import { notFound } from "next/navigation";
 
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { MeetingPrepare } from "@/components/meeting/meeting-prepare";
-import { getPendingActionItems } from "@/lib/actions/action-item-actions";
+import {
+  getLastMeetingPendingActions,
+  getPendingActionItems,
+} from "@/lib/actions/action-item-actions";
 import { getRecentMeetings } from "@/lib/actions/meeting-actions";
 import { getMember } from "@/lib/actions/member-actions";
 
@@ -15,8 +18,11 @@ export default async function PrepareMeetingPage({ params }: Props) {
     notFound();
   }
 
-  const recentMeetings = await getRecentMeetings(id, 5);
-  const pendingActions = await getPendingActionItems(id);
+  const [recentMeetings, pendingActions, carryoverData] = await Promise.all([
+    getRecentMeetings(id, 5),
+    getPendingActionItems(id),
+    getLastMeetingPendingActions(id),
+  ]);
 
   return (
     <div className="animate-fade-in-up">
@@ -34,6 +40,7 @@ export default async function PrepareMeetingPage({ params }: Props) {
         memberId={id}
         recentMeetings={recentMeetings}
         pendingActions={pendingActions}
+        carryoverData={carryoverData}
       />
     </div>
   );
