@@ -37,6 +37,37 @@ describe("TemplateSelector", () => {
   it("highlights the selected template", () => {
     render(<TemplateSelector onSelect={vi.fn()} selectedId="career" />);
     const careerButton = screen.getByRole("button", { name: /キャリア面談/ });
-    expect(careerButton.className).toMatch(/border-primary|ring/);
+    expect(careerButton.className).toMatch(/ring-2/);
+    expect(careerButton.className).toMatch(/border-primary/);
+  });
+
+  it("applies background color to selected template", () => {
+    render(<TemplateSelector onSelect={vi.fn()} selectedId="career" />);
+    const careerButton = screen.getByRole("button", { name: /キャリア面談/ });
+    expect(careerButton.className).toMatch(/bg-primary/);
+  });
+
+  it("shows check icon only for selected template", () => {
+    render(<TemplateSelector onSelect={vi.fn()} selectedId="career" />);
+    const checkIcons = document.querySelectorAll("[data-testid='template-check-icon']");
+    expect(checkIcons).toHaveLength(1);
+  });
+
+  it("does not show check icon when no template is selected", () => {
+    render(<TemplateSelector onSelect={vi.fn()} />);
+    const checkIcons = document.querySelectorAll("[data-testid='template-check-icon']");
+    expect(checkIcons).toHaveLength(0);
+  });
+
+  it("moves check icon when selection changes", async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    render(<TemplateSelector onSelect={onSelect} selectedId="career" />);
+
+    const checkIcons = document.querySelectorAll("[data-testid='template-check-icon']");
+    expect(checkIcons).toHaveLength(1);
+
+    await user.click(screen.getByRole("button", { name: /定期チェックイン/ }));
+    expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ id: "regular-checkin" }));
   });
 });
