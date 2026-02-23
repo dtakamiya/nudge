@@ -78,6 +78,15 @@ const mockPendingActions = [
   },
 ];
 
+const mockCarryoverData = {
+  meetingId: "meeting-1",
+  meetingDate: new Date("2026-02-17"),
+  actions: [
+    { id: "c1", title: "引き継ぎタスク1", status: "TODO", dueDate: new Date("2026-03-01") },
+    { id: "c2", title: "引き継ぎタスク2", status: "IN_PROGRESS", dueDate: null },
+  ],
+};
+
 describe("MeetingPrepare", () => {
   afterEach(() => cleanup());
 
@@ -87,6 +96,7 @@ describe("MeetingPrepare", () => {
         memberId="m1"
         recentMeetings={mockRecentMeetings}
         pendingActions={mockPendingActions}
+        carryoverData={null}
       />,
     );
     expect(screen.getByText("進捗報告")).toBeDefined();
@@ -100,6 +110,7 @@ describe("MeetingPrepare", () => {
         memberId="m1"
         recentMeetings={mockRecentMeetings}
         pendingActions={mockPendingActions}
+        carryoverData={null}
       />,
     );
     expect(screen.getByText("資料作成")).toBeDefined();
@@ -107,19 +118,28 @@ describe("MeetingPrepare", () => {
   });
 
   it("shows empty state when no recent meetings", () => {
-    render(<MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} />);
+    render(
+      <MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} carryoverData={null} />,
+    );
     expect(screen.getByText("過去のミーティング記録はありません")).toBeDefined();
   });
 
   it("shows empty state when no pending actions", () => {
-    render(<MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} />);
+    render(
+      <MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} carryoverData={null} />,
+    );
     expect(screen.getByText("未完了のアクションはありません")).toBeDefined();
   });
 
   it("copies topic to agenda when copy button is clicked", async () => {
     const user = userEvent.setup();
     render(
-      <MeetingPrepare memberId="m1" recentMeetings={mockRecentMeetings} pendingActions={[]} />,
+      <MeetingPrepare
+        memberId="m1"
+        recentMeetings={mockRecentMeetings}
+        pendingActions={[]}
+        carryoverData={null}
+      />,
     );
     const copyButtons = screen.getAllByRole("button", { name: /コピー/ });
     await user.click(copyButtons[0]);
@@ -132,14 +152,18 @@ describe("MeetingPrepare", () => {
   });
 
   it("renders template selector", () => {
-    render(<MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} />);
+    render(
+      <MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} carryoverData={null} />,
+    );
     expect(screen.getByText("定期チェックイン")).toBeDefined();
     expect(screen.getByText("キャリア面談")).toBeDefined();
   });
 
   it("populates topics when template is selected", async () => {
     const user = userEvent.setup();
-    render(<MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} />);
+    render(
+      <MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} carryoverData={null} />,
+    );
     await user.click(screen.getByRole("button", { name: /定期チェックイン/ }));
     const inputs = screen.getAllByPlaceholderText("話題のタイトル");
     expect(inputs[0]).toHaveProperty("value", "今週の進捗報告");
@@ -148,14 +172,59 @@ describe("MeetingPrepare", () => {
 
   it("can add a topic manually", async () => {
     const user = userEvent.setup();
-    render(<MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} />);
+    render(
+      <MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} carryoverData={null} />,
+    );
     await user.click(screen.getByRole("button", { name: /話題を追加/ }));
     const inputs = screen.getAllByPlaceholderText("話題のタイトル");
     expect(inputs.length).toBeGreaterThanOrEqual(2);
   });
 
   it("renders start meeting button", () => {
-    render(<MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} />);
+    render(
+      <MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} carryoverData={null} />,
+    );
     expect(screen.getByRole("link", { name: /ミーティングを開始/ })).toBeDefined();
+  });
+
+  it("carryoverData がある場合は「前回からの引き継ぎ」セクションが表示される", () => {
+    render(
+      <MeetingPrepare
+        memberId="m1"
+        recentMeetings={[]}
+        pendingActions={[]}
+        carryoverData={mockCarryoverData}
+      />,
+    );
+    expect(screen.getByText("前回からの引き継ぎ")).toBeDefined();
+    expect(screen.getByText("引き継ぎタスク1")).toBeDefined();
+    expect(screen.getByText("引き継ぎタスク2")).toBeDefined();
+  });
+
+  it("carryoverData が null の場合は「前回からの引き継ぎ」セクションが非表示", () => {
+    render(
+      <MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} carryoverData={null} />,
+    );
+    expect(screen.queryByText("前回からの引き継ぎ")).toBeNull();
+  });
+
+  it("フォローアップ対象チェックで buildStartUrl に followUpActionIds が含まれる", async () => {
+    const user = userEvent.setup();
+    render(
+      <MeetingPrepare
+        memberId="m1"
+        recentMeetings={[]}
+        pendingActions={[]}
+        carryoverData={mockCarryoverData}
+      />,
+    );
+
+    const checkboxes = screen.getAllByRole("checkbox");
+    await user.click(checkboxes[0]!);
+
+    const startLink = screen.getByRole("link", { name: /ミーティングを開始/ });
+    const href = startLink.getAttribute("href") ?? "";
+    expect(href).toContain("followUpActionIds");
+    expect(href).toContain("c1");
   });
 });

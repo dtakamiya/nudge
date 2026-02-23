@@ -135,4 +135,46 @@ describe("PreviousMeetingSidebar", () => {
       expect(mockRefresh).toHaveBeenCalled();
     });
   });
+
+  it("followUpActionIds に含まれるアクションに「引き継ぎ」バッジが表示される", () => {
+    render(
+      <PreviousMeetingSidebar
+        previousMeeting={previousMeeting}
+        pendingActions={pendingActions}
+        followUpActionIds={["action-1"]}
+      />,
+    );
+    expect(screen.getByText("引き継ぎ")).toBeDefined();
+  });
+
+  it("followUpActionIds が空の場合は「引き継ぎ」バッジが表示されない", () => {
+    render(
+      <PreviousMeetingSidebar
+        previousMeeting={previousMeeting}
+        pendingActions={pendingActions}
+        followUpActionIds={[]}
+      />,
+    );
+    expect(screen.queryByText("引き継ぎ")).toBeNull();
+  });
+
+  it("followUpActionIds が指定されない場合は「引き継ぎ」バッジが表示されない", () => {
+    render(
+      <PreviousMeetingSidebar previousMeeting={previousMeeting} pendingActions={pendingActions} />,
+    );
+    expect(screen.queryByText("引き継ぎ")).toBeNull();
+  });
+
+  it("フォローアップ対象アクションが先頭に表示される", () => {
+    render(
+      <PreviousMeetingSidebar
+        previousMeeting={previousMeeting}
+        pendingActions={pendingActions}
+        followUpActionIds={["action-2"]}
+      />,
+    );
+    const items = screen.getAllByRole("checkbox");
+    // action-2 (設計書更新) が先頭になる
+    expect(items[0]).toHaveAttribute("aria-label", "設計書更新を完了にする");
+  });
 });

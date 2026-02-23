@@ -12,9 +12,18 @@ import { formatDate } from "@/lib/format";
 type Topic = { id: string; category: string; title: string; notes: string };
 type ActionItem = { id: string; title: string; status: string; dueDate: Date | null };
 type MeetingData = { id: string; date: Date; topics: Topic[]; actionItems: ActionItem[] } | null;
-type Props = { previousMeeting: MeetingData; pendingActions: ActionItem[] };
+type Props = {
+  previousMeeting: MeetingData;
+  pendingActions: ActionItem[];
+  followUpActionIds?: string[];
+};
 
-export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Props) {
+export function PreviousMeetingSidebar({
+  previousMeeting,
+  pendingActions,
+  followUpActionIds = [],
+}: Props) {
+  const followUpSet = new Set(followUpActionIds);
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [optimisticActions, setOptimisticActions] = useOptimistic(
@@ -34,6 +43,12 @@ export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Prop
     });
   }
 
+  const sortedActions = [...optimisticActions].sort((a, b) => {
+    const aIsFollowUp = followUpSet.has(a.id) ? 0 : 1;
+    const bIsFollowUp = followUpSet.has(b.id) ? 0 : 1;
+    return aIsFollowUp - bIsFollowUp;
+  });
+
   return (
     <div className="flex flex-col gap-4">
       <Card>
@@ -45,26 +60,40 @@ export function PreviousMeetingSidebar({ previousMeeting, pendingActions }: Prop
             <p className="text-sm text-muted-foreground">なし</p>
           ) : (
             <div className={`flex flex-col gap-2 ${isPending ? "opacity-80" : ""}`}>
-              {optimisticActions.map((action) => (
-                <div
-                  key={action.id}
-                  className={`flex items-center gap-2 text-sm ${action.status === "DONE" ? "line-through text-muted-foreground" : ""}`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={action.status === "DONE"}
-                    onChange={() => markDone(action.id)}
-                    className="rounded"
-                    aria-label={`${action.title}を完了にする`}
-                  />
-                  <span>{action.title}</span>
-                  {action.dueDate && (
-                    <span className="text-xs text-muted-foreground ml-auto">
-                      {formatDate(action.dueDate)}
-                    </span>
-                  )}
-                </div>
-              ))}
+              {sortedActions.map((action) => {
+                const isFollowUp = followUpSet.has(action.id);
+                return (
+                  <div
+                    key={action.id}
+                    className={`flex items-center gap-2 text-sm rounded p-1 ${
+                      action.status === "DONE"
+                        ? "line-through text-muted-foreground"
+                        : isFollowUp
+                          ? "bg-primary/10 border border-primary/20"
+                          : ""
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={action.status === "DONE"}
+                      onChange={() => markDone(action.id)}
+                      className="rounded"
+                      aria-label={`${action.title}を完了にする`}
+                    />
+                    {isFollowUp && action.status !== "DONE" && (
+                      <Badge variant="secondary" className="text-xs shrink-0 px-1">
+                        引き継ぎ
+                      </Badge>
+                    )}
+                    <span className="flex-1">{action.title}</span>
+                    {action.dueDate && (
+                      <span className="text-xs text-muted-foreground ml-auto">
+                        {formatDate(action.dueDate)}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </CardContent>
