@@ -103,7 +103,7 @@ export function MemberList({ members }: Props) {
             <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">
               <button
                 onClick={() => toggleSort("lastMeeting")}
-                className="flex items-center gap-1 hover:text-foreground transition-colors duration-150"
+                className="flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors duration-150"
               >
                 最終1on1
                 <ArrowUpDown className="w-3 h-3" />
@@ -112,7 +112,7 @@ export function MemberList({ members }: Props) {
             <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">
               <button
                 onClick={() => toggleSort("actions")}
-                className="flex items-center gap-1 hover:text-foreground transition-colors duration-150"
+                className="flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors duration-150"
               >
                 未完了
                 <ArrowUpDown className="w-3 h-3" />

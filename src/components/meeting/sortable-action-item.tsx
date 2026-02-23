@@ -66,7 +66,7 @@ export function SortableActionItem({
         <button
           type="button"
           data-testid={`drag-handle-${id}`}
-          className="cursor-grab touch-none text-muted-foreground hover:text-foreground self-center"
+          className="cursor-grab touch-none text-muted-foreground hover:text-foreground self-center p-1"
           {...attributes}
           {...listeners}
           aria-label={`${title || "アクションアイテム"}を並び替え`}

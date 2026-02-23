@@ -3,7 +3,7 @@
 import { BarChart2, LayoutDashboard, ListChecks, Menu, UserPlus, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Separator } from "@/components/ui/separator";
@@ -99,9 +99,50 @@ function MemberQuickList({
   );
 }
 
+const FOCUSABLE_SELECTORS =
+  'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export function Sidebar({ members = [], actionCount }: SidebarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const sidebar = sidebarRef.current;
+    if (!sidebar) return;
+
+    const focusable = sidebar.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS);
+    if (focusable.length > 0) focusable[0].focus();
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setIsOpen(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      const elements = Array.from(sidebar!.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS));
+      const firstEl = elements[0];
+      const lastEl = elements[elements.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstEl) {
+          e.preventDefault();
+          lastEl.focus();
+        }
+      } else {
+        if (document.activeElement === lastEl) {
+          e.preventDefault();
+          firstEl.focus();
+        }
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
 
   return (
     <>
@@ -124,6 +165,10 @@ export function Sidebar({ members = [], actionCount }: SidebarProps) {
           onClick={() => setIsOpen(false)}
         >
           <aside
+            ref={sidebarRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="ナビゲーションメニュー"
             className="w-56 h-full bg-[var(--sidebar)] p-4 flex flex-col gap-6 shadow-lg transition-transform duration-150"
             onClick={(e) => e.stopPropagation()}
           >
