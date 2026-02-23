@@ -10,8 +10,9 @@ test.describe("メンバー編集・削除", () => {
       position: "エンジニア",
     });
 
-    // 編集ダイアログを開く
-    await page.getByRole("button", { name: "編集" }).click();
+    // 編集ダイアログを開く（「その他」ドロップダウン経由）
+    await page.getByRole("button", { name: "その他" }).click();
+    await page.getByRole("menuitem", { name: "編集" }).click();
     await expect(page.getByText("メンバー情報の編集")).toBeVisible();
 
     // 名前を変更
@@ -44,8 +45,9 @@ test.describe("メンバー編集・削除", () => {
       department: "テスト部",
     });
 
-    // 編集ダイアログを開く
-    await page.getByRole("button", { name: "編集" }).click();
+    // 編集ダイアログを開く（「その他」ドロップダウン経由）
+    await page.getByRole("button", { name: "その他" }).click();
+    await page.getByRole("menuitem", { name: "編集" }).click();
     await expect(page.getByText("メンバー情報の編集")).toBeVisible();
 
     // 名前を変更（保存しない）
@@ -69,8 +71,9 @@ test.describe("メンバー編集・削除", () => {
       department: "テスト部",
     });
 
-    // 削除ダイアログを開く
-    await page.getByRole("button", { name: "削除" }).click();
+    // 削除ダイアログを開く（「その他」ドロップダウン経由）
+    await page.getByRole("button", { name: "その他" }).click();
+    await page.getByRole("menuitem", { name: "削除" }).click();
     await expect(page.getByText("メンバーを削除しますか？")).toBeVisible();
 
     // 確認メッセージにメンバー名が含まれる
@@ -94,8 +97,9 @@ test.describe("メンバー編集・削除", () => {
       department: "テスト部",
     });
 
-    // 削除ダイアログを開く
-    await page.getByRole("button", { name: "削除" }).click();
+    // 削除ダイアログを開く（「その他」ドロップダウン経由）
+    await page.getByRole("button", { name: "その他" }).click();
+    await page.getByRole("menuitem", { name: "削除" }).click();
     await expect(page.getByText("メンバーを削除しますか？")).toBeVisible();
 
     // キャンセル

@@ -21,18 +21,18 @@ test.describe("アクションフィルタリング", () => {
 
   /**
    * ステータスフィルターのコンボボックスを取得する
-   * ActionFilters の SelectTrigger は w-40 クラスを持つ
+   * ActionFilters の SelectTrigger は w-36 クラスを持つ
    */
   function getStatusFilter(page: import("@playwright/test").Page) {
-    return page.locator("main button[role='combobox'].w-40");
+    return page.locator("main button[role='combobox'].w-36");
   }
 
   /**
    * メンバーフィルターのコンボボックスを取得する
-   * ActionFilters の SelectTrigger は w-48 クラスを持つ
+   * ActionFilters の SelectTrigger は w-44 クラスを持つ
    */
   function getMemberFilter(page: import("@playwright/test").Page) {
-    return page.locator("main button[role='combobox'].w-48");
+    return page.locator("main button[role='combobox'].w-44");
   }
 
   test("フィルターUIが表示される", async ({ page }) => {
