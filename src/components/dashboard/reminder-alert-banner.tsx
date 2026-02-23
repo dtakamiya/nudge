@@ -1,14 +1,24 @@
-import { AlertTriangle } from "lucide-react";
+"use client";
+
+import { AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 import type { OverdueReminder } from "@/lib/actions/reminder-actions";
+
+const DEFAULT_LIMIT = 5;
 
 type Props = {
   readonly reminders: OverdueReminder[];
 };
 
 export function ReminderAlertBanner({ reminders }: Props) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   if (reminders.length === 0) return null;
+
+  const hasMore = reminders.length > DEFAULT_LIMIT;
+  const visibleReminders = isExpanded ? reminders : reminders.slice(0, DEFAULT_LIMIT);
 
   return (
     <div
@@ -24,7 +34,7 @@ export function ReminderAlertBanner({ reminders }: Props) {
       </div>
 
       <ul className="flex flex-col gap-2">
-        {reminders.map((reminder) => (
+        {visibleReminders.map((reminder) => (
           <li
             key={reminder.memberId}
             className="flex items-center justify-between gap-3 rounded-lg bg-background/60 px-3 py-2 text-sm"
@@ -49,6 +59,29 @@ export function ReminderAlertBanner({ reminders }: Props) {
           </li>
         ))}
       </ul>
+
+      {hasMore && (
+        <div className="mt-3 flex justify-center">
+          <button
+            type="button"
+            aria-expanded={isExpanded}
+            onClick={() => setIsExpanded((prev) => !prev)}
+            className="flex items-center gap-1 text-xs text-destructive hover:text-destructive/80 font-medium transition-colors"
+          >
+            {isExpanded ? (
+              <>
+                折りたたむ
+                <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" />
+              </>
+            ) : (
+              <>
+                すべて表示（{reminders.length}件）
+                <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+              </>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
