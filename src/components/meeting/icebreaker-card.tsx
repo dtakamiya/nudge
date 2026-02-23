@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { getRandomIcebreaker,type Icebreaker } from "@/lib/icebreakers";
+import { getRandomIcebreaker, type Icebreaker } from "@/lib/icebreakers";
 
 interface IcebreakerCardProps {
   className?: string;

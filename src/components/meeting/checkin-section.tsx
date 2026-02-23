@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { getRandomCheckinMessage } from "@/lib/checkin-messages";
 
-import { type ConditionField,ConditionSelector } from "./condition-selector";
+import { type ConditionField, ConditionSelector } from "./condition-selector";
 import { IcebreakerCard } from "./icebreaker-card";
 
 interface CheckinSectionProps {

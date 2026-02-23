@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getRandomIcebreaker, getRandomIcebreakers,ICEBREAKERS } from "@/lib/icebreakers";
+import { getRandomIcebreaker, getRandomIcebreakers, ICEBREAKERS } from "@/lib/icebreakers";
 
 describe("ICEBREAKERS", () => {
   it("30件以上のアイスブレイクが定義されていること", () => {
