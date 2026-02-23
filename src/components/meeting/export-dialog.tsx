@@ -22,13 +22,25 @@ import { formatMeetingMarkdown } from "@/lib/export";
 type Props = {
   readonly memberId: string;
   readonly memberName: string;
+  readonly open?: boolean;
+  readonly onOpenChange?: (open: boolean) => void;
 };
 
-export function ExportDialog({ memberId, memberName }: Props) {
-  const [open, setOpen] = useState(false);
+export function ExportDialog({ memberId, memberName, open: openProp, onOpenChange }: Props) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? openProp : internalOpen;
+
+  function handleOpenChange(value: boolean) {
+    if (!isControlled) {
+      setInternalOpen(value);
+    }
+    onOpenChange?.(value);
+  }
 
   async function fetchMarkdown() {
     const result = await getMeetingsForExport({
@@ -67,7 +79,8 @@ export function ExportDialog({ memberId, memberName }: Props) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `1on1-${memberName}-${new Date().toISOString().slice(0, 10)}.md`;
+      const today = new Date().toISOString().slice(0, 10);
+      a.download = `1on1-${memberName}-${today}.md`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -79,8 +92,8 @@ export function ExportDialog({ memberId, memberName }: Props) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild style={isControlled ? { display: "none" } : undefined}>
         <Button variant="outline" size="sm">
           <FileText className="w-4 h-4 mr-1.5" />
           エクスポート
@@ -121,7 +134,7 @@ export function ExportDialog({ memberId, memberName }: Props) {
         </div>
 
         <DialogFooter className="flex-col sm:flex-row gap-2">
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>
+          <Button variant="outline" onClick={() => handleOpenChange(false)} disabled={loading}>
             キャンセル
           </Button>
           <Button variant="outline" onClick={handleCopy} disabled={loading}>

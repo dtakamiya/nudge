@@ -5,10 +5,8 @@ import { ActionListCompact } from "@/components/action/action-list-compact";
 import { ActionAnalyticsSection } from "@/components/analytics/action-analytics-section";
 import { TopicAnalyticsSection } from "@/components/analytics/topic-analytics-section";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
-import { ExportDialog } from "@/components/meeting/export-dialog";
 import { MeetingHistory } from "@/components/meeting/meeting-history";
-import { MemberDeleteDialog } from "@/components/member/member-delete-dialog";
-import { MemberEditDialog } from "@/components/member/member-edit-dialog";
+import { MemberActionsDropdown } from "@/components/member/member-actions-dropdown";
 import { MemberQuickActions } from "@/components/member/member-quick-actions";
 import { MemberStatsBar } from "@/components/member/member-stats-bar";
 import { MoodTrendChart } from "@/components/member/mood-trend-chart";
@@ -52,9 +50,13 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
           </div>
         </div>
         <div className="flex gap-2">
-          <ExportDialog memberId={member.id} memberName={member.name} />
-          <MemberDeleteDialog memberId={member.id} memberName={member.name} />
-          <MemberEditDialog
+          <Link href={`/members/${id}/meetings/prepare`}>
+            <Button variant="outline">1on1 を準備</Button>
+          </Link>
+          <Link href={`/members/${id}/meetings/new`}>
+            <Button>新規1on1</Button>
+          </Link>
+          <MemberActionsDropdown
             member={{
               id: member.id,
               name: member.name,
@@ -62,12 +64,6 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
               position: member.position,
             }}
           />
-          <Link href={`/members/${id}/meetings/prepare`}>
-            <Button variant="outline">1on1 を準備</Button>
-          </Link>
-          <Link href={`/members/${id}/meetings/new`}>
-            <Button>新規1on1</Button>
-          </Link>
         </div>
       </div>
 
