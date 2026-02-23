@@ -2,7 +2,7 @@ import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 /**
- * テスト用メンバーを作成してダッシュボードに戻る
+ * テスト用メンバーを作成してメンバー詳細ページに遷移する
  */
 export async function createMember(
   page: Page,
@@ -18,7 +18,7 @@ export async function createMember(
     await page.getByLabel("役職").fill(options.position);
   }
   await page.getByRole("button", { name: "登録する" }).click();
-  await expect(page).toHaveURL("/", { timeout: 15000 });
+  await expect(page).toHaveURL(/\/members\/[^/]+$/, { timeout: 15000 });
 }
 
 /**
@@ -50,6 +50,7 @@ export async function navigateToMemberDetail(page: Page, name: string) {
 
 /**
  * テスト用メンバーを作成してメンバー詳細ページに遷移する
+ * createMember 後はすでにメンバー詳細ページにいるため、見出しを確認するだけ
  */
 export async function createMemberAndNavigateToDetail(
   page: Page,
@@ -60,7 +61,7 @@ export async function createMemberAndNavigateToDetail(
     department: options?.department ?? "テスト部",
     position: options?.position,
   });
-  await navigateToMemberDetail(page, name);
+  await expect(page.getByRole("heading", { name })).toBeVisible({ timeout: 10000 });
 }
 
 /**
