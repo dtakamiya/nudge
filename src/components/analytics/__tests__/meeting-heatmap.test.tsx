@@ -28,6 +28,7 @@ const sampleData: HeatmapData = {
     {
       memberId: "member-1",
       memberName: "田中 太郎",
+      department: "開発部",
       months: [
         { month: "2025-03", count: 0 },
         { month: "2025-04", count: 1 },
@@ -46,6 +47,7 @@ const sampleData: HeatmapData = {
     {
       memberId: "member-2",
       memberName: "鈴木 花子",
+      department: null,
       months: [
         { month: "2025-03", count: 1 },
         { month: "2025-04", count: 0 },

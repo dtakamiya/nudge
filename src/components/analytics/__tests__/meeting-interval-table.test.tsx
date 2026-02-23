@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { MeetingIntervalTable } from "../meeting-interval-table";
@@ -35,16 +35,35 @@ const mockData = [
 ];
 
 describe("MeetingIntervalTable", () => {
-  it("renders member names", () => {
+  it("実施済みメンバーを表示する", () => {
     render(<MeetingIntervalTable data={mockData} />);
     expect(screen.getByText("山田 太郎")).toBeDefined();
-    expect(screen.getByText("鈴木 花子")).toBeDefined();
   });
 
-  it("shows 未実施 for members with no meetings", () => {
+  it("未実施メンバーはデフォルトで非表示", () => {
     render(<MeetingIntervalTable data={mockData} />);
-    const elements = screen.getAllByText("未実施");
-    expect(elements.length).toBeGreaterThan(0);
+    expect(screen.queryByText("鈴木 花子")).toBeNull();
+  });
+
+  it("未実施メンバーの件数をトグルボタンで表示する", () => {
+    render(<MeetingIntervalTable data={mockData} />);
+    expect(screen.getByText(/未実施メンバーを表示（1件）/)).toBeDefined();
+  });
+
+  it("トグルクリックで未実施メンバーが表示される", () => {
+    render(<MeetingIntervalTable data={mockData} />);
+    const toggleButton = screen.getByText(/未実施メンバーを表示（1件）/);
+    fireEvent.click(toggleButton);
+    expect(screen.getByText("鈴木 花子")).toBeDefined();
+    expect(screen.getByText("未実施")).toBeDefined();
+  });
+
+  it("トグルを2回クリックで未実施メンバーが再び非表示になる", () => {
+    render(<MeetingIntervalTable data={mockData} />);
+    const toggleButton = screen.getByText(/未実施メンバーを表示（1件）/);
+    fireEvent.click(toggleButton);
+    fireEvent.click(screen.getByText(/折りたたむ/));
+    expect(screen.queryByText("鈴木 花子")).toBeNull();
   });
 
   it("shows days since last meeting", () => {
@@ -56,5 +75,11 @@ describe("MeetingIntervalTable", () => {
   it("renders empty state when no data", () => {
     render(<MeetingIntervalTable data={[]} />);
     expect(screen.getByText("データがありません")).toBeDefined();
+  });
+
+  it("全員が実施済みの場合トグルボタンは表示しない", () => {
+    const dataWithNoNoMeeting = [mockData[0]];
+    render(<MeetingIntervalTable data={dataWithNoNoMeeting} />);
+    expect(screen.queryByText(/未実施メンバーを表示/)).toBeNull();
   });
 });

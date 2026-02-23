@@ -141,12 +141,18 @@ export type MeetingFrequencyMonth = {
   count: number;
 };
 
-export async function getMeetingFrequencyByMonth(): Promise<MeetingFrequencyMonth[]> {
-  const twelveMonthsAgo = new Date();
-  twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+export async function getMeetingFrequencyByMonth(
+  monthCount: 3 | 6 | 12 = 12,
+  department?: string,
+): Promise<MeetingFrequencyMonth[]> {
+  const since = new Date();
+  since.setMonth(since.getMonth() - monthCount);
 
   const meetings = await prisma.meeting.findMany({
-    where: { date: { gte: twelveMonthsAgo } },
+    where: {
+      date: { gte: since },
+      ...(department ? { member: { department } } : {}),
+    },
     select: { date: true },
     orderBy: { date: "asc" },
   });
@@ -161,6 +167,15 @@ export async function getMeetingFrequencyByMonth(): Promise<MeetingFrequencyMont
   return Array.from(monthMap.entries())
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([month, count]) => ({ month, count }));
+}
+
+export async function getDepartments(): Promise<string[]> {
+  const rows = await prisma.member.findMany({
+    select: { department: true },
+    distinct: ["department"],
+    orderBy: { department: "asc" },
+  });
+  return rows.map((r) => r.department).filter((d): d is string => d !== null);
 }
 
 export type RecommendedMeeting = {
@@ -259,6 +274,7 @@ export async function getScheduledMeetingsThisWeek(): Promise<ScheduledMeeting[]
 export type MemberMeetingHeatmapEntry = {
   memberId: string;
   memberName: string;
+  department: string | null;
   months: { month: string; count: number }[];
 };
 
@@ -267,20 +283,23 @@ export type HeatmapData = {
   months: string[];
 };
 
-export async function getMemberMeetingHeatmap(): Promise<HeatmapData> {
+export async function getMemberMeetingHeatmap(
+  monthCount: 3 | 6 | 12 = 12,
+  department?: string,
+): Promise<HeatmapData> {
   const now = new Date();
-  const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+  const since = new Date(now.getFullYear(), now.getMonth() - (monthCount - 1), 1);
 
-  // 直近12ヶ月の月キー配列を宣言的に生成
-  const months: string[] = Array.from({ length: 12 }, (_, i) =>
-    toMonthKey(new Date(now.getFullYear(), now.getMonth() - (11 - i), 1)),
+  const months: string[] = Array.from({ length: monthCount }, (_, i) =>
+    toMonthKey(new Date(now.getFullYear(), now.getMonth() - (monthCount - 1 - i), 1)),
   );
 
   try {
     const members = await prisma.member.findMany({
+      where: department ? { department } : undefined,
       include: {
         meetings: {
-          where: { date: { gte: twelveMonthsAgo } },
+          where: { date: { gte: since } },
           select: { date: true },
         },
       },
@@ -296,6 +315,7 @@ export async function getMemberMeetingHeatmap(): Promise<HeatmapData> {
       return {
         memberId: member.id,
         memberName: member.name,
+        department: member.department,
         months: months.map((month) => ({ month, count: countMap.get(month) ?? 0 })),
       };
     });
@@ -307,10 +327,21 @@ export async function getMemberMeetingHeatmap(): Promise<HeatmapData> {
   }
 }
 
-export async function getAllMembersWithInterval(): Promise<RecommendedMeeting[]> {
+export type MemberIntervalSort = "name" | "last_meeting" | "department";
+
+export type MemberIntervalOptions = {
+  department?: string;
+  sort?: MemberIntervalSort;
+};
+
+export async function getAllMembersWithInterval(
+  options: MemberIntervalOptions = {},
+): Promise<RecommendedMeeting[]> {
+  const { department, sort = "name" } = options;
   const now = new Date();
 
   const members = await prisma.member.findMany({
+    where: department ? { department } : undefined,
     include: {
       meetings: {
         orderBy: { date: "desc" },
@@ -321,7 +352,7 @@ export async function getAllMembersWithInterval(): Promise<RecommendedMeeting[]>
     orderBy: { name: "asc" },
   });
 
-  return members.map((m) => {
+  const mapped = members.map((m) => {
     const lastDate = m.meetings[0]?.date ?? null;
     const lastDateObj = lastDate ? new Date(lastDate) : null;
     const daysSinceLast = lastDateObj
@@ -338,4 +369,18 @@ export async function getAllMembersWithInterval(): Promise<RecommendedMeeting[]>
       nextRecommendedDate: calcNextRecommendedDate(lastDateObj, m.meetingIntervalDays),
     };
   });
+
+  if (sort === "last_meeting") {
+    return mapped.sort((a, b) => b.daysSinceLast - a.daysSinceLast);
+  }
+  if (sort === "department") {
+    return mapped.sort((a, b) => {
+      const deptA = a.department ?? "";
+      const deptB = b.department ?? "";
+      if (deptA !== deptB) return deptA.localeCompare(deptB);
+      return a.name.localeCompare(b.name);
+    });
+  }
+  // sort === "name" (default, already sorted by DB)
+  return mapped;
 }
