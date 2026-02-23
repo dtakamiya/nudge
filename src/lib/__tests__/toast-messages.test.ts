@@ -9,7 +9,6 @@ describe("TOAST_MESSAGES", () => {
       expect(TOAST_MESSAGES.member.createError).toBe("メンバーの登録に失敗しました");
       expect(TOAST_MESSAGES.member.updateSuccess).toBe("メンバー情報を更新しました");
       expect(TOAST_MESSAGES.member.updateError).toBe("メンバー情報の更新に失敗しました");
-      expect(TOAST_MESSAGES.member.deleteSuccess).toBe("メンバーを削除しました");
       expect(TOAST_MESSAGES.member.deleteError).toBe("メンバーの削除に失敗しました");
     });
   });

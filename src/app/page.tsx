@@ -47,7 +47,7 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <Suspense>
+      <Suspense fallback={null}>
         <FlashToast />
       </Suspense>
       <h1 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">ダッシュボード</h1>
