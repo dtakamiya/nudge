@@ -148,7 +148,7 @@ describe("MeetingDetailPageClient", () => {
 
   it("shows start meeting button when startedAt and endedAt are both absent", () => {
     render(<MeetingDetailPageClient {...defaultProps} startedAt={null} endedAt={null} />);
-    expect(screen.getByRole("button", { name: /ミーティングを開始/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /記録を開始/ })).toBeTruthy();
   });
 
   it("calls startMeeting when start meeting button is clicked", async () => {
@@ -158,7 +158,7 @@ describe("MeetingDetailPageClient", () => {
 
     const user = userEvent.setup();
     render(<MeetingDetailPageClient {...defaultProps} startedAt={null} endedAt={null} />);
-    await user.click(screen.getByRole("button", { name: /ミーティングを開始/ }));
+    await user.click(screen.getByRole("button", { name: /記録を開始/ }));
     expect(mockStartMeeting).toHaveBeenCalledWith({ meetingId: "meeting-1" });
   });
 
@@ -194,6 +194,6 @@ describe("MeetingDetailPageClient", () => {
         endedAt={new Date("2026-02-20T11:00:00.000Z")}
       />,
     );
-    expect(screen.queryByRole("button", { name: /ミーティングを開始/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /記録を開始/ })).toBeNull();
   });
 });
