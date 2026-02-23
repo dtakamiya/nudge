@@ -10,6 +10,7 @@ import { DueDateBadge } from "@/components/action/due-date-badge";
 import { TagBadge } from "@/components/tag/tag-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { DatePicker } from "@/components/ui/date-picker";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import {
@@ -138,10 +139,9 @@ export function ActionListFull({ actionItems, statusFilter }: Props) {
                   onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                   placeholder="説明"
                 />
-                <Input
-                  type="date"
+                <DatePicker
                   value={editForm.dueDate}
-                  onChange={(e) => setEditForm({ ...editForm, dueDate: e.target.value })}
+                  onChange={(value) => setEditForm({ ...editForm, dueDate: value })}
                 />
               </div>
               <div className="flex gap-2 justify-end">

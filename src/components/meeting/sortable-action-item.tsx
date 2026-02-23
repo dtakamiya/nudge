@@ -7,6 +7,7 @@ import { GripVertical } from "lucide-react";
 import { TagBadge } from "@/components/tag/tag-badge";
 import { TagInput } from "@/components/tag/tag-input";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -84,11 +85,7 @@ export function SortableActionItem({
         </div>
         <div className="flex-1">
           <Label>期限</Label>
-          <Input
-            type="date"
-            value={dueDate}
-            onChange={(e) => onUpdate(index, "dueDate", e.target.value)}
-          />
+          <DatePicker value={dueDate} onChange={(value) => onUpdate(index, "dueDate", value)} />
         </div>
         <Button type="button" variant="ghost" size="sm" onClick={() => onRemove(index)}>
           削除
