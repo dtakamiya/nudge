@@ -48,8 +48,15 @@ describe("ScheduledMeetingsSection", () => {
 
   it("shows 1on1準備 button with correct link", () => {
     render(<ScheduledMeetingsSection meetings={[todayMeeting]} />);
-    const link = screen.getByRole("link");
+    const link = screen.getByRole("link", { name: /1on1準備/ });
     expect(link.getAttribute("href")).toBe("/members/m1/meetings/prepare");
+  });
+
+  it("メンバー名がメンバー詳細ページへのリンクになっている", () => {
+    render(<ScheduledMeetingsSection meetings={[todayMeeting]} />);
+    const link = screen.getByRole("link", { name: "山田 太郎" });
+    expect(link).toBeDefined();
+    expect(link.getAttribute("href")).toBe("/members/m1");
   });
 
   it("renders multiple members", () => {
