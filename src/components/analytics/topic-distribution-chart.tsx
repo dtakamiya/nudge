@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +27,20 @@ type Props = {
   data: CategoryTrend[];
 };
 
+function subscribe() {
+  return () => {};
+}
+
+function getSnapshot() {
+  return true;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
 export function TopicDistributionChart({ data }: Props) {
+  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const chartData = useMemo(() => {
     return data.map((item) => ({
       name: CATEGORY_LABELS[item.category],
@@ -35,6 +48,8 @@ export function TopicDistributionChart({ data }: Props) {
       color: CATEGORY_COLORS[item.category],
     }));
   }, [data]);
+
+  if (!mounted) return null;
 
   if (data.length === 0) {
     return (

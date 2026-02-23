@@ -1,11 +1,28 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { MeetingFrequencyMonth } from "@/lib/actions/analytics-actions";
 
+function subscribe() {
+  return () => {};
+}
+
+function getSnapshot() {
+  return true;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
 export function MeetingFrequencyChart({ data }: { data: MeetingFrequencyMonth[] }) {
+  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+
+  if (!mounted) return null;
+
   return (
     <Card className="h-full">
       <CardHeader>

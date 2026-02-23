@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import {
   Bar,
   BarChart,
@@ -22,7 +22,20 @@ type Props = {
   data: MonthlyTrend[];
 };
 
+function subscribe() {
+  return () => {};
+}
+
+function getSnapshot() {
+  return true;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
 export function TopicTrendChart({ data }: Props) {
+  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const chartData = useMemo(() => {
     return data.map((item) => {
       // month を整形 (YYYY-MM -> YYYY/MM)
@@ -35,6 +48,8 @@ export function TopicTrendChart({ data }: Props) {
   }, [data]);
 
   const categories = Object.keys(CATEGORY_LABELS) as TopicCategory[];
+
+  if (!mounted) return null;
 
   if (data.length === 0) {
     return (
