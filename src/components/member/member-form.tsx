@@ -81,6 +81,10 @@ export function MemberForm({ initialData, onSuccess }: Props) {
     }
   }
 
+  function handleCancel() {
+    router.back();
+  }
+
   const content = (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
@@ -127,15 +131,20 @@ export function MemberForm({ initialData, onSuccess }: Props) {
         </select>
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting
-          ? isEditing
-            ? "更新中..."
-            : "登録中..."
-          : isEditing
-            ? "更新する"
-            : "登録する"}
-      </Button>
+      <div className="flex gap-2">
+        <Button type="button" variant="outline" onClick={handleCancel} disabled={isSubmitting}>
+          キャンセル
+        </Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting
+            ? isEditing
+              ? "更新中..."
+              : "登録中..."
+            : isEditing
+              ? "更新する"
+              : "登録する"}
+        </Button>
+      </div>
     </form>
   );
 
