@@ -310,15 +310,16 @@ export async function deleteMeeting(id: string): Promise<ActionResult<Meeting>> 
 export async function startMeeting(input: StartMeetingInput): Promise<ActionResult<Meeting>> {
   return runAction(async () => {
     const validated = startMeetingSchema.parse(input);
-    const existing = await prisma.meeting.findUnique({ where: { id: validated.meetingId } });
-    if (!existing) throw new Error("ミーティングが見つかりません");
-    // startedAt が既にセットされている場合は上書きしない（冪等性）
-    if (existing.startedAt) {
-      return existing;
-    }
-    const meeting = await prisma.meeting.update({
-      where: { id: validated.meetingId },
-      data: { startedAt: new Date() },
+    const meeting = await prisma.$transaction(async (tx) => {
+      const existing = await tx.meeting.findUnique({ where: { id: validated.meetingId } });
+      if (!existing) throw new Error("ミーティングが見つかりません");
+      if (existing.startedAt) {
+        return existing;
+      }
+      return tx.meeting.update({
+        where: { id: validated.meetingId },
+        data: { startedAt: new Date() },
+      });
     });
     revalidatePath("/", "layout");
     return meeting;
@@ -328,9 +329,19 @@ export async function startMeeting(input: StartMeetingInput): Promise<ActionResu
 export async function endMeeting(input: EndMeetingInput): Promise<ActionResult<Meeting>> {
   return runAction(async () => {
     const validated = endMeetingSchema.parse(input);
-    const meeting = await prisma.meeting.update({
-      where: { id: validated.meetingId },
-      data: { endedAt: new Date() },
+    const meeting = await prisma.$transaction(async (tx) => {
+      const existing = await tx.meeting.findUnique({ where: { id: validated.meetingId } });
+      if (!existing) throw new Error("ミーティングが見つかりません");
+      if (existing.endedAt) {
+        return existing;
+      }
+      if (!existing.startedAt) {
+        throw new Error("ミーティングがまだ開始されていません");
+      }
+      return tx.meeting.update({
+        where: { id: validated.meetingId },
+        data: { endedAt: new Date() },
+      });
     });
     revalidatePath("/", "layout");
     return meeting;
