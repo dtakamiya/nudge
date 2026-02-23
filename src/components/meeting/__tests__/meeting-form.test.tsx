@@ -149,7 +149,7 @@ describe("MeetingForm", () => {
     });
 
     // Click save button in dialog (アクション未設定時は「このまま保存」)
-    const saveButton = screen.getByRole("button", { name: /このまま保存|保存する/ });
+    const saveButton = screen.getByRole("button", { name: /アクションなしで保存|保存する/ });
     await user.click(saveButton);
 
     await waitFor(() => {
@@ -173,7 +173,7 @@ describe("MeetingForm", () => {
       expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
     });
 
-    const saveButton = screen.getByRole("button", { name: /このまま保存|保存する/ });
+    const saveButton = screen.getByRole("button", { name: /アクションなしで保存|保存する/ });
     await user.click(saveButton);
 
     await waitFor(() => {
@@ -198,7 +198,7 @@ describe("MeetingForm", () => {
       expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
     });
 
-    const saveButton = screen.getByRole("button", { name: /このまま保存|保存する/ });
+    const saveButton = screen.getByRole("button", { name: /アクションなしで保存|保存する/ });
     await user.click(saveButton);
 
     await waitFor(() => {
