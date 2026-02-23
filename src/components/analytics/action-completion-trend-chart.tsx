@@ -1,6 +1,5 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import {
   CartesianGrid,
   Legend,
@@ -13,22 +12,11 @@ import {
 } from "recharts";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useChartMounted } from "@/hooks/use-chart-mounted";
 import type { ActionMonthlyTrend } from "@/lib/actions/analytics-actions";
 
-function subscribe() {
-  return () => {};
-}
-
-function getSnapshot() {
-  return true;
-}
-
-function getServerSnapshot() {
-  return false;
-}
-
 export function ActionCompletionTrendChart({ data }: { data: ActionMonthlyTrend[] }) {
-  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const mounted = useChartMounted();
 
   if (!mounted) return null;
 
