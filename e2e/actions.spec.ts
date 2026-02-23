@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { createMemberAndNavigateToDetail } from "./helpers";
+import { confirmSaveMeeting, createMemberAndNavigateToDetail } from "./helpers";
 
 test.describe("アクションアイテム", () => {
   /**
@@ -22,8 +22,9 @@ test.describe("アクションアイテム", () => {
     await page.getByRole("button", { name: "+ アクション追加" }).click();
     await page.getByPlaceholder("アクションのタイトル").first().fill(actionTitle);
 
-    // 保存
+    // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
     await page.getByRole("button", { name: "1on1を保存" }).click();
+    await confirmSaveMeeting(page);
     await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
   }
 

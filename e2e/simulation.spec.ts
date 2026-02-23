@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { confirmSaveMeeting } from "./helpers";
+
 test.describe("一連の業務フローシミュレーション", () => {
   test("ダッシュボード確認から1on1作成、アクション更新までの一連のフロー", async ({ page }) => {
     // 1. ダッシュボードの確認
@@ -48,8 +50,9 @@ test.describe("一連の業務フローシミュレーション", () => {
     const newActionTitle = `シミュレーション確認用アクション_${Date.now()}`;
     await actionTitleInput.first().fill(newActionTitle);
 
-    // 保存
+    // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
     await page.getByRole("button", { name: "1on1を保存" }).click();
+    await confirmSaveMeeting(page);
     await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
 
     // 4. アクション一覧の確認と更新

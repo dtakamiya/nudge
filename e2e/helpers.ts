@@ -65,6 +65,22 @@ export async function createMemberAndNavigateToDetail(
 }
 
 /**
+ * ClosingDialog の確認ボタンをクリックして保存を確定する
+ * アクションアイテムの有無でボタンラベルが変わるため両方に対応する
+ */
+export async function confirmSaveMeeting(page: Page) {
+  const saveBtn = page.getByRole("button", { name: "保存する" });
+  const saveWithoutActionBtn = page.getByRole("button", { name: "アクションなしで保存" });
+  await saveBtn.or(saveWithoutActionBtn).first().waitFor({ timeout: 5000 });
+  const hasSaveBtn = await saveBtn.isVisible();
+  if (hasSaveBtn) {
+    await saveBtn.click();
+  } else {
+    await saveWithoutActionBtn.click();
+  }
+}
+
+/**
  * メンバー詳細ページからミーティングを作成してメンバー詳細に戻る
  * 事前に createMemberAndNavigateToDetail でメンバー詳細ページにいることが前提
  */
@@ -86,8 +102,9 @@ export async function createMeetingFromDetail(
     await page.getByPlaceholder("アクションのタイトル").first().fill(options.actionTitle);
   }
 
-  // 保存
+  // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
   await page.getByRole("button", { name: "1on1を保存" }).click();
+  await confirmSaveMeeting(page);
   await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
 }
 
