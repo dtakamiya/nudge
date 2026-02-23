@@ -1,0 +1,47 @@
+"use client";
+
+import { useState } from "react";
+
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  type CoachingCategory,
+  type CoachingTip,
+  getRandomTipByCategory,
+} from "@/lib/coaching-tips";
+
+interface CoachingTipCardProps {
+  category: CoachingCategory;
+  className?: string;
+}
+
+export function CoachingTipCard({ category, className }: CoachingTipCardProps) {
+  const [current, setCurrent] = useState<CoachingTip>(() => getRandomTipByCategory(category));
+
+  const handleRefresh = () => {
+    setCurrent((prev) => getRandomTipByCategory(category, prev.id));
+  };
+
+  return (
+    <Card className={className}>
+      <CardContent className="pt-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-2">
+            <Badge variant="secondary" className="text-xs">
+              {current.category}
+            </Badge>
+            <p className="text-sm font-medium text-slate-800">{current.text}</p>
+            {current.detail && <p className="text-xs text-muted-foreground">{current.detail}</p>}
+          </div>
+          <button
+            type="button"
+            onClick={handleRefresh}
+            className="shrink-0 rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            別のTip 🎲
+          </button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

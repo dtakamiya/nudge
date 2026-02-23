@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { CoachingPanel } from "@/components/meeting/coaching-panel";
 import { MeetingDeleteDialog } from "@/components/meeting/meeting-delete-dialog";
 import { MeetingDetailPageClient } from "@/components/meeting/meeting-detail-page-client";
 import { Button } from "@/components/ui/button";
@@ -41,44 +42,53 @@ export default async function MeetingDetailPage({ params }: Props) {
           </Link>
         </div>
       </div>
-      <MeetingDetailPageClient
-        meetingId={meetingId}
-        memberId={id}
-        date={meeting.date}
-        mood={meeting.mood}
-        conditionHealth={meeting.conditionHealth}
-        conditionMood={meeting.conditionMood}
-        conditionWorkload={meeting.conditionWorkload}
-        checkinNote={meeting.checkinNote}
-        startedAt={meeting.startedAt}
-        endedAt={meeting.endedAt}
-        topics={meeting.topics.map((t) => ({
-          id: t.id,
-          category: t.category,
-          title: t.title,
-          notes: t.notes,
-          sortOrder: t.sortOrder,
-          tags: t.tags.map((tt) => ({
-            id: tt.tag.id,
-            name: tt.tag.name,
-            color: tt.tag.color,
-          })),
-        }))}
-        actionItems={meeting.actionItems.map((a) => ({
-          id: a.id,
-          title: a.title,
-          description: a.description,
-          sortOrder: a.sortOrder,
-          status: a.status,
-          dueDate: a.dueDate,
-          meeting: { date: meeting.date },
-          tags: a.tags.map((at) => ({
-            id: at.tag.id,
-            name: at.tag.name,
-            color: at.tag.color,
-          })),
-        }))}
-      />
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
+        <div>
+          <MeetingDetailPageClient
+            meetingId={meetingId}
+            memberId={id}
+            date={meeting.date}
+            mood={meeting.mood}
+            conditionHealth={meeting.conditionHealth}
+            conditionMood={meeting.conditionMood}
+            conditionWorkload={meeting.conditionWorkload}
+            checkinNote={meeting.checkinNote}
+            startedAt={meeting.startedAt}
+            endedAt={meeting.endedAt}
+            topics={meeting.topics.map((t) => ({
+              id: t.id,
+              category: t.category,
+              title: t.title,
+              notes: t.notes,
+              sortOrder: t.sortOrder,
+              tags: t.tags.map((tt) => ({
+                id: tt.tag.id,
+                name: tt.tag.name,
+                color: tt.tag.color,
+              })),
+            }))}
+            actionItems={meeting.actionItems.map((a) => ({
+              id: a.id,
+              title: a.title,
+              description: a.description,
+              sortOrder: a.sortOrder,
+              status: a.status,
+              dueDate: a.dueDate,
+              meeting: { date: meeting.date },
+              tags: a.tags.map((at) => ({
+                id: at.tag.id,
+                name: at.tag.name,
+                color: at.tag.color,
+              })),
+            }))}
+          />
+        </div>
+        <aside className="hidden lg:block">
+          <div className="sticky top-6">
+            <CoachingPanel />
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }
