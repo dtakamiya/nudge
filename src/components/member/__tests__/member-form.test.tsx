@@ -60,7 +60,7 @@ describe("MemberForm - 新規作成モード", () => {
 
   it("送信時に createMember が呼ばれる", async () => {
     const user = userEvent.setup();
-    mockCreateMember.mockResolvedValue({ success: true, data: {} });
+    mockCreateMember.mockResolvedValue({ success: true, data: { id: "new-member-id" } });
     render(<MemberForm />);
 
     await user.type(screen.getByLabelText("名前 *"), "山田花子");
@@ -74,7 +74,7 @@ describe("MemberForm - 新規作成モード", () => {
       meetingIntervalDays: 14,
     });
     expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.member.createSuccess);
-    expect(mockPush).toHaveBeenCalledWith("/");
+    expect(mockPush).toHaveBeenCalledWith("/members/new-member-id");
   });
 
   it("ミーティング間隔セレクトが表示される（デフォルト14日）", () => {

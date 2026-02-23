@@ -70,7 +70,7 @@ export function MemberForm({ initialData, onSuccess }: Props) {
           return;
         }
         toast.success(TOAST_MESSAGES.member.createSuccess);
-        router.push("/");
+        router.push(`/members/${result.data.id}`);
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "予期しないエラーが発生しました";
