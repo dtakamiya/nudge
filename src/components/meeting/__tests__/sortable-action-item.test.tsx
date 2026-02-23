@@ -16,6 +16,13 @@ vi.mock("@dnd-kit/sortable", () => ({
   }),
 }));
 
+// Mock DatePicker to behave like a simple date input for unit tests
+vi.mock("@/components/ui/date-picker", () => ({
+  DatePicker: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+    <input type="date" value={value} onChange={(e) => onChange(e.target.value)} />
+  ),
+}));
+
 const defaultProps = {
   id: "action-0",
   title: "レビュー依頼",
