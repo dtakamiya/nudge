@@ -142,15 +142,15 @@ npx prisma studio
 
 ### モデル一覧
 
-| モデル          | 説明                                    |
-| --------------- | --------------------------------------- |
-| `Member`        | 1on1 対象メンバー                       |
-| `Meeting`       | ミーティング記録（mood フィールドあり） |
-| `Topic`         | ミーティングのトピック                  |
-| `ActionItem`    | アクションアイテム                      |
-| `Tag`           | タグ/ラベル（色付き）                   |
-| `TopicTag`      | Topic と Tag の中間テーブル             |
-| `ActionItemTag` | ActionItem と Tag の中間テーブル        |
+| モデル          | 説明                                                                                      |
+| --------------- | ----------------------------------------------------------------------------------------- |
+| `Member`        | 1on1 対象メンバー（`meetingIntervalDays` で推奨ミーティング間隔を管理）                   |
+| `Meeting`       | ミーティング記録（`mood`, `conditionHealth/Mood/Workload`, `checkinNote`, 開始/終了時刻） |
+| `Topic`         | ミーティングのトピック（`sortOrder` で並び替え可能）                                      |
+| `ActionItem`    | アクションアイテム（`sortOrder`, `dueDate`, `completedAt` 対応）                          |
+| `Tag`           | タグ/ラベル（色付き）                                                                     |
+| `TopicTag`      | Topic と Tag の中間テーブル                                                               |
+| `ActionItemTag` | ActionItem と Tag の中間テーブル                                                          |
 
 ### リレーション
 
@@ -162,6 +162,18 @@ Meeting 1--* ActionItem
 Topic *--* Tag (via TopicTag)
 ActionItem *--* Tag (via ActionItemTag)
 ```
+
+### Meeting モデルの主要フィールド
+
+| フィールド          | 型          | 説明                                     |
+| ------------------- | ----------- | ---------------------------------------- |
+| `mood`              | `Int?`      | ミーティング全体の気分スコア             |
+| `conditionHealth`   | `Int?`      | チェックイン: 健康状態スコア             |
+| `conditionMood`     | `Int?`      | チェックイン: 気分スコア                 |
+| `conditionWorkload` | `Int?`      | チェックイン: 業務負荷スコア             |
+| `checkinNote`       | `String`    | チェックインメモ（デフォルト空文字）     |
+| `startedAt`         | `DateTime?` | ミーティング開始時刻（リアルタイム記録） |
+| `endedAt`           | `DateTime?` | ミーティング終了時刻（リアルタイム記録） |
 
 ### Enum
 
