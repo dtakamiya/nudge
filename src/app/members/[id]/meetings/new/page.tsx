@@ -23,6 +23,17 @@ function parsePreparedTopics(raw: string | string[] | undefined) {
   }
 }
 
+function parseFollowUpActionIds(raw: string | string[] | undefined): string[] {
+  if (typeof raw !== "string") return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((id): id is string => typeof id === "string");
+  } catch {
+    return [];
+  }
+}
+
 export default async function NewMeetingPage({ params, searchParams }: Props) {
   const { id } = await params;
   const member = await getMember(id);
@@ -31,9 +42,12 @@ export default async function NewMeetingPage({ params, searchParams }: Props) {
   }
 
   const resolvedSearchParams = await searchParams;
-  const previousMeeting = await getPreviousMeeting(id);
-  const pendingActions = await getPendingActionItems(id);
+  const [previousMeeting, pendingActions] = await Promise.all([
+    getPreviousMeeting(id),
+    getPendingActionItems(id),
+  ]);
   const initialTopics = parsePreparedTopics(resolvedSearchParams.preparedTopics);
+  const followUpActionIds = parseFollowUpActionIds(resolvedSearchParams.followUpActionIds);
 
   return (
     <div className="animate-fade-in-up">
@@ -55,6 +69,7 @@ export default async function NewMeetingPage({ params, searchParams }: Props) {
           <PreviousMeetingSidebar
             previousMeeting={previousMeeting}
             pendingActions={pendingActions}
+            followUpActionIds={followUpActionIds}
           />
         </div>
       </div>

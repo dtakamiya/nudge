@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { CarryoverActionList } from "@/components/meeting/carryover-action-list";
 import { PastMeetingsAccordion } from "@/components/meeting/past-meetings-accordion";
 import { PrepareActionChecklist } from "@/components/meeting/prepare-action-checklist";
 import { TemplateSelector } from "@/components/meeting/template-selector";
@@ -40,10 +41,24 @@ type PendingAction = {
   meeting: { date: Date };
 };
 
+type CarryoverActionItem = {
+  id: string;
+  title: string;
+  status: string;
+  dueDate: Date | null;
+};
+
+type CarryoverData = {
+  meetingId: string;
+  meetingDate: Date;
+  actions: CarryoverActionItem[];
+} | null;
+
 type Props = {
   memberId: string;
   recentMeetings: MeetingData[];
   pendingActions: PendingAction[];
+  carryoverData: CarryoverData;
 };
 
 const categoryOptions = [
@@ -58,9 +73,10 @@ function createEmptyTopic(sortOrder: number): TopicDraft {
   return { category: "WORK_PROGRESS", title: "", notes: "", sortOrder };
 }
 
-export function MeetingPrepare({ memberId, recentMeetings, pendingActions }: Props) {
+export function MeetingPrepare({ memberId, recentMeetings, pendingActions, carryoverData }: Props) {
   const [topics, setTopics] = useState<TopicDraft[]>([createEmptyTopic(0)]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>();
+  const [selectedFollowUpIds, setSelectedFollowUpIds] = useState<Set<string>>(new Set());
 
   function handleTemplateSelect(template: MeetingTemplate) {
     setSelectedTemplateId(template.id);
@@ -103,11 +119,26 @@ export function MeetingPrepare({ memberId, recentMeetings, pendingActions }: Pro
     toast.success(TOAST_MESSAGES.prepare.topicCopied);
   }
 
+  function handleCarryoverToggle(id: string) {
+    setSelectedFollowUpIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
   function buildStartUrl(): string {
     const validTopics = topics.filter((t) => t.title.trim() !== "");
     const params = new URLSearchParams();
     if (validTopics.length > 0) {
       params.set("preparedTopics", JSON.stringify(validTopics));
+    }
+    if (selectedFollowUpIds.size > 0) {
+      params.set("followUpActionIds", JSON.stringify(Array.from(selectedFollowUpIds)));
     }
     const query = params.toString();
     return `/members/${memberId}/meetings/new${query ? `?${query}` : ""}`;
@@ -117,6 +148,22 @@ export function MeetingPrepare({ memberId, recentMeetings, pendingActions }: Pro
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Left column: Previous meetings review & pending actions */}
       <div className="flex flex-col gap-4">
+        {carryoverData && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">前回からの引き継ぎ</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CarryoverActionList
+                meetingDate={carryoverData.meetingDate}
+                actions={carryoverData.actions}
+                selectedIds={selectedFollowUpIds}
+                onToggle={handleCarryoverToggle}
+              />
+            </CardContent>
+          </Card>
+        )}
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">未完了アクション</CardTitle>

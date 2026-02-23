@@ -143,6 +143,53 @@ export async function updateActionItem(
   });
 }
 
+export type CarryoverAction = {
+  id: string;
+  title: string;
+  status: string;
+  dueDate: Date | null;
+};
+
+export type LastMeetingPendingActionsResult = {
+  meetingId: string;
+  meetingDate: Date;
+  actions: CarryoverAction[];
+} | null;
+
+export async function getLastMeetingPendingActions(
+  memberId: string,
+): Promise<LastMeetingPendingActionsResult> {
+  const lastMeeting = await prisma.meeting.findFirst({
+    where: { memberId },
+    orderBy: { date: "desc" },
+    select: { id: true, date: true },
+  });
+
+  if (!lastMeeting) return null;
+
+  const actions = await prisma.actionItem.findMany({
+    where: {
+      meetingId: lastMeeting.id,
+      status: { not: "DONE" },
+    },
+    orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
+    select: {
+      id: true,
+      title: true,
+      status: true,
+      dueDate: true,
+    },
+  });
+
+  if (actions.length === 0) return null;
+
+  return {
+    meetingId: lastMeeting.id,
+    meetingDate: lastMeeting.date,
+    actions,
+  };
+}
+
 export async function createActionItemForMeeting(
   meetingId: string,
   memberId: string,

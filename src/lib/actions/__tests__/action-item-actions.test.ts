@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import {
   createActionItemForMeeting,
   getActionItems,
+  getLastMeetingPendingActions,
   getPendingActionItems,
   updateActionItem,
   updateActionItemStatus,
@@ -327,5 +328,107 @@ describe("createActionItemForMeeting", () => {
     expect(result.success).toBe(true);
     if (!result.success) return;
     expect(result.data.sortOrder).toBe(1);
+  });
+});
+
+describe("getLastMeetingPendingActions", () => {
+  it("前回ミーティングの未完了アクションを返す", async () => {
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [
+        { title: "未完了タスク", description: "" },
+        { title: "完了タスク", description: "" },
+      ],
+    });
+
+    const items = await prisma.actionItem.findMany({ where: { memberId } });
+    const doneItem = items.find((i) => i.title === "完了タスク");
+    if (doneItem) {
+      await prisma.actionItem.update({
+        where: { id: doneItem.id },
+        data: { status: "DONE" },
+      });
+    }
+
+    const result = await getLastMeetingPendingActions(memberId);
+    expect(result).not.toBeNull();
+    expect(result!.actions).toHaveLength(1);
+    expect(result!.actions[0].title).toBe("未完了タスク");
+    expect(result!.actions[0].status).not.toBe("DONE");
+  });
+
+  it("前回ミーティングが存在しない場合は null を返す", async () => {
+    const newMemberResult = await createMember({ name: "新規メンバー引き継ぎ" });
+    if (!newMemberResult.success) throw new Error(newMemberResult.error);
+    const newMemberId = newMemberResult.data.id;
+
+    const result = await getLastMeetingPendingActions(newMemberId);
+    expect(result).toBeNull();
+  });
+
+  it("前回ミーティングの全アクションが完了済みの場合は null を返す", async () => {
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "完了タスク", description: "" }],
+    });
+
+    const items = await prisma.actionItem.findMany({ where: { memberId } });
+    for (const item of items) {
+      await prisma.actionItem.update({
+        where: { id: item.id },
+        data: { status: "DONE" },
+      });
+    }
+
+    const result = await getLastMeetingPendingActions(memberId);
+    expect(result).toBeNull();
+  });
+
+  it("最新のミーティングのアクションのみを返す", async () => {
+    // beforeEach で今日のミーティングが作成されるため、未来の日付を使用する
+    const futureDate1 = new Date();
+    futureDate1.setFullYear(futureDate1.getFullYear() + 1);
+    const futureDate2 = new Date();
+    futureDate2.setFullYear(futureDate2.getFullYear() + 2);
+
+    await createMeeting({
+      memberId,
+      date: futureDate1.toISOString(),
+      topics: [],
+      actionItems: [{ title: "古いタスク", description: "" }],
+    });
+    await createMeeting({
+      memberId,
+      date: futureDate2.toISOString(),
+      topics: [],
+      actionItems: [{ title: "新しいタスク", description: "" }],
+    });
+
+    const result = await getLastMeetingPendingActions(memberId);
+    expect(result).not.toBeNull();
+    expect(result!.actions).toHaveLength(1);
+    expect(result!.actions[0].title).toBe("新しいタスク");
+  });
+
+  it("meetingDate と meetingId を返す", async () => {
+    // beforeEach で今日のミーティングが作成されるため、未来の日付を使用する
+    const futureDate = new Date();
+    futureDate.setFullYear(futureDate.getFullYear() + 1);
+
+    await createMeeting({
+      memberId,
+      date: futureDate.toISOString(),
+      topics: [],
+      actionItems: [{ title: "タスク", description: "" }],
+    });
+
+    const result = await getLastMeetingPendingActions(memberId);
+    expect(result).not.toBeNull();
+    expect(result!.meetingId).toBeDefined();
+    expect(result!.meetingDate).toBeInstanceOf(Date);
   });
 });
