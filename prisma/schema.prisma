@@ -30,6 +30,8 @@ model Meeting {
   conditionMood      Int?
   conditionWorkload  Int?
   checkinNote        String   @default("")
+  startedAt   DateTime?
+  endedAt     DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

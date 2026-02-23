@@ -70,3 +70,20 @@ export type CreateMeetingInput = z.input<typeof createMeetingSchema>;
 export type UpdateMeetingInput = z.input<typeof updateMeetingSchema>;
 export type TopicInput = z.infer<typeof topicInputSchema>;
 export type ActionItemInput = z.infer<typeof actionItemInputSchema>;
+
+export const startMeetingSchema = z.object({
+  meetingId: z.string().min(1, "ミーティングIDは必須です"),
+});
+
+export const endMeetingSchema = z.object({
+  meetingId: z.string().min(1, "ミーティングIDは必須です"),
+});
+
+export const updateTopicNotesSchema = z.object({
+  topicId: z.string().min(1, "トピックIDは必須です"),
+  notes: z.string(),
+});
+
+export type StartMeetingInput = z.input<typeof startMeetingSchema>;
+export type EndMeetingInput = z.input<typeof endMeetingSchema>;
+export type UpdateTopicNotesInput = z.input<typeof updateTopicNotesSchema>;
