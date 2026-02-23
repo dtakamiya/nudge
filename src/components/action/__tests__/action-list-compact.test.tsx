@@ -212,4 +212,54 @@ describe("ActionListCompact", () => {
     await user.click(saveBtn);
     expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.actionItem.updateError);
   });
+
+  describe("期限日バッジ", () => {
+    it("期限超過（DONE以外）のアイテムに「期限超過」バッジを表示する", () => {
+      const overdueItems = [
+        {
+          id: "overdue-1",
+          title: "期限切れタスク",
+          description: "",
+          status: "TODO",
+          dueDate: new Date("2020-01-01"),
+          meeting: { date: new Date("2020-01-01") },
+        },
+      ];
+      render(<ActionListCompact actionItems={overdueItems} />);
+      expect(screen.getByText("期限超過")).toBeDefined();
+    });
+
+    it("期限3日以内（DONE以外）のアイテムに「もうすぐ期限」バッジを表示する", () => {
+      const twoDaysFromNow = new Date();
+      twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 2);
+      const dueSoonItems = [
+        {
+          id: "due-soon-1",
+          title: "もうすぐ期限タスク",
+          description: "",
+          status: "TODO",
+          dueDate: twoDaysFromNow,
+          meeting: { date: new Date("2026-01-01") },
+        },
+      ];
+      render(<ActionListCompact actionItems={dueSoonItems} />);
+      expect(screen.getByText("もうすぐ期限")).toBeDefined();
+    });
+
+    it("DONE のアイテムには期限超過バッジを表示しない", () => {
+      const doneItems = [
+        {
+          id: "done-1",
+          title: "完了タスク",
+          description: "",
+          status: "DONE",
+          dueDate: new Date("2020-01-01"),
+          meeting: { date: new Date("2020-01-01") },
+        },
+      ];
+      render(<ActionListCompact actionItems={doneItems} />);
+      expect(screen.queryByText("期限超過")).toBeNull();
+      expect(screen.queryByText("もうすぐ期限")).toBeNull();
+    });
+  });
 });
