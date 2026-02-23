@@ -88,7 +88,7 @@ function MemberQuickList({
             key={member.id}
             href={`/members/${member.id}`}
             onClick={onNavigate}
-            className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors duration-150"
+            className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors duration-150"
           >
             <AvatarInitial name={member.name} size="sm" />
             <span className="truncate">{member.name}</span>
@@ -147,10 +147,10 @@ export function Sidebar({ members = [], actionCount }: SidebarProps) {
   return (
     <>
       {/* モバイルトップバー */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-[var(--sidebar)] border-b flex items-center px-4">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-sidebar border-b flex items-center px-4">
         <button
           onClick={() => setIsOpen(true)}
-          className="p-2 rounded-lg hover:bg-accent transition-colors duration-150"
+          className="p-3 rounded-lg hover:bg-accent transition-colors duration-150"
           aria-label="メニューを開く"
         >
           <Menu className="w-5 h-5" />
@@ -169,7 +169,7 @@ export function Sidebar({ members = [], actionCount }: SidebarProps) {
             role="dialog"
             aria-modal="true"
             aria-label="ナビゲーションメニュー"
-            className="w-56 h-full bg-[var(--sidebar)] p-4 flex flex-col gap-6 shadow-lg transition-transform duration-150"
+            className="w-56 h-full bg-sidebar p-4 flex flex-col gap-6 shadow-lg transition-transform duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
@@ -178,7 +178,7 @@ export function Sidebar({ members = [], actionCount }: SidebarProps) {
               </Link>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-accent transition-colors duration-150"
+                className="p-3 rounded-lg hover:bg-accent transition-colors duration-150"
                 aria-label="メニューを閉じる"
               >
                 <X className="w-4 h-4" />
@@ -199,7 +199,7 @@ export function Sidebar({ members = [], actionCount }: SidebarProps) {
       )}
 
       {/* デスクトップサイドバー */}
-      <aside className="hidden lg:flex w-56 border-r bg-[var(--sidebar)] p-4 flex-col gap-6 shrink-0">
+      <aside className="hidden lg:flex w-56 border-r bg-sidebar p-4 flex-col gap-6 shrink-0">
         <Link href="/" className="text-lg font-semibold tracking-tight text-foreground">
           Nudge
         </Link>

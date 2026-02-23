@@ -43,7 +43,7 @@ export default async function DashboardPage() {
   const isFirstTime = members.length === 0;
 
   return (
-    <div className="animate-fade-in-up">
+    <div>
       <h1 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">ダッシュボード</h1>
 
       {!isFirstTime && <ReminderAlertBanner reminders={overdueReminders} />}
@@ -53,16 +53,12 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div className="lg:col-span-2 rounded-xl border bg-card p-5">
-          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
-            最近のアクティビティ
-          </h2>
+          <h2 className="text-base font-semibold text-foreground mb-4">最近のアクティビティ</h2>
           <RecentActivityFeed activities={recentActivity} />
         </div>
 
         <div className="rounded-xl border bg-card p-5">
-          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
-            今週のタスク
-          </h2>
+          <h2 className="text-base font-semibold text-foreground mb-4">今週のタスク</h2>
           <UpcomingActionsSection
             today={upcomingActions.today}
             thisWeek={upcomingActions.thisWeek}
@@ -72,18 +68,14 @@ export default async function DashboardPage() {
 
       {!isFirstTime && (
         <div className="rounded-xl border bg-card p-5 mb-8">
-          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
-            今週の1on1予定
-          </h2>
+          <h2 className="text-base font-semibold text-foreground mb-4">今週の1on1予定</h2>
           <ScheduledMeetingsSection meetings={scheduledMeetings} />
         </div>
       )}
 
       {recommendedMeetings.length > 0 && (
         <div className="rounded-xl border bg-card p-5 mb-8">
-          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
-            推奨: 1on1すべきメンバー
-          </h2>
+          <h2 className="text-base font-semibold text-foreground mb-4">1on1すべきメンバー</h2>
           <RecommendedMeetingsSection members={recommendedMeetings} />
         </div>
       )}

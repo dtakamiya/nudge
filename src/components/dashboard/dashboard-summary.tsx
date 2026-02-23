@@ -1,4 +1,4 @@
-import { Calendar, CircleAlert, CircleCheck, TrendingUp } from "lucide-react";
+import { Calendar, CircleAlert, Clock, TrendingUp } from "lucide-react";
 
 import type { DashboardSummary as DashboardSummaryType } from "@/lib/actions/dashboard-actions";
 
@@ -116,7 +116,7 @@ export function DashboardSummary({ summary }: Props) {
         value={summary.overdueActions}
         unit="件"
         variant={getOverdueVariant(summary.overdueActions)}
-        icon={<CircleCheck className="w-5 h-5" />}
+        icon={<Clock className="w-5 h-5" />}
         staggerClass="stagger-4"
       />
     </div>
