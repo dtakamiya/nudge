@@ -1,0 +1,63 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":timezone(Asia/Tokyo)",
+    ":dependencyDashboard",
+    "group:monorepos",
+    "group:recommended"
+  ],
+  "labels": ["dependencies"],
+  "assignees": [],
+  "packageRules": [
+    {
+      "description": "パッチ・マイナーバージョンの型定義は安全性が高いため自動マージ",
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": ["@types/**"],
+      "automerge": true,
+      "groupName": "definitelyTyped"
+    },
+    {
+      "description": "LinterやFormatter関連はまとめて更新（自動マージ）",
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": ["eslint", "prettier", "husky", "lint-staged"],
+      "matchPackagePatterns": ["^eslint-"],
+      "excludePackageNames": ["eslint-config-next"],
+      "automerge": true,
+      "groupName": "lint/format tools"
+    },
+    {
+      "description": "React関連をグループ化",
+      "matchPackageNames": ["react", "react-dom"],
+      "groupName": "react packages"
+    },
+    {
+      "description": "Next.js関連をグループ化",
+      "matchPackageNames": ["next", "eslint-config-next"],
+      "groupName": "next.js packages"
+    },
+    {
+      "description": "Prisma関連をグループ化",
+      "matchPackageNames": ["@prisma/client", "prisma"],
+      "groupName": "prisma packages"
+    },
+    {
+      "description": "UIコンポーネント関連(radix-ui, lucide, sonnerなど)をグループ化",
+      "matchPackageNames": [
+        "@radix-ui/**",
+        "lucide-react",
+        "sonner",
+        "clsx",
+        "tailwind-merge",
+        "class-variance-authority"
+      ],
+      "groupName": "ui components"
+    },
+    {
+      "description": "テスト関連(playwright, vitest)をグループ化",
+      "matchPackageNames": ["@playwright/test", "vitest", "@testing-library/**"],
+      "groupName": "testing tools"
+    }
+  ],
+  "schedule": ["before 9am on monday"]
+}
