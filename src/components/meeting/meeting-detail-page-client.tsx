@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { startMeeting } from "@/lib/actions/meeting-actions";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
+import { CoachingSheet } from "./coaching-sheet";
 import { MeetingDetail } from "./meeting-detail";
 import { MeetingForm } from "./meeting-form";
 import { RecordingMode } from "./recording-mode";
@@ -102,18 +103,21 @@ export function MeetingDetailPageClient({
 
   if (isRecording) {
     return (
-      <RecordingMode
-        meetingId={meetingId}
-        startedAt={startedAt ?? new Date()}
-        topics={topics.map((t) => ({
-          id: t.id,
-          category: t.category,
-          title: t.title,
-          notes: t.notes,
-          sortOrder: t.sortOrder,
-        }))}
-        onEnd={handleRecordingEnd}
-      />
+      <>
+        <RecordingMode
+          meetingId={meetingId}
+          startedAt={startedAt ?? new Date()}
+          topics={topics.map((t) => ({
+            id: t.id,
+            category: t.category,
+            title: t.title,
+            notes: t.notes,
+            sortOrder: t.sortOrder,
+          }))}
+          onEnd={handleRecordingEnd}
+        />
+        <CoachingSheet />
+      </>
     );
   }
 
@@ -155,6 +159,7 @@ export function MeetingDetailPageClient({
           }}
           onSuccess={handleEditSuccess}
         />
+        <CoachingSheet />
       </div>
     );
   }
@@ -185,6 +190,7 @@ export function MeetingDetailPageClient({
         startedAt={startedAt}
         endedAt={endedAt}
       />
+      <CoachingSheet />
     </div>
   );
 }
