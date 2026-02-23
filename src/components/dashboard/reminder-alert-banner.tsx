@@ -64,6 +64,7 @@ export function ReminderAlertBanner({ reminders }: Props) {
         <div className="mt-3 flex justify-center">
           <button
             type="button"
+            aria-expanded={isExpanded}
             onClick={() => setIsExpanded((prev) => !prev)}
             className="flex items-center gap-1 text-xs text-destructive hover:text-destructive/80 font-medium transition-colors"
           >
