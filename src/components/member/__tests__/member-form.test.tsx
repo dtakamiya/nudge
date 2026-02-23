@@ -9,11 +9,13 @@ import { MemberForm } from "../member-form";
 
 const mockPush = vi.fn();
 const mockRefresh = vi.fn();
+const mockBack = vi.fn();
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,
     refresh: mockRefresh,
+    back: mockBack,
   }),
 }));
 
@@ -48,6 +50,19 @@ describe("MemberForm - 新規作成モード", () => {
     expect(screen.getByRole("button", { name: "登録する" })).toBeDefined();
   });
 
+  it("「キャンセル」ボタンが表示される", () => {
+    render(<MemberForm />);
+    expect(screen.getByRole("button", { name: "キャンセル" })).toBeDefined();
+  });
+
+  it("「キャンセル」ボタンをクリックすると前のページに戻る", async () => {
+    const user = userEvent.setup();
+    render(<MemberForm />);
+
+    await user.click(screen.getByRole("button", { name: "キャンセル" }));
+
+    expect(mockBack).toHaveBeenCalledOnce();
+  });
   it("空の入力フィールドが表示される", () => {
     render(<MemberForm />);
     const nameInput = screen.getByLabelText("名前 *") as HTMLInputElement;
