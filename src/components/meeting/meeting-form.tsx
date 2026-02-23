@@ -339,8 +339,24 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
   const topicIds = topics.map((_, i) => `topic-${i}`);
   const actionIds = actionItems.map((_, i) => `action-${i}`);
 
-  const validTopicCount = topics.filter((t) => t.title.trim() !== "").length;
-  const validActionCount = actionItems.filter((a) => a.title.trim() !== "").length;
+  const validTopics = topics.filter((t) => t.title.trim() !== "");
+  const validActions = actionItems.filter((a) => a.title.trim() !== "");
+  const validTopicCount = validTopics.length;
+  const validActionCount = validActions.length;
+
+  const categoryLabelMap: Record<string, string> = {
+    WORK_PROGRESS: "業務進捗",
+    CAREER: "キャリア",
+    ISSUES: "課題・相談",
+    FEEDBACK: "フィードバック",
+    OTHER: "その他",
+  };
+
+  const topicTitles = validTopics.map((t) => {
+    const label = categoryLabelMap[t.category] ?? t.category;
+    return `${label} - ${t.title}`;
+  });
+  const actionItemTitles = validActions.map((a) => a.title);
 
   return (
     <>
@@ -503,6 +519,8 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
           checkinNote,
           topicCount: validTopicCount,
           actionItemCount: validActionCount,
+          topicTitles,
+          actionItemTitles,
         }}
       />
     </>

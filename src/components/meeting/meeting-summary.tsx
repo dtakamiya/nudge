@@ -10,6 +10,8 @@ export interface MeetingSummaryProps {
   checkinNote: string;
   topicCount: number;
   actionItemCount: number;
+  topicTitles?: string[];
+  actionItemTitles?: string[];
   showWarnings?: boolean;
 }
 
@@ -21,6 +23,8 @@ export function MeetingSummary({
   checkinNote,
   topicCount,
   actionItemCount,
+  topicTitles,
+  actionItemTitles,
   showWarnings = true,
 }: MeetingSummaryProps) {
   const hasAnyCondition =
@@ -66,14 +70,38 @@ export function MeetingSummary({
         </div>
       )}
 
-      <div className="flex items-center gap-2">
-        <span className="text-muted-foreground min-w-[4rem]">話題</span>
-        <span className="font-medium">{topicCount}件</span>
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground min-w-[4rem]">話題</span>
+          <span className="font-medium">{topicCount}件</span>
+        </div>
+        {topicTitles && topicTitles.length > 0 && (
+          <ul className="flex flex-col gap-0.5 pl-[4.5rem]">
+            {topicTitles.map((title, i) => (
+              <li key={i} className="flex gap-1 text-muted-foreground">
+                <span>・</span>
+                <span>{title}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-muted-foreground min-w-[4rem]">アクション</span>
-        <span className="font-medium">{actionItemCount}件</span>
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground min-w-[4rem]">アクション</span>
+          <span className="font-medium">{actionItemCount}件</span>
+        </div>
+        {actionItemTitles && actionItemTitles.length > 0 && (
+          <ul className="flex flex-col gap-0.5 pl-[4.5rem]">
+            {actionItemTitles.map((title, i) => (
+              <li key={i} className="flex gap-1 text-muted-foreground">
+                <span>・</span>
+                <span>{title}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       {showWarnings && actionItemCount === 0 && (

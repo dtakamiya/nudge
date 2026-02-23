@@ -17,6 +17,8 @@ const baseSummaryProps = {
   checkinNote: "",
   topicCount: 2,
   actionItemCount: 3,
+  topicTitles: ["業務進捗 - 今週の進捗報告", "課題・相談 - 困っていること"],
+  actionItemTitles: ["QAテスト完了レポートを共有する"],
 };
 
 describe("ClosingDialog", () => {
@@ -99,6 +101,33 @@ describe("ClosingDialog", () => {
       );
       await user.click(screen.getByRole("button", { name: "戻る" }));
       expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe("話題・アクションタイトル一覧", () => {
+    it("話題タイトルがダイアログ内に表示されること", () => {
+      render(
+        <ClosingDialog
+          open={true}
+          onOpenChange={vi.fn()}
+          onConfirm={vi.fn()}
+          summaryProps={baseSummaryProps}
+        />,
+      );
+      expect(screen.getByText("業務進捗 - 今週の進捗報告")).toBeDefined();
+      expect(screen.getByText("課題・相談 - 困っていること")).toBeDefined();
+    });
+
+    it("アクションアイテムタイトルがダイアログ内に表示されること", () => {
+      render(
+        <ClosingDialog
+          open={true}
+          onOpenChange={vi.fn()}
+          onConfirm={vi.fn()}
+          summaryProps={baseSummaryProps}
+        />,
+      );
+      expect(screen.getByText("QAテスト完了レポートを共有する")).toBeDefined();
     });
   });
 

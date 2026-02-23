@@ -74,6 +74,47 @@ describe("MeetingSummary", () => {
     });
   });
 
+  describe("話題タイトル一覧", () => {
+    it("topicTitles が渡された場合にタイトルが表示されること", () => {
+      render(
+        <MeetingSummary
+          {...baseProps}
+          topicTitles={["業務進捗 - 今週の進捗報告", "課題・相談 - 困っていること"]}
+        />,
+      );
+      expect(screen.getByText("業務進捗 - 今週の進捗報告")).toBeDefined();
+      expect(screen.getByText("課題・相談 - 困っていること")).toBeDefined();
+    });
+
+    it("topicTitles が渡されない場合はタイトル一覧が表示されないこと", () => {
+      render(<MeetingSummary {...baseProps} />);
+      expect(screen.queryByText(/業務進捗/)).toBeNull();
+    });
+
+    it("topicTitles が空配列の場合はタイトル一覧が表示されないこと", () => {
+      render(<MeetingSummary {...baseProps} topicTitles={[]} />);
+      expect(screen.queryByRole("list")).toBeNull();
+    });
+  });
+
+  describe("アクションアイテムタイトル一覧", () => {
+    it("actionItemTitles が渡された場合にタイトルが表示されること", () => {
+      render(
+        <MeetingSummary
+          {...baseProps}
+          actionItemTitles={["QAテスト完了レポートを共有する", "設計書を更新する"]}
+        />,
+      );
+      expect(screen.getByText("QAテスト完了レポートを共有する")).toBeDefined();
+      expect(screen.getByText("設計書を更新する")).toBeDefined();
+    });
+
+    it("actionItemTitles が渡されない場合はタイトル一覧が表示されないこと", () => {
+      render(<MeetingSummary {...baseProps} />);
+      expect(screen.queryByText(/QAテスト/)).toBeNull();
+    });
+  });
+
   describe("アクションアイテム警告", () => {
     it("アクションアイテムが0件の場合に警告が表示されること", () => {
       render(<MeetingSummary {...baseProps} actionItemCount={0} />);
