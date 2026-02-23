@@ -160,7 +160,37 @@ describe("ActionListFull", () => {
     expect(toast.error).toHaveBeenCalledWith(TOAST_MESSAGES.actionItem.updateError);
   });
 
+  describe("statusFilter プロパティ", () => {
+    it("statusFilter を指定しない場合、すべてのアイテムが表示される", () => {
+      render(<ActionListFull actionItems={baseItems} />);
+      expect(screen.getByText("レビュー依頼")).toBeDefined();
+      expect(screen.getByText("ドキュメント更新")).toBeDefined();
+    });
+
+    it("statusFilter を指定しても、渡されたアイテムはそのまま表示される", () => {
+      const inProgressItems = [
+        {
+          id: "action-2",
+          title: "ドキュメント更新",
+          description: "",
+          status: "IN_PROGRESS",
+          dueDate: null,
+          member: { id: "member-2", name: "佐藤花子" },
+          meeting: { id: "meeting-2", date: new Date("2026-02-10") },
+        },
+      ];
+      render(<ActionListFull actionItems={inProgressItems} statusFilter="IN_PROGRESS" />);
+      expect(screen.getByText("ドキュメント更新")).toBeDefined();
+    });
+
+    it("statusFilter を指定して空リストの場合、空状態メッセージを表示する", () => {
+      render(<ActionListFull actionItems={[]} statusFilter="DONE" />);
+      expect(screen.getByText("アクションアイテムはありません")).toBeDefined();
+    });
+  });
+
   // Note: Radix UI Select の onValueChange テストは jsdom 環境では
   // hasPointerCapture 非対応のため実行不可。
+  // statusFilter によるステータス変更後のフィルタリング動作（楽観的更新）は E2E テストで検証する。
   // トースト通知のロジックは action-list-compact テストで検証している。
 });

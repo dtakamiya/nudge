@@ -45,7 +45,7 @@ export default async function ActionsPage({ searchParams }: Props) {
       <Suspense>
         <ActionFilters members={memberList} tags={tagList} />
       </Suspense>
-      <ActionListFull actionItems={actionItemsWithTags} />
+      <ActionListFull actionItems={actionItemsWithTags} statusFilter={filters.status} />
     </div>
   );
 }
