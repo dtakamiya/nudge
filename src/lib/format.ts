@@ -46,3 +46,17 @@ export function formatDateLong(date: Date | string | null): string {
   const d = new Date(date);
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
 }
+
+export function formatDuration(startedAt: Date, endedAt: Date | null): string {
+  const end = endedAt ?? new Date();
+  const diffMs = end.getTime() - startedAt.getTime();
+  const totalMinutes = Math.floor(diffMs / (1000 * 60));
+
+  if (totalMinutes < 1) return "1分未満";
+
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours === 0) return `${minutes}分`;
+  return `${hours}時間${minutes}分`;
+}

@@ -122,3 +122,36 @@ describe("formatDateLong", () => {
     expect(formatDateLong("2026-01-05")).toBe("2026年1月5日");
   });
 });
+
+import { formatDuration } from "@/lib/format";
+
+describe("formatDuration", () => {
+  it("45分間の所要時間を「45分」と表示する", () => {
+    const start = new Date("2024-01-01T10:00:00");
+    const end = new Date("2024-01-01T10:45:00");
+    expect(formatDuration(start, end)).toBe("45分");
+  });
+
+  it("1時間23分を「1時間23分」と表示する", () => {
+    const start = new Date("2024-01-01T10:00:00");
+    const end = new Date("2024-01-01T11:23:00");
+    expect(formatDuration(start, end)).toBe("1時間23分");
+  });
+
+  it("2時間0分を「2時間0分」と表示する", () => {
+    const start = new Date("2024-01-01T10:00:00");
+    const end = new Date("2024-01-01T12:00:00");
+    expect(formatDuration(start, end)).toBe("2時間0分");
+  });
+
+  it("1分未満を「1分未満」と表示する", () => {
+    const start = new Date("2024-01-01T10:00:00");
+    const end = new Date("2024-01-01T10:00:30");
+    expect(formatDuration(start, end)).toBe("1分未満");
+  });
+
+  it("endedAt が null の場合は現在時刻との差分を計算する", () => {
+    const start = new Date(Date.now() - 45 * 60 * 1000); // 45分前
+    expect(formatDuration(start, null)).toBe("45分");
+  });
+});
