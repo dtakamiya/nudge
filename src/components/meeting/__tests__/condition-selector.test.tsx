@@ -101,4 +101,29 @@ describe("ConditionSelector", () => {
     expect(minLabels).toHaveLength(3);
     expect(maxLabels).toHaveLength(3);
   });
+
+  it("体調・気分軸にスケール端絵文字 😞（最小）と 😊（最大）が表示されること", () => {
+    render(<ConditionSelector {...defaultProps} />);
+    const minEmojis = screen.getAllByText("😞");
+    const maxEmojis = screen.getAllByText("😊");
+    // 体調と気分の2軸分
+    expect(minEmojis).toHaveLength(2);
+    expect(maxEmojis).toHaveLength(2);
+  });
+
+  it("業務量軸にスケール端絵文字 😌（最小）と 😰（最大）が表示されること", () => {
+    render(<ConditionSelector {...defaultProps} />);
+    expect(screen.getByText("😌")).toBeInTheDocument();
+    expect(screen.getByText("😰")).toBeInTheDocument();
+  });
+
+  it("各軸のスケール端絵文字が合計6つ表示されること（min×3, max×3）", () => {
+    render(<ConditionSelector {...defaultProps} />);
+    // min絵文字: 😞×2（体調・気分）+ 😌×1（業務量）= 3つ
+    // max絵文字: 😊×2（体調・気分）+ 😰×1（業務量）= 3つ
+    const minEmojis = screen.getAllByText(/^(😞|😌)$/);
+    const maxEmojis = screen.getAllByText(/^(😊|😰)$/);
+    expect(minEmojis).toHaveLength(3);
+    expect(maxEmojis).toHaveLength(3);
+  });
 });
