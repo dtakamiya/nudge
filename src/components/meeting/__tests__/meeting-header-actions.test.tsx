@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
-import { MeetingDeleteDialog } from "../meeting-delete-dialog";
+import { MeetingHeaderActions } from "../meeting-header-actions";
 
 const mockPush = vi.fn();
 
@@ -40,17 +40,27 @@ const props = {
   meetingDate: "2025年1月15日",
 };
 
-describe("MeetingDeleteDialog", () => {
-  it("「削除」ボタンが表示される", () => {
-    render(<MeetingDeleteDialog {...props} />);
-    expect(screen.getByRole("button", { name: /削除/ })).toBeDefined();
+describe("MeetingHeaderActions", () => {
+  it("「その他」ボタンが表示される", () => {
+    render(<MeetingHeaderActions {...props} />);
+    expect(screen.getByRole("button")).toBeDefined();
   });
 
-  it("ボタンクリックで確認ダイアログが開く", async () => {
+  it("ドロップダウンを開くと「削除」が表示される", async () => {
     const user = userEvent.setup();
-    render(<MeetingDeleteDialog {...props} />);
+    render(<MeetingHeaderActions {...props} />);
 
-    await user.click(screen.getByRole("button", { name: /削除/ }));
+    await user.click(screen.getByRole("button"));
+
+    expect(screen.getByText("削除")).toBeDefined();
+  });
+
+  it("「削除」クリックで確認ダイアログが開く", async () => {
+    const user = userEvent.setup();
+    render(<MeetingHeaderActions {...props} />);
+
+    await user.click(screen.getByRole("button"));
+    await user.click(screen.getByText("削除"));
 
     expect(screen.getByText("ミーティングを削除しますか？")).toBeDefined();
     expect(
@@ -62,9 +72,10 @@ describe("MeetingDeleteDialog", () => {
 
   it("キャンセルボタンでダイアログが閉じる", async () => {
     const user = userEvent.setup();
-    render(<MeetingDeleteDialog {...props} />);
+    render(<MeetingHeaderActions {...props} />);
 
-    await user.click(screen.getByRole("button", { name: /削除/ }));
+    await user.click(screen.getByRole("button"));
+    await user.click(screen.getByText("削除"));
     await user.click(screen.getByRole("button", { name: "キャンセル" }));
 
     expect(mockDeleteMeeting).not.toHaveBeenCalled();
@@ -73,9 +84,10 @@ describe("MeetingDeleteDialog", () => {
   it("削除成功後にメンバー詳細ページへ遷移する", async () => {
     const user = userEvent.setup();
     mockDeleteMeeting.mockResolvedValue({ success: true, data: {} });
-    render(<MeetingDeleteDialog {...props} />);
+    render(<MeetingHeaderActions {...props} />);
 
-    await user.click(screen.getByRole("button", { name: /削除/ }));
+    await user.click(screen.getByRole("button"));
+    await user.click(screen.getByText("削除"));
     await user.click(screen.getByRole("button", { name: "削除する" }));
 
     expect(mockDeleteMeeting).toHaveBeenCalledWith("meeting-1");
@@ -86,9 +98,10 @@ describe("MeetingDeleteDialog", () => {
   it("削除失敗時にエラーメッセージとトーストが表示される", async () => {
     const user = userEvent.setup();
     mockDeleteMeeting.mockResolvedValue({ success: false, error: "削除エラー" });
-    render(<MeetingDeleteDialog {...props} />);
+    render(<MeetingHeaderActions {...props} />);
 
-    await user.click(screen.getByRole("button", { name: /削除/ }));
+    await user.click(screen.getByRole("button"));
+    await user.click(screen.getByText("削除"));
     await user.click(screen.getByRole("button", { name: "削除する" }));
 
     await waitFor(() => {

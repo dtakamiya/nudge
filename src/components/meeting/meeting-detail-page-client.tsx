@@ -170,7 +170,7 @@ export function MeetingDetailPageClient({
         {!startedAt && !endedAt && (
           <Button variant="default" size="sm" onClick={handleStartMeeting} disabled={isStarting}>
             <Play className="w-4 h-4 mr-1.5" />
-            {isStarting ? "開始中..." : "ミーティングを開始"}
+            {isStarting ? "記録開始中..." : "記録を開始"}
           </Button>
         )}
         <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>

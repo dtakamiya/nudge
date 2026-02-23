@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { CoachingPanel } from "@/components/meeting/coaching-panel";
-import { MeetingDeleteDialog } from "@/components/meeting/meeting-delete-dialog";
 import { MeetingDetailPageClient } from "@/components/meeting/meeting-detail-page-client";
+import { MeetingHeaderActions } from "@/components/meeting/meeting-header-actions";
 import { Button } from "@/components/ui/button";
 import { getMeeting } from "@/lib/actions/meeting-actions";
 import { formatDate } from "@/lib/format";
@@ -32,7 +32,7 @@ export default async function MeetingDetailPage({ params }: Props) {
           {meeting.member.name}との1on1
         </h1>
         <div className="flex gap-2">
-          <MeetingDeleteDialog
+          <MeetingHeaderActions
             meetingId={meetingId}
             memberId={id}
             meetingDate={formatDate(meeting.date)}
