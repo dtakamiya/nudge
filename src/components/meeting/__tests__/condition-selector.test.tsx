@@ -78,4 +78,27 @@ describe("ConditionSelector", () => {
     await user.click(buttons[1]);
     expect(handleChange).toHaveBeenCalledWith("conditionHealth", null);
   });
+
+  it("体調行に最小ラベル「悪い」と最大ラベル「良い」が表示されること", () => {
+    render(<ConditionSelector {...defaultProps} />);
+    const allBadText = screen.getAllByText("悪い");
+    const allGoodText = screen.getAllByText("良い");
+    expect(allBadText.length).toBeGreaterThanOrEqual(1);
+    expect(allGoodText.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("業務量行に最小ラベル「少ない」と最大ラベル「多い」が表示されること", () => {
+    render(<ConditionSelector {...defaultProps} />);
+    expect(screen.getByText("少ない")).toBeInTheDocument();
+    expect(screen.getByText("多い")).toBeInTheDocument();
+  });
+
+  it("各軸の最小・最大ラベルが合計6つ表示されること（min×3, max×3）", () => {
+    render(<ConditionSelector {...defaultProps} />);
+    // 体調: 悪い/良い, 気分: 悪い/良い, 業務量: 少ない/多い
+    const minLabels = screen.getAllByText(/^(悪い|少ない)$/);
+    const maxLabels = screen.getAllByText(/^(良い|多い)$/);
+    expect(minLabels).toHaveLength(3);
+    expect(maxLabels).toHaveLength(3);
+  });
 });
