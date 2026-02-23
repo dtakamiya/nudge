@@ -1,13 +1,13 @@
 "use client";
 
-import { AlertTriangle, Pencil, SquareCheck } from "lucide-react";
+import { Pencil, SquareCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 
+import { DueDateBadge } from "@/components/action/due-date-badge";
 import { TagBadge } from "@/components/tag/tag-badge";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -20,7 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { updateActionItem, updateActionItemStatus } from "@/lib/actions/action-item-actions";
-import { getDueDateStatus } from "@/lib/due-date";
 import { formatDate } from "@/lib/format";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
@@ -189,31 +188,7 @@ export function ActionListFull({ actionItems, statusFilter }: Props) {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                {item.dueDate &&
-                  (() => {
-                    const dueDateStatus = getDueDateStatus(item.dueDate, item.status);
-                    if (dueDateStatus === "overdue") {
-                      return (
-                        <Badge variant="destructive" className="flex items-center gap-1 text-xs">
-                          <AlertTriangle className="h-3 w-3" />
-                          期限超過
-                        </Badge>
-                      );
-                    }
-                    if (dueDateStatus === "due-soon") {
-                      return (
-                        <Badge className="flex items-center gap-1 text-xs bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-100">
-                          <AlertTriangle className="h-3 w-3" />
-                          もうすぐ期限
-                        </Badge>
-                      );
-                    }
-                    return (
-                      <span className="text-sm text-muted-foreground">
-                        期限: {formatDate(item.dueDate)}
-                      </span>
-                    );
-                  })()}
+                {item.dueDate && <DueDateBadge dueDate={item.dueDate} status={item.status} />}
                 <Button
                   variant="ghost"
                   size="icon-xs"
