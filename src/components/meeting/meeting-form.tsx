@@ -10,8 +10,9 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -151,6 +152,7 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showClosingDialog, setShowClosingDialog] = useState(false);
+  const errorRef = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor));
   const topicAnnouncements = useMemo(() => createAnnouncements("話題"), []);
@@ -267,6 +269,10 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
         if (!result.success) {
           setError(result.error);
           toast.error(TOAST_MESSAGES.meeting.updateError);
+          setTimeout(
+            () => errorRef.current?.scrollIntoView?.({ behavior: "smooth", block: "center" }),
+            0,
+          );
           return;
         }
         toast.success(TOAST_MESSAGES.meeting.updateSuccess);
@@ -298,6 +304,10 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
         if (!result.success) {
           setError(result.error);
           toast.error(TOAST_MESSAGES.meeting.createError);
+          setTimeout(
+            () => errorRef.current?.scrollIntoView?.({ behavior: "smooth", block: "center" }),
+            0,
+          );
           return;
         }
         toast.success(TOAST_MESSAGES.meeting.createSuccess);
@@ -307,6 +317,10 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
       const message = err instanceof Error ? err.message : "予期しないエラーが発生しました";
       setError(message);
       toast.error(message);
+      setTimeout(
+        () => errorRef.current?.scrollIntoView?.({ behavior: "smooth", block: "center" }),
+        0,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -443,7 +457,16 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
           </CardContent>
         </Card>
 
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && (
+          <div
+            ref={errorRef}
+            role="alert"
+            className="flex items-start gap-2 rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive"
+          >
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
         <Button type="submit" disabled={isSubmitting} className="self-start">
           {isSubmitting
             ? isEditing

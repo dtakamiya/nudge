@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { z } from "zod";
 
 import { runAction } from "../types";
 
@@ -20,5 +21,39 @@ describe("runAction", () => {
       throw "string error";
     });
     expect(result).toEqual({ success: false, error: "予期しないエラーが発生しました" });
+  });
+
+  it("ZodError がスローされた場合にユーザー向けバリデーションメッセージを返す", async () => {
+    const schema = z.object({
+      title: z.string().min(1, "タイトルは必須です"),
+      age: z.number().min(0, "年齢は0以上で入力してください"),
+    });
+    const result = await runAction(async () => {
+      schema.parse({ title: "", age: -1 });
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toBe("タイトルは必須です、年齢は0以上で入力してください");
+    }
+  });
+
+  it("ZodError が単一の場合にそのメッセージのみを返す", async () => {
+    const schema = z.object({ name: z.string().min(1, "名前は必須です") });
+    const result = await runAction(async () => {
+      schema.parse({ name: "" });
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toBe("名前は必須です");
+    }
+  });
+
+  it("エラー発生時に console.error でサーバーサイドログを出力する", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    await runAction(async () => {
+      throw new Error("ログテスト");
+    });
+    expect(consoleSpy).toHaveBeenCalledWith("[Server Action Error]", expect.any(Error));
+    consoleSpy.mockRestore();
   });
 });
