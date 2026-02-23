@@ -4,7 +4,6 @@ export const TOAST_MESSAGES = {
     createError: "メンバーの登録に失敗しました",
     updateSuccess: "メンバー情報を更新しました",
     updateError: "メンバー情報の更新に失敗しました",
-    deleteSuccess: "メンバーを削除しました",
     deleteError: "メンバーの削除に失敗しました",
   },
   meeting: {
