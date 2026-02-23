@@ -75,7 +75,7 @@ export function ReminderAlertBanner({ reminders }: Props) {
               </>
             ) : (
               <>
-                すべて表示（{reminders.length}件）
+                もっと見る (+{reminders.length - DEFAULT_LIMIT}件)
                 <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
               </>
             )}
