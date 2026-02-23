@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 
+import { DueDateBadge } from "@/components/action/due-date-badge";
 import { TagBadge } from "@/components/tag/tag-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { updateActionItem, updateActionItemStatus } from "@/lib/actions/action-item-actions";
-import { formatDate } from "@/lib/format";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 type TagData = {
@@ -168,9 +168,7 @@ export function ActionListCompact({ actionItems }: Props) {
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {item.dueDate && (
-                <span className="text-xs text-muted-foreground">
-                  期限: {formatDate(item.dueDate)}
-                </span>
+                <DueDateBadge dueDate={item.dueDate} status={item.status} size="sm" />
               )}
               <Button
                 variant="ghost"

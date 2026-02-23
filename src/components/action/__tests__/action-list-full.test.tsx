@@ -193,4 +193,77 @@ describe("ActionListFull", () => {
   // hasPointerCapture 非対応のため実行不可。
   // statusFilter によるステータス変更後のフィルタリング動作（楽観的更新）は E2E テストで検証する。
   // トースト通知のロジックは action-list-compact テストで検証している。
+
+  describe("期限日バッジ", () => {
+    it("期限超過（DONE以外）のアイテムに「期限超過」バッジを表示する", () => {
+      const overdueItems = [
+        {
+          id: "overdue-1",
+          title: "期限切れタスク",
+          description: "",
+          status: "TODO",
+          dueDate: new Date("2020-01-01"),
+          member: { id: "member-1", name: "田中太郎" },
+          meeting: { id: "meeting-1", date: new Date("2020-01-01") },
+        },
+      ];
+      render(<ActionListFull actionItems={overdueItems} />);
+      expect(screen.getByText("期限超過")).toBeDefined();
+    });
+
+    it("期限超過でも DONE のアイテムにはバッジを表示しない", () => {
+      const doneItems = [
+        {
+          id: "done-1",
+          title: "完了タスク",
+          description: "",
+          status: "DONE",
+          dueDate: new Date("2020-01-01"),
+          member: { id: "member-1", name: "田中太郎" },
+          meeting: { id: "meeting-1", date: new Date("2020-01-01") },
+        },
+      ];
+      render(<ActionListFull actionItems={doneItems} />);
+      expect(screen.queryByText("期限超過")).toBeNull();
+      expect(screen.queryByText("もうすぐ期限")).toBeNull();
+      expect(screen.getByText(/期限:/)).toBeDefined();
+    });
+
+    it("dueDate が null のアイテムには期限テキストを表示しない", () => {
+      const noDateItems = [
+        {
+          id: "no-date-1",
+          title: "タスクA",
+          description: "",
+          status: "TODO",
+          dueDate: null,
+          member: { id: "member-1", name: "田中太郎" },
+          meeting: { id: "meeting-1", date: new Date("2026-02-01") },
+        },
+      ];
+      render(<ActionListFull actionItems={noDateItems} />);
+      expect(screen.queryByText(/期限/)).toBeNull();
+    });
+
+    it("期限3日以内（DONE以外）のアイテムに「もうすぐ期限」バッジを表示する", () => {
+      // 明らかに遠い未来だが「もうすぐ期限」とはならない基準日を使う
+      // getByText で存在確認するため、getDueDateStatus に依存する形でテストする
+      // dueDate を2日後に固定した固定日を使用
+      const twoDaysFromNow = new Date();
+      twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 2);
+      const dueSoonItems = [
+        {
+          id: "due-soon-1",
+          title: "もうすぐ期限タスク",
+          description: "",
+          status: "TODO",
+          dueDate: twoDaysFromNow,
+          member: { id: "member-1", name: "田中太郎" },
+          meeting: { id: "meeting-1", date: new Date("2026-01-01") },
+        },
+      ];
+      render(<ActionListFull actionItems={dueSoonItems} />);
+      expect(screen.getByText("もうすぐ期限")).toBeDefined();
+    });
+  });
 });

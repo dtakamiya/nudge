@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 
+import { DueDateBadge } from "@/components/action/due-date-badge";
 import { TagBadge } from "@/components/tag/tag-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -187,9 +188,7 @@ export function ActionListFull({ actionItems, statusFilter }: Props) {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-sm text-muted-foreground">
-                  {item.dueDate && `期限: ${formatDate(item.dueDate)}`}
-                </span>
+                {item.dueDate && <DueDateBadge dueDate={item.dueDate} status={item.status} />}
                 <Button
                   variant="ghost"
                   size="icon-xs"
