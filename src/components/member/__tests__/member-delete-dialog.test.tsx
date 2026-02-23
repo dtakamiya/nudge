@@ -78,8 +78,8 @@ describe("MemberDeleteDialog", () => {
     await user.click(screen.getByRole("button", { name: "削除する" }));
 
     expect(mockDeleteMember).toHaveBeenCalledWith("member-1");
-    expect(toast.success).toHaveBeenCalledWith(TOAST_MESSAGES.member.deleteSuccess);
-    expect(mockPush).toHaveBeenCalledWith("/");
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(mockPush).toHaveBeenCalledWith(`/?deleted=${encodeURIComponent("田中太郎")}`);
   });
 
   it("削除失敗時にエラーメッセージとトーストが表示される", async () => {

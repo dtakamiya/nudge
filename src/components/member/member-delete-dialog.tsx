@@ -53,9 +53,8 @@ export function MemberDeleteDialog({ memberId, memberName, open: openProp, onOpe
         setLoading(false);
         return;
       }
-      toast.success(TOAST_MESSAGES.member.deleteSuccess);
       handleOpenChange(false);
-      router.push("/");
+      router.push(`/?deleted=${encodeURIComponent(memberName)}`);
     } catch {
       setError("削除に失敗しました。もう一度お試しください。");
       toast.error(TOAST_MESSAGES.member.deleteError);
