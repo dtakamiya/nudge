@@ -215,4 +215,10 @@
   .animate-pulse-attention {
     animation: none;
   }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

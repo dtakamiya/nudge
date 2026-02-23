@@ -33,7 +33,7 @@ export function ThemeToggle() {
           aria-label={label}
           aria-pressed={theme === value}
           title={label}
-          className={`flex items-center justify-center w-7 h-7 rounded-md transition-colors duration-150 ${
+          className={`flex items-center justify-center w-8 h-8 rounded-md transition-colors duration-150 ${
             theme === value
               ? "bg-background text-primary shadow-sm"
               : "text-muted-foreground hover:text-foreground"
