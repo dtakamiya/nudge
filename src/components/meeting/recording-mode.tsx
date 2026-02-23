@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect,useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -21,39 +21,45 @@ type Topic = {
 
 type Props = {
   meetingId: string;
-  memberId: string;
   startedAt: Date;
   topics: ReadonlyArray<Topic>;
   onEnd: () => void;
 };
 
-function buildInitialNotes(topics: ReadonlyArray<Topic>): Map<string, string> {
-  return new Map(topics.map((t) => [t.id, t.notes ?? ""]));
-}
-
-export function RecordingMode({ meetingId, topics, startedAt, onEnd }: Props) {
-  const [localNotes, setLocalNotes] = useState<Map<string, string>>(() =>
-    buildInitialNotes(topics),
+export function RecordingMode({ meetingId, startedAt, topics, onEnd }: Props) {
+  const [localNotes, setLocalNotes] = useState<Map<string, string>>(
+    () => new Map(topics.map((t) => [t.id, t.notes ?? ""])),
   );
+  const [dirtyTopicIds, setDirtyTopicIds] = useState<Set<string>>(new Set());
   const [isEnding, setIsEnding] = useState(false);
-  const isSavingRef = useRef(false);
-
   const debouncedNotes = useDebounce(localNotes, 500);
+  const isFirstRender = useRef(true);
+
+  const sortedTopics = useMemo(
+    () => [...topics].sort((a, b) => a.sortOrder - b.sortOrder),
+    [topics],
+  );
 
   useEffect(() => {
-    if (isSavingRef.current) {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
       return;
     }
-    const saveAll = async () => {
-      for (const [topicId, notes] of debouncedNotes.entries()) {
+    if (dirtyTopicIds.size === 0) return;
+
+    async function saveAll() {
+      for (const topicId of dirtyTopicIds) {
+        const notes = debouncedNotes.get(topicId) ?? "";
         const result = await updateTopicNotes({ topicId, notes });
         if (!result.success) {
           toast.error(TOAST_MESSAGES.meeting.autoSaveError);
         }
       }
-    };
-    saveAll();
-  }, [debouncedNotes]);
+      setDirtyTopicIds(new Set());
+    }
+
+    void saveAll();
+  }, [debouncedNotes]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleNotesChange(topicId: string, notes: string) {
     setLocalNotes((prev) => {
@@ -61,38 +67,50 @@ export function RecordingMode({ meetingId, topics, startedAt, onEnd }: Props) {
       next.set(topicId, notes);
       return next;
     });
+    setDirtyTopicIds((prev) => new Set(prev).add(topicId));
   }
 
   async function handleBlur(topicId: string) {
-    isSavingRef.current = true;
     const notes = localNotes.get(topicId) ?? "";
-    const result = await updateTopicNotes({ topicId, notes });
-    if (!result.success) {
+    try {
+      const result = await updateTopicNotes({ topicId, notes });
+      if (!result.success) {
+        toast.error(TOAST_MESSAGES.meeting.autoSaveError);
+      }
+    } catch {
       toast.error(TOAST_MESSAGES.meeting.autoSaveError);
+    } finally {
+      setDirtyTopicIds((prev) => {
+        const next = new Set(prev);
+        next.delete(topicId);
+        return next;
+      });
     }
-    isSavingRef.current = false;
   }
 
   async function handleEnd() {
     setIsEnding(true);
-    const result = await endMeeting({ meetingId });
-    setIsEnding(false);
-    if (result.success) {
-      toast.success(TOAST_MESSAGES.meeting.recordingEnd);
-      onEnd();
-    } else {
+    try {
+      const result = await endMeeting({ meetingId });
+      if (result.success) {
+        toast.success(TOAST_MESSAGES.meeting.recordingEnd);
+        onEnd();
+      } else {
+        toast.error(TOAST_MESSAGES.meeting.recordingEndError);
+      }
+    } catch {
       toast.error(TOAST_MESSAGES.meeting.recordingEndError);
+    } finally {
+      setIsEnding(false);
     }
   }
-
-  const sortedTopics = [...topics].sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between border-b pb-4">
         <ElapsedTimer startedAt={startedAt} />
         <Button variant="destructive" size="sm" onClick={handleEnd} disabled={isEnding}>
-          ミーティングを終了する
+          {isEnding ? "終了中..." : "ミーティングを終了する"}
         </Button>
       </div>
 

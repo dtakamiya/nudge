@@ -48,7 +48,6 @@ const defaultTopics = [
 
 const defaultProps = {
   meetingId: "meeting-1",
-  memberId: "member-1",
   startedAt: new Date("2024-01-01T10:00:00"),
   topics: defaultTopics,
   onEnd: vi.fn(),
