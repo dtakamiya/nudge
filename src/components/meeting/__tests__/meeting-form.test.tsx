@@ -117,13 +117,34 @@ describe("MeetingForm", () => {
     expect(healthButtons.length).toBeGreaterThan(0);
   });
 
+  it("renders two save buttons (header and footer) in create mode", () => {
+    render(<MeetingForm memberId="m1" />);
+    const saveButtons = screen.getAllByRole("button", { name: "1on1を保存" });
+    expect(saveButtons).toHaveLength(2);
+  });
+
+  it("shows ClosingDialog when header save button is clicked", async () => {
+    const user = userEvent.setup();
+    render(<MeetingForm memberId="m1" />);
+
+    const titleInput = screen.getByPlaceholderText("話題のタイトル");
+    await user.type(titleInput, "テスト話題");
+    // Click header save button (first one)
+    const saveButtons = screen.getAllByRole("button", { name: "1on1を保存" });
+    await user.click(saveButtons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
+    });
+  });
+
   it("shows ClosingDialog when form is submitted", async () => {
     const user = userEvent.setup();
     render(<MeetingForm memberId="m1" />);
 
     const titleInput = screen.getByPlaceholderText("話題のタイトル");
     await user.type(titleInput, "テスト話題");
-    await user.click(screen.getByRole("button", { name: "1on1を保存" }));
+    await user.click(screen.getAllByRole("button", { name: "1on1を保存" })[0]);
 
     // ClosingDialog should appear
     await waitFor(() => {
@@ -141,7 +162,7 @@ describe("MeetingForm", () => {
 
     const titleInput = screen.getByPlaceholderText("話題のタイトル");
     await user.type(titleInput, "テスト話題");
-    await user.click(screen.getByRole("button", { name: "1on1を保存" }));
+    await user.click(screen.getAllByRole("button", { name: "1on1を保存" })[0]);
 
     // Wait for dialog to appear
     await waitFor(() => {
@@ -167,7 +188,7 @@ describe("MeetingForm", () => {
 
     const titleInput = screen.getByPlaceholderText("話題のタイトル");
     await user.type(titleInput, "テスト話題");
-    await user.click(screen.getByRole("button", { name: "1on1を保存" }));
+    await user.click(screen.getAllByRole("button", { name: "1on1を保存" })[0]);
 
     await waitFor(() => {
       expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
@@ -192,7 +213,7 @@ describe("MeetingForm", () => {
 
     const titleInput = screen.getByPlaceholderText("話題のタイトル");
     await user.type(titleInput, "テスト話題");
-    await user.click(screen.getByRole("button", { name: "1on1を保存" }));
+    await user.click(screen.getAllByRole("button", { name: "1on1を保存" })[0]);
 
     await waitFor(() => {
       expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
@@ -260,12 +281,14 @@ describe("MeetingForm (edit mode)", () => {
 
   it("shows update button text in edit mode", () => {
     render(<MeetingForm memberId="m1" initialData={mockInitialData} />);
-    expect(screen.getByRole("button", { name: "1on1を更新" })).toBeTruthy();
+    const updateButtons = screen.getAllByRole("button", { name: "1on1を更新" });
+    expect(updateButtons).toHaveLength(2);
   });
 
   it("shows save button text in create mode", () => {
     render(<MeetingForm memberId="m1" />);
-    expect(screen.getByRole("button", { name: "1on1を保存" })).toBeTruthy();
+    const saveButtons = screen.getAllByRole("button", { name: "1on1を保存" });
+    expect(saveButtons).toHaveLength(2);
   });
 
   it("pre-fills checkinNote from initialData", () => {
@@ -274,10 +297,16 @@ describe("MeetingForm (edit mode)", () => {
     expect(textarea).toHaveProperty("value", "体調良好");
   });
 
+  it("renders two update buttons in edit mode (header and footer)", () => {
+    render(<MeetingForm memberId="m1" initialData={mockInitialData} />);
+    const updateButtons = screen.getAllByRole("button", { name: "1on1を更新" });
+    expect(updateButtons).toHaveLength(2);
+  });
+
   it("shows ClosingDialog when update form is submitted", async () => {
     const user = userEvent.setup();
     render(<MeetingForm memberId="m1" initialData={mockInitialData} />);
-    await user.click(screen.getByRole("button", { name: "1on1を更新" }));
+    await user.click(screen.getAllByRole("button", { name: "1on1を更新" })[0]);
 
     await waitFor(() => {
       expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
@@ -293,7 +322,7 @@ describe("MeetingForm (edit mode)", () => {
     const user = userEvent.setup();
     render(<MeetingForm memberId="m1" initialData={mockInitialData} onSuccess={onSuccess} />);
 
-    await user.click(screen.getByRole("button", { name: "1on1を更新" }));
+    await user.click(screen.getAllByRole("button", { name: "1on1を更新" })[0]);
 
     await waitFor(() => {
       expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
@@ -325,7 +354,7 @@ describe("MeetingForm (edit mode)", () => {
     const user = userEvent.setup();
     render(<MeetingForm memberId="m1" initialData={mockInitialData} onSuccess={onSuccess} />);
 
-    await user.click(screen.getByRole("button", { name: "1on1を更新" }));
+    await user.click(screen.getAllByRole("button", { name: "1on1を更新" })[0]);
 
     await waitFor(() => {
       expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
@@ -348,7 +377,7 @@ describe("MeetingForm (edit mode)", () => {
     const user = userEvent.setup();
     render(<MeetingForm memberId="m1" initialData={mockInitialData} />);
 
-    await user.click(screen.getByRole("button", { name: "1on1を更新" }));
+    await user.click(screen.getAllByRole("button", { name: "1on1を更新" })[0]);
 
     await waitFor(() => {
       expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
@@ -383,7 +412,7 @@ describe("MeetingForm (edit mode)", () => {
     // Find the delete button for topics (not actions)
     await user.click(deleteButtons[1]); // second topic delete button
 
-    await user.click(screen.getByRole("button", { name: "1on1を更新" }));
+    await user.click(screen.getAllByRole("button", { name: "1on1を更新" })[0]);
 
     await waitFor(() => {
       expect(screen.getByText("ミーティングを保存しますか？")).toBeTruthy();
