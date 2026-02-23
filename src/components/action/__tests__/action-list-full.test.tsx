@@ -244,5 +244,26 @@ describe("ActionListFull", () => {
       render(<ActionListFull actionItems={noDateItems} />);
       expect(screen.queryByText(/期限/)).toBeNull();
     });
+
+    it("期限3日以内（DONE以外）のアイテムに「もうすぐ期限」バッジを表示する", () => {
+      // 明らかに遠い未来だが「もうすぐ期限」とはならない基準日を使う
+      // getByText で存在確認するため、getDueDateStatus に依存する形でテストする
+      // dueDate を2日後に固定した固定日を使用
+      const twoDaysFromNow = new Date();
+      twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 2);
+      const dueSoonItems = [
+        {
+          id: "due-soon-1",
+          title: "もうすぐ期限タスク",
+          description: "",
+          status: "TODO",
+          dueDate: twoDaysFromNow,
+          member: { id: "member-1", name: "田中太郎" },
+          meeting: { id: "meeting-1", date: new Date("2026-01-01") },
+        },
+      ];
+      render(<ActionListFull actionItems={dueSoonItems} />);
+      expect(screen.getByText("もうすぐ期限")).toBeDefined();
+    });
   });
 });
