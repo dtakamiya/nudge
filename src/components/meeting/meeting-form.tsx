@@ -467,15 +467,17 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
             <span>{error}</span>
           </div>
         )}
-        <Button type="submit" disabled={isSubmitting} className="self-start">
-          {isSubmitting
-            ? isEditing
-              ? "更新中..."
-              : "保存中..."
-            : isEditing
-              ? "1on1を更新"
-              : "1on1を保存"}
-        </Button>
+        <div className="sticky bottom-0 z-10 bg-background border-t pt-3 pb-3">
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting
+              ? isEditing
+                ? "更新中..."
+                : "保存中..."
+              : isEditing
+                ? "1on1を更新"
+                : "1on1を保存"}
+          </Button>
+        </div>
       </form>
 
       <ClosingDialog
