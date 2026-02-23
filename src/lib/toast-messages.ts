@@ -14,6 +14,11 @@ export const TOAST_MESSAGES = {
     updateError: "1on1の更新に失敗しました",
     deleteSuccess: "ミーティングを削除しました",
     deleteError: "ミーティングの削除に失敗しました",
+    recordingStart: "ミーティングを開始しました",
+    recordingStartError: "ミーティングの開始に失敗しました",
+    recordingEnd: "ミーティングを終了しました",
+    recordingEndError: "ミーティングの終了に失敗しました",
+    autoSaveError: "自動保存に失敗しました",
   },
   actionItem: {
     statusChangeSuccess: "ステータスを更新しました",

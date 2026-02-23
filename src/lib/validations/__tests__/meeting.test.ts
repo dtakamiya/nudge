@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { createMeetingSchema, updateMeetingSchema } from "../meeting";
+import {
+  createMeetingSchema,
+  endMeetingSchema,
+  startMeetingSchema,
+  updateMeetingSchema,
+  updateTopicNotesSchema,
+} from "../meeting";
 
 describe("createMeetingSchema", () => {
   it("accepts valid input with topics and actions", () => {
@@ -455,5 +461,88 @@ describe("updateMeetingSchema - conditionフィールド", () => {
       expect(result.data.conditionWorkload).toBe(4);
       expect(result.data.checkinNote).toBe("良い状態です");
     }
+  });
+});
+
+describe("startMeetingSchema", () => {
+  it("有効な meetingId でパース成功", () => {
+    const result = startMeetingSchema.safeParse({ meetingId: "some-meeting-uuid" });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.meetingId).toBe("some-meeting-uuid");
+    }
+  });
+
+  it("空文字列の meetingId でバリデーションエラー", () => {
+    const result = startMeetingSchema.safeParse({ meetingId: "" });
+    expect(result.success).toBe(false);
+  });
+
+  it("meetingId が省略された場合エラー", () => {
+    const result = startMeetingSchema.safeParse({});
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("endMeetingSchema", () => {
+  it("有効な meetingId でパース成功", () => {
+    const result = endMeetingSchema.safeParse({ meetingId: "some-meeting-uuid" });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.meetingId).toBe("some-meeting-uuid");
+    }
+  });
+
+  it("空文字列の meetingId でバリデーションエラー", () => {
+    const result = endMeetingSchema.safeParse({ meetingId: "" });
+    expect(result.success).toBe(false);
+  });
+
+  it("meetingId が省略された場合エラー", () => {
+    const result = endMeetingSchema.safeParse({});
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("updateTopicNotesSchema", () => {
+  it("有効な topicId と notes でパース成功", () => {
+    const result = updateTopicNotesSchema.safeParse({
+      topicId: "some-topic-uuid",
+      notes: "ミーティングのメモ内容",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.topicId).toBe("some-topic-uuid");
+      expect(result.data.notes).toBe("ミーティングのメモ内容");
+    }
+  });
+
+  it("空文字列の topicId でバリデーションエラー", () => {
+    const result = updateTopicNotesSchema.safeParse({
+      topicId: "",
+      notes: "何らかのメモ",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("notes が空文字列でも成功（空ノートを許可）", () => {
+    const result = updateTopicNotesSchema.safeParse({
+      topicId: "some-topic-uuid",
+      notes: "",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.notes).toBe("");
+    }
+  });
+
+  it("topicId が省略された場合エラー", () => {
+    const result = updateTopicNotesSchema.safeParse({ notes: "メモ" });
+    expect(result.success).toBe(false);
+  });
+
+  it("notes が省略された場合エラー", () => {
+    const result = updateTopicNotesSchema.safeParse({ topicId: "some-topic-uuid" });
+    expect(result.success).toBe(false);
   });
 });

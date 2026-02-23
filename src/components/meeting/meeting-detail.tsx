@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { CATEGORY_LABELS } from "@/lib/constants";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatDuration } from "@/lib/format";
 import { getMoodOption } from "@/lib/mood";
 
 import { ConditionBar } from "./condition-bar";
@@ -34,6 +34,8 @@ type Props = {
   checkinNote?: string | null;
   topics: Topic[];
   actionItems: ActionItem[];
+  startedAt?: Date | null;
+  endedAt?: Date | null;
 };
 
 export function MeetingDetail({
@@ -45,15 +47,23 @@ export function MeetingDetail({
   checkinNote,
   topics,
   actionItems,
+  startedAt,
+  endedAt,
 }: Props) {
   const moodOption = getMoodOption(mood);
   const hasAnyCondition =
     conditionHealth != null || conditionMood != null || conditionWorkload != null;
+  const hasDuration = startedAt != null && endedAt != null;
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center gap-3">
         <p className="text-lg text-muted-foreground">{formatDate(date)}</p>
+        {hasDuration && (
+          <span className="text-sm text-muted-foreground">
+            ({formatDuration(startedAt, endedAt)})
+          </span>
+        )}
         {moodOption && (
           <span
             className="text-xl"

@@ -4,10 +4,13 @@ import { prisma } from "@/lib/prisma";
 
 import {
   createMeeting,
+  endMeeting,
   getMeeting,
   getPreviousMeeting,
   getRecentMeetings,
+  startMeeting,
   updateMeeting,
+  updateTopicNotes,
 } from "../meeting-actions";
 import { createMember } from "../member-actions";
 
@@ -654,5 +657,153 @@ describe("updateMeeting - チェックインコンディション", () => {
     expect(updated?.conditionHealth).toBeNull();
     expect(updated?.conditionMood).toBeNull();
     expect(updated?.conditionWorkload).toBeNull();
+  });
+});
+
+describe("startMeeting", () => {
+  it("startedAt に現在時刻がセットされること", async () => {
+    const created = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+    if (!created.success) throw new Error(created.error);
+    const before = new Date();
+    const result = await startMeeting({ meetingId: created.data.id });
+    const after = new Date();
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.startedAt).not.toBeNull();
+    expect(result.data.startedAt!.getTime()).toBeGreaterThanOrEqual(before.getTime() - 1000);
+    expect(result.data.startedAt!.getTime()).toBeLessThanOrEqual(after.getTime() + 1000);
+  });
+
+  it("既に startedAt がセットされている場合は上書きしないこと（冪等性）", async () => {
+    const created = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+    if (!created.success) throw new Error(created.error);
+    const first = await startMeeting({ meetingId: created.data.id });
+    expect(first.success).toBe(true);
+    if (!first.success) return;
+    const originalStartedAt = first.data.startedAt;
+
+    // 少し待ってから再度呼ぶ
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    const second = await startMeeting({ meetingId: created.data.id });
+    expect(second.success).toBe(true);
+    if (!second.success) return;
+    expect(second.data.startedAt?.getTime()).toBe(originalStartedAt?.getTime());
+  });
+
+  it("存在しない meetingId でエラーを返すこと", async () => {
+    const result = await startMeeting({ meetingId: "non-existent-id" });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("endMeeting", () => {
+  it("endedAt に現在時刻がセットされること", async () => {
+    const created = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+    if (!created.success) throw new Error(created.error);
+    await startMeeting({ meetingId: created.data.id });
+    const before = new Date();
+    const result = await endMeeting({ meetingId: created.data.id });
+    const after = new Date();
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.endedAt).not.toBeNull();
+    expect(result.data.endedAt!.getTime()).toBeGreaterThanOrEqual(before.getTime() - 1000);
+    expect(result.data.endedAt!.getTime()).toBeLessThanOrEqual(after.getTime() + 1000);
+  });
+
+  it("存在しない meetingId でエラーを返すこと", async () => {
+    const result = await endMeeting({ meetingId: "non-existent-id" });
+    expect(result.success).toBe(false);
+  });
+
+  it("既に endedAt がセットされている場合は上書きしないこと（冪等性）", async () => {
+    const created = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+    if (!created.success) throw new Error(created.error);
+    await startMeeting({ meetingId: created.data.id });
+    const first = await endMeeting({ meetingId: created.data.id });
+    expect(first.success).toBe(true);
+    if (!first.success) return;
+    const originalEndedAt = first.data.endedAt;
+
+    // 少し待ってから再度呼ぶ
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    const second = await endMeeting({ meetingId: created.data.id });
+    expect(second.success).toBe(true);
+    if (!second.success) return;
+    expect(second.data.endedAt?.getTime()).toBe(originalEndedAt?.getTime());
+  });
+
+  it("startedAt が未設定の場合はエラーを返すこと", async () => {
+    const created = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+    if (!created.success) throw new Error(created.error);
+    // startMeeting を呼ばずに endMeeting を呼ぶ
+    const result = await endMeeting({ meetingId: created.data.id });
+    expect(result.success).toBe(false);
+    if (result.success) return;
+    expect(result.error).toBe("ミーティングがまだ開始されていません");
+  });
+});
+
+describe("updateTopicNotes", () => {
+  it("notes フィールドが更新されること", async () => {
+    const created = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [{ category: "WORK_PROGRESS", title: "テストトピック", notes: "", sortOrder: 0 }],
+      actionItems: [],
+    });
+    if (!created.success) throw new Error(created.error);
+    const topicId = created.data.topics[0].id;
+    const result = await updateTopicNotes({ topicId, notes: "更新されたノート" });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.notes).toBe("更新されたノート");
+  });
+
+  it("空文字列でも保存できること", async () => {
+    const created = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [
+        { category: "CAREER", title: "キャリアトピック", notes: "既存のノート", sortOrder: 0 },
+      ],
+      actionItems: [],
+    });
+    if (!created.success) throw new Error(created.error);
+    const topicId = created.data.topics[0].id;
+    const result = await updateTopicNotes({ topicId, notes: "" });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.notes).toBe("");
+  });
+
+  it("存在しない topicId でエラーを返すこと", async () => {
+    const result = await updateTopicNotes({ topicId: "non-existent-id", notes: "ノート" });
+    expect(result.success).toBe(false);
   });
 });

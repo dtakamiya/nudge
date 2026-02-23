@@ -11,6 +11,7 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("@/lib/actions/meeting-actions", () => ({
   updateMeeting: vi.fn(),
+  startMeeting: vi.fn(),
 }));
 
 // Mock MeetingDetail to simplify tests
@@ -32,6 +33,15 @@ vi.mock("../meeting-form", () => ({
     <div data-testid="meeting-form">
       <span>editing: {initialData?.meetingId}</span>
       <button onClick={onSuccess}>mock-save</button>
+    </div>
+  ),
+}));
+
+// Mock RecordingMode
+vi.mock("../recording-mode", () => ({
+  RecordingMode: ({ onEnd }: { onEnd: () => void }) => (
+    <div data-testid="recording-mode">
+      <button onClick={onEnd}>mock-end</button>
     </div>
   ),
 }));
@@ -134,5 +144,56 @@ describe("MeetingDetailPageClient", () => {
     await user.click(screen.getByRole("button", { name: "mock-save" }));
     expect(screen.getByTestId("meeting-detail")).toBeTruthy();
     expect(mockRefresh).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows start meeting button when startedAt and endedAt are both absent", () => {
+    render(<MeetingDetailPageClient {...defaultProps} startedAt={null} endedAt={null} />);
+    expect(screen.getByRole("button", { name: /ミーティングを開始/ })).toBeTruthy();
+  });
+
+  it("calls startMeeting when start meeting button is clicked", async () => {
+    const { startMeeting } = await import("@/lib/actions/meeting-actions");
+    const mockStartMeeting = vi.mocked(startMeeting);
+    mockStartMeeting.mockResolvedValueOnce({ success: true, data: {} as never });
+
+    const user = userEvent.setup();
+    render(<MeetingDetailPageClient {...defaultProps} startedAt={null} endedAt={null} />);
+    await user.click(screen.getByRole("button", { name: /ミーティングを開始/ }));
+    expect(mockStartMeeting).toHaveBeenCalledWith({ meetingId: "meeting-1" });
+  });
+
+  it("shows RecordingMode when startedAt is set and endedAt is null", () => {
+    render(
+      <MeetingDetailPageClient
+        {...defaultProps}
+        startedAt={new Date("2026-02-20T10:00:00.000Z")}
+        endedAt={null}
+      />,
+    );
+    expect(screen.getByTestId("recording-mode")).toBeTruthy();
+    expect(screen.queryByTestId("meeting-detail")).toBeNull();
+  });
+
+  it("shows view mode (not recording) when both startedAt and endedAt are set", () => {
+    render(
+      <MeetingDetailPageClient
+        {...defaultProps}
+        startedAt={new Date("2026-02-20T10:00:00.000Z")}
+        endedAt={new Date("2026-02-20T11:00:00.000Z")}
+      />,
+    );
+    expect(screen.getByTestId("meeting-detail")).toBeTruthy();
+    expect(screen.queryByTestId("recording-mode")).toBeNull();
+  });
+
+  it("does not show start meeting button when meeting has ended", () => {
+    render(
+      <MeetingDetailPageClient
+        {...defaultProps}
+        startedAt={new Date("2026-02-20T10:00:00.000Z")}
+        endedAt={new Date("2026-02-20T11:00:00.000Z")}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /ミーティングを開始/ })).toBeNull();
   });
 });

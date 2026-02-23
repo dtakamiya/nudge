@@ -4,8 +4,20 @@ import { revalidatePath } from "next/cache";
 
 import type { ActionItem, Meeting, Topic } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import type { CreateMeetingInput, UpdateMeetingInput } from "@/lib/validations/meeting";
-import { createMeetingSchema, updateMeetingSchema } from "@/lib/validations/meeting";
+import type {
+  CreateMeetingInput,
+  EndMeetingInput,
+  StartMeetingInput,
+  UpdateMeetingInput,
+  UpdateTopicNotesInput,
+} from "@/lib/validations/meeting";
+import {
+  createMeetingSchema,
+  endMeetingSchema,
+  startMeetingSchema,
+  updateMeetingSchema,
+  updateTopicNotesSchema,
+} from "@/lib/validations/meeting";
 
 import { getOrCreateTagsInTx } from "./tag-actions";
 import { type ActionResult, runAction } from "./types";
@@ -292,5 +304,58 @@ export async function deleteMeeting(id: string): Promise<ActionResult<Meeting>> 
     const result = await prisma.meeting.delete({ where: { id } });
     revalidatePath("/", "layout");
     return result;
+  });
+}
+
+export async function startMeeting(input: StartMeetingInput): Promise<ActionResult<Meeting>> {
+  return runAction(async () => {
+    const validated = startMeetingSchema.parse(input);
+    const meeting = await prisma.$transaction(async (tx) => {
+      const existing = await tx.meeting.findUnique({ where: { id: validated.meetingId } });
+      if (!existing) throw new Error("ミーティングが見つかりません");
+      if (existing.startedAt) {
+        return existing;
+      }
+      return tx.meeting.update({
+        where: { id: validated.meetingId },
+        data: { startedAt: new Date() },
+      });
+    });
+    revalidatePath("/", "layout");
+    return meeting;
+  });
+}
+
+export async function endMeeting(input: EndMeetingInput): Promise<ActionResult<Meeting>> {
+  return runAction(async () => {
+    const validated = endMeetingSchema.parse(input);
+    const meeting = await prisma.$transaction(async (tx) => {
+      const existing = await tx.meeting.findUnique({ where: { id: validated.meetingId } });
+      if (!existing) throw new Error("ミーティングが見つかりません");
+      if (existing.endedAt) {
+        return existing;
+      }
+      if (!existing.startedAt) {
+        throw new Error("ミーティングがまだ開始されていません");
+      }
+      return tx.meeting.update({
+        where: { id: validated.meetingId },
+        data: { endedAt: new Date() },
+      });
+    });
+    revalidatePath("/", "layout");
+    return meeting;
+  });
+}
+
+export async function updateTopicNotes(input: UpdateTopicNotesInput): Promise<ActionResult<Topic>> {
+  return runAction(async () => {
+    const validated = updateTopicNotesSchema.parse(input);
+    const topic = await prisma.topic.update({
+      where: { id: validated.topicId },
+      data: { notes: validated.notes },
+    });
+    // revalidatePath は呼ばない（debounce 自動保存のため）
+    return topic;
   });
 }

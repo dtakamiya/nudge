@@ -115,4 +115,42 @@ describe("MeetingDetail", () => {
     expect(screen.getByText(/業務量📊:/)).toBeTruthy();
     expect(screen.getByText("今日は元気です")).toBeTruthy();
   });
+
+  it("shows duration when both startedAt and endedAt are provided", () => {
+    render(
+      <MeetingDetail
+        {...baseProps}
+        startedAt={new Date("2026-02-20T10:00:00.000Z")}
+        endedAt={new Date("2026-02-20T10:45:00.000Z")}
+      />,
+    );
+    expect(screen.getByText("(45分)")).toBeTruthy();
+  });
+
+  it("does not show duration when only startedAt is provided", () => {
+    render(
+      <MeetingDetail
+        {...baseProps}
+        startedAt={new Date("2026-02-20T10:00:00.000Z")}
+        endedAt={null}
+      />,
+    );
+    expect(screen.queryByText(/分\)/)).toBeNull();
+  });
+
+  it("does not show duration when only endedAt is provided", () => {
+    render(
+      <MeetingDetail
+        {...baseProps}
+        startedAt={null}
+        endedAt={new Date("2026-02-20T10:45:00.000Z")}
+      />,
+    );
+    expect(screen.queryByText(/分\)/)).toBeNull();
+  });
+
+  it("does not show duration when neither startedAt nor endedAt are provided", () => {
+    render(<MeetingDetail {...baseProps} />);
+    expect(screen.queryByText(/分\)/)).toBeNull();
+  });
 });
