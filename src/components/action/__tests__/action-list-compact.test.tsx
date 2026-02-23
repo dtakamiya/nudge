@@ -260,6 +260,25 @@ describe("ActionListCompact", () => {
       render(<ActionListCompact actionItems={doneItems} />);
       expect(screen.queryByText("期限超過")).toBeNull();
       expect(screen.queryByText("もうすぐ期限")).toBeNull();
+      expect(screen.getByText(/期限:/)).toBeDefined();
+    });
+
+    it("期限が4日以上先のアイテムには通常の期限テキストを表示する", () => {
+      const farFuture = new Date("2099-12-31");
+      const normalItems = [
+        {
+          id: "normal-1",
+          title: "余裕のあるタスク",
+          description: "",
+          status: "TODO",
+          dueDate: farFuture,
+          meeting: { date: new Date("2026-01-01") },
+        },
+      ];
+      render(<ActionListCompact actionItems={normalItems} />);
+      expect(screen.getByText(/期限:/)).toBeDefined();
+      expect(screen.queryByText("期限超過")).toBeNull();
+      expect(screen.queryByText("もうすぐ期限")).toBeNull();
     });
   });
 });
