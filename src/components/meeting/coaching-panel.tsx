@@ -1,7 +1,7 @@
 "use client";
 
-import { Ear, Heart, HelpCircle, Lightbulb, MessageSquare, Star } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { Ear, Heart, HelpCircle, Lightbulb, MessageSquare, Star } from "lucide-react";
 
 import {
   AccordionContent,
