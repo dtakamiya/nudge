@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ActionListCompact } from "@/components/action/action-list-compact";
 import { ActionAnalyticsSection } from "@/components/analytics/action-analytics-section";
+import { CheckinTrendSection } from "@/components/analytics/checkin-trend-section";
 import { TopicAnalyticsSection } from "@/components/analytics/topic-analytics-section";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { MeetingHistory } from "@/components/meeting/meeting-history";
@@ -82,6 +83,7 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
 
       <TopicAnalyticsSection memberId={id} />
       <ActionAnalyticsSection memberId={id} />
+      <CheckinTrendSection memberId={id} />
 
       {moodTrend.length > 0 && (
         <div className="mt-6">
