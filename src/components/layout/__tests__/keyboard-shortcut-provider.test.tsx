@@ -5,14 +5,17 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { KeyboardShortcutProvider } from "../keyboard-shortcut-provider";
 
 const mockPush = vi.fn();
+let mockPathname = "/";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
+  usePathname: () => mockPathname,
 }));
 
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  mockPathname = "/";
 });
 
 const members = [
@@ -48,6 +51,31 @@ describe("KeyboardShortcutProvider", () => {
       fireEvent.keyDown(document, { key: "?" });
 
       expect(screen.getByText("キーボードショートカット")).toBeDefined();
+    });
+  });
+
+  describe("コンテキスト検出", () => {
+    it("グローバルページでは global context の ShortcutHelpDialog が開く", () => {
+      mockPathname = "/";
+      render(<KeyboardShortcutProvider members={members} />);
+
+      fireEvent.keyDown(document, { key: "?" });
+
+      // グローバルセクションが表示されている
+      expect(screen.getByText("グローバル")).toBeDefined();
+      // global context では記録中セクションは非表示
+      expect(screen.queryByText("記録中")).toBeNull();
+    });
+
+    it("ミーティング詳細ページでは recording context の ShortcutHelpDialog が開く", () => {
+      mockPathname = "/members/m1/meetings/meet1";
+      render(<KeyboardShortcutProvider members={members} />);
+
+      fireEvent.keyDown(document, { key: "?" });
+
+      // recording context では記録中セクションが表示される
+      expect(screen.getByText("記録中")).toBeDefined();
+      expect(screen.getByText("タイマー開始/一時停止")).toBeDefined();
     });
   });
 });

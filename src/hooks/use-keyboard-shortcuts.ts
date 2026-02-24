@@ -2,6 +2,25 @@
 
 import { useEffect, useRef } from "react";
 
+export type ShortcutContext = "global" | "recording";
+
+export type ShortcutEntry = {
+  readonly key: string;
+  readonly description: string;
+  readonly context: ShortcutContext;
+};
+
+export const KEYBOARD_SHORTCUTS: ReadonlyArray<ShortcutEntry> = [
+  { key: "n", description: "新規メンバーを追加", context: "global" },
+  { key: "m", description: "新規ミーティングを作成", context: "global" },
+  { key: "⌘ K", description: "検索", context: "global" },
+  { key: "?", description: "ショートカット一覧を表示", context: "global" },
+  { key: "Space", description: "タイマー開始/一時停止", context: "recording" },
+  { key: "T", description: "新しいトピックを追加", context: "recording" },
+  { key: "A", description: "アクションアイテムを追加", context: "recording" },
+  { key: "Esc", description: "ダイアログを閉じる", context: "global" },
+];
+
 type ShortcutCallbacks = {
   readonly onNewMember: () => void;
   readonly onNewMeeting: () => void;
