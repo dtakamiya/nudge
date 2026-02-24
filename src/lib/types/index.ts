@@ -25,9 +25,13 @@ export type {
 } from "./dashboard";
 export type { CategoryTrend, MonthlyTrend, MoodTrendEntry } from "./meeting";
 export type {
+  ActionCompletedEntry,
   ActionItemWithMeeting,
+  ActionOverdueEntry,
   MeetingsPage,
+  MeetingTimelineEntry,
   MeetingWithRelations,
+  MemberTimelineEntry,
   MemberWithStats,
 } from "./member";
 export type { OverdueReminder } from "./reminder";

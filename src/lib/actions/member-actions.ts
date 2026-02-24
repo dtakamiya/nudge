@@ -5,7 +5,12 @@ import { revalidatePath } from "next/cache";
 import type { Member } from "@/generated/prisma/client";
 import { MEETINGS_PAGE_SIZE } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
-import type { MeetingsPage, MeetingWithRelations, MemberWithStats } from "@/lib/types";
+import type {
+  MeetingsPage,
+  MeetingWithRelations,
+  MemberTimelineEntry,
+  MemberWithStats,
+} from "@/lib/types";
 import type { CreateMemberInput, UpdateMemberInput } from "@/lib/validations/member";
 import { createMemberSchema, updateMemberSchema } from "@/lib/validations/member";
 
@@ -95,6 +100,80 @@ export async function getMemberMeetings(
     hasNext: skip + meetings.length < total,
     hasPrev: page > 1,
   };
+}
+
+export async function getMemberTimeline(memberId: string): Promise<MemberTimelineEntry[]> {
+  if (!memberId) return [];
+  const now = new Date();
+  const [meetings, completedActions, overdueActions] = await Promise.all([
+    prisma.meeting.findMany({
+      where: { memberId },
+      orderBy: { date: "desc" },
+      include: {
+        _count: { select: { topics: true, actionItems: true } },
+      },
+    }),
+    prisma.actionItem.findMany({
+      where: {
+        meeting: { memberId },
+        status: "DONE",
+        completedAt: { not: null },
+      },
+      include: { meeting: { select: { id: true } } },
+    }),
+    prisma.actionItem.findMany({
+      where: {
+        meeting: { memberId },
+        status: { not: "DONE" },
+        dueDate: { lt: now },
+      },
+      include: { meeting: { select: { id: true } } },
+    }),
+  ]);
+
+  const entries: MemberTimelineEntry[] = [
+    ...meetings.map(
+      (m): MemberTimelineEntry => ({
+        type: "meeting",
+        id: m.id,
+        date: m.date,
+        mood: m.mood,
+        topicCount: m._count.topics,
+        actionCount: m._count.actionItems,
+      }),
+    ),
+    ...completedActions
+      .filter((a) => a.completedAt !== null)
+      .map(
+        (a): MemberTimelineEntry => ({
+          type: "action_completed",
+          id: a.id,
+          title: a.title,
+          completedAt: a.completedAt!,
+          meetingId: a.meeting!.id,
+        }),
+      ),
+    ...overdueActions
+      .filter((a) => a.dueDate !== null)
+      .map(
+        (a): MemberTimelineEntry => ({
+          type: "action_overdue",
+          id: a.id,
+          title: a.title,
+          dueDate: a.dueDate!,
+          meetingId: a.meeting!.id,
+        }),
+      ),
+  ];
+
+  return entries.sort((a, b) => {
+    const getDate = (e: MemberTimelineEntry): Date => {
+      if (e.type === "meeting") return e.date;
+      if (e.type === "action_completed") return e.completedAt;
+      return e.dueDate;
+    };
+    return getDate(b).getTime() - getDate(a).getTime();
+  });
 }
 
 export async function createMember(input: CreateMemberInput): Promise<ActionResult<Member>> {
