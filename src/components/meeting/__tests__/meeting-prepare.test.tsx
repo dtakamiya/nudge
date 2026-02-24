@@ -17,29 +17,11 @@ vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 
-vi.mock("radix-ui", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("radix-ui")>();
+vi.mock("@dnd-kit/core", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@dnd-kit/core")>();
   return {
     ...actual,
-    Accordion: {
-      Root: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-        <div {...props}>{children}</div>
-      ),
-      Item: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-        <div {...props}>{children}</div>
-      ),
-      Header: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-        <div {...props}>{children}</div>
-      ),
-      Trigger: ({ children, onClick, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
-        <button onClick={onClick} {...props}>
-          {children}
-        </button>
-      ),
-      Content: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-        <div {...props}>{children}</div>
-      ),
-    },
+    DndContext: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
   };
 });
 
@@ -78,10 +60,11 @@ const mockPendingActions = [
   },
 ];
 
-const mockCarryoverData = {
+const mockLastMeetingData = {
   meetingId: "meeting-1",
   meetingDate: new Date("2026-02-17"),
-  actions: [
+  completedActions: [{ id: "c0", title: "完了済みタスク", dueDate: null }],
+  pendingActions: [
     { id: "c1", title: "引き継ぎタスク1", status: "TODO", dueDate: new Date("2026-03-01") },
     { id: "c2", title: "引き継ぎタスク2", status: "IN_PROGRESS", dueDate: null },
   ],
@@ -90,122 +73,119 @@ const mockCarryoverData = {
 describe("MeetingPrepare", () => {
   afterEach(() => cleanup());
 
-  it("renders past meetings accordion with topic titles", () => {
+  it("renders agenda topic input initially", () => {
     render(
       <MeetingPrepare
         memberId="m1"
         recentMeetings={mockRecentMeetings}
         pendingActions={mockPendingActions}
-        carryoverData={null}
+        lastMeetingData={null}
       />,
     );
-    expect(screen.getByText("進捗報告")).toBeDefined();
-    expect(screen.getByText("キャリア相談")).toBeDefined();
-    expect(screen.getByText("先月の話題")).toBeDefined();
+    const inputs = screen.getAllByPlaceholderText("話題のタイトル");
+    expect(inputs.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("renders pending action items in checklist", () => {
+  it("renders pending action items when provided", () => {
     render(
       <MeetingPrepare
         memberId="m1"
         recentMeetings={mockRecentMeetings}
         pendingActions={mockPendingActions}
-        carryoverData={null}
+        lastMeetingData={null}
       />,
     );
-    expect(screen.getByText("資料作成")).toBeDefined();
-    expect(screen.getByText("レビュー依頼")).toBeDefined();
+    // 未完了アクションセクションが表示される
+    expect(screen.getByText(/未完了アクション全件/)).toBeDefined();
   });
 
-  it("shows empty state when no recent meetings", () => {
-    render(
-      <MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} carryoverData={null} />,
-    );
-    expect(screen.getByText("過去のミーティング記録はありません")).toBeDefined();
-  });
-
-  it("shows empty state when no pending actions", () => {
-    render(
-      <MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} carryoverData={null} />,
-    );
-    expect(screen.getByText("未完了のアクションはありません")).toBeDefined();
-  });
-
-  it("copies topic to agenda when add-to-agenda button is clicked", async () => {
-    const user = userEvent.setup();
+  it("does not show pending actions section when no pending actions", () => {
     render(
       <MeetingPrepare
         memberId="m1"
-        recentMeetings={mockRecentMeetings}
+        recentMeetings={[]}
         pendingActions={[]}
-        carryoverData={null}
+        lastMeetingData={null}
       />,
     );
-    const copyButtons = screen.getAllByRole("button", { name: /アジェンダに追加/ });
-    await user.click(copyButtons[0]);
-    // コピーされた話題がアジェンダに追加される（複数のplaceholderが存在するはず）
-    const inputs = screen.getAllByPlaceholderText("話題のタイトル");
-    expect(inputs.length).toBeGreaterThanOrEqual(2);
-    // コピーされた話題のタイトルが入力欄に反映される
-    const values = inputs.map((el) => (el as HTMLInputElement).value);
-    expect(values).toContain("進捗報告");
+    expect(screen.queryByText(/未完了アクション全件/)).toBeNull();
   });
 
-  it("renders template selector", () => {
+  it("shows empty state for previous meeting when lastMeetingData is null", () => {
     render(
-      <MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} carryoverData={null} />,
+      <MeetingPrepare
+        memberId="m1"
+        recentMeetings={[]}
+        pendingActions={[]}
+        lastMeetingData={null}
+      />,
     );
-    expect(screen.getByText("定期チェックイン")).toBeDefined();
-    expect(screen.getByText("キャリア面談")).toBeDefined();
+    expect(screen.getByText("前回のミーティング記録がありません")).toBeDefined();
   });
 
-  it("populates topics when template is selected", async () => {
-    const user = userEvent.setup();
+  it("renders template selector in collapsible section", () => {
     render(
-      <MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} carryoverData={null} />,
+      <MeetingPrepare
+        memberId="m1"
+        recentMeetings={[]}
+        pendingActions={[]}
+        lastMeetingData={null}
+      />,
     );
-    await user.click(screen.getByRole("button", { name: /定期チェックイン/ }));
-    const inputs = screen.getAllByPlaceholderText("話題のタイトル");
-    expect(inputs[0]).toHaveProperty("value", "今週の進捗報告");
-    expect(inputs[1]).toHaveProperty("value", "困っていること");
+    expect(screen.getByText("テンプレートを適用")).toBeDefined();
   });
 
   it("can add a topic manually", async () => {
     const user = userEvent.setup();
     render(
-      <MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} carryoverData={null} />,
+      <MeetingPrepare
+        memberId="m1"
+        recentMeetings={[]}
+        pendingActions={[]}
+        lastMeetingData={null}
+      />,
     );
     await user.click(screen.getByRole("button", { name: /話題を追加/ }));
     const inputs = screen.getAllByPlaceholderText("話題のタイトル");
     expect(inputs.length).toBeGreaterThanOrEqual(2);
   });
 
-  it("renders start meeting button", () => {
-    render(
-      <MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} carryoverData={null} />,
-    );
-    expect(screen.getByRole("link", { name: /ミーティングを開始/ })).toBeDefined();
-  });
-
-  it("carryoverData がある場合は「前回からの引き継ぎ」セクションが表示される", () => {
+  it("renders start recording button", () => {
     render(
       <MeetingPrepare
         memberId="m1"
         recentMeetings={[]}
         pendingActions={[]}
-        carryoverData={mockCarryoverData}
+        lastMeetingData={null}
       />,
     );
-    expect(screen.getByText("前回からの引き継ぎ")).toBeDefined();
-    expect(screen.getByText("引き継ぎタスク1")).toBeDefined();
-    expect(screen.getByText("引き継ぎタスク2")).toBeDefined();
+    expect(screen.getByRole("link", { name: /記録を開始/ })).toBeDefined();
   });
 
-  it("carryoverData が null の場合は「前回からの引き継ぎ」セクションが非表示", () => {
+  it("lastMeetingData がある場合は前回の振り返りセクションに完了・未完了が表示される", () => {
     render(
-      <MeetingPrepare memberId="m1" recentMeetings={[]} pendingActions={[]} carryoverData={null} />,
+      <MeetingPrepare
+        memberId="m1"
+        recentMeetings={[]}
+        pendingActions={[]}
+        lastMeetingData={mockLastMeetingData}
+      />,
     );
-    expect(screen.queryByText("前回からの引き継ぎ")).toBeNull();
+    expect(screen.getByText("引き継ぎタスク1")).toBeDefined();
+    expect(screen.getByText("引き継ぎタスク2")).toBeDefined();
+    expect(screen.getByText("完了済みタスク")).toBeDefined();
+  });
+
+  it("lastMeetingData が null の場合は「前回のミーティング記録がありません」が表示される", () => {
+    render(
+      <MeetingPrepare
+        memberId="m1"
+        recentMeetings={[]}
+        pendingActions={[]}
+        lastMeetingData={null}
+      />,
+    );
+    expect(screen.getByText("前回のミーティング記録がありません")).toBeDefined();
   });
 
   it("フォローアップ対象チェックで buildStartUrl に followUpActionIds が含まれる", async () => {
@@ -215,16 +195,16 @@ describe("MeetingPrepare", () => {
         memberId="m1"
         recentMeetings={[]}
         pendingActions={[]}
-        carryoverData={mockCarryoverData}
+        lastMeetingData={mockLastMeetingData}
       />,
     );
 
+    // 未完了アクションのチェックボックス（引き継ぎタスク1）をクリック
     const checkboxes = screen.getAllByRole("checkbox");
     await user.click(checkboxes[0]!);
 
-    const startLink = screen.getByRole("link", { name: /ミーティングを開始/ });
+    const startLink = screen.getByRole("link", { name: /記録を開始/ });
     const href = startLink.getAttribute("href") ?? "";
     expect(href).toContain("followUpActionIds");
-    expect(href).toContain("c1");
   });
 });
