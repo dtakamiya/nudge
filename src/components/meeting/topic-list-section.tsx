@@ -1,6 +1,6 @@
 "use client";
 
-import { type Announcements,closestCenter, DndContext, type DragEndEvent } from "@dnd-kit/core";
+import { type Announcements, closestCenter, DndContext, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 import { Button } from "@/components/ui/button";
