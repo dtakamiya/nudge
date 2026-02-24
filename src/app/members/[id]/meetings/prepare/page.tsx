@@ -8,6 +8,7 @@ import {
 } from "@/lib/actions/action-item-actions";
 import { getRecentMeetings } from "@/lib/actions/meeting-actions";
 import { getMember } from "@/lib/actions/member-actions";
+import { getCustomTemplates } from "@/lib/actions/template-actions";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -18,10 +19,11 @@ export default async function PrepareMeetingPage({ params }: Props) {
     notFound();
   }
 
-  const [recentMeetings, pendingActions, carryoverData] = await Promise.all([
+  const [recentMeetings, pendingActions, carryoverData, customTemplates] = await Promise.all([
     getRecentMeetings(id, 5),
     getPendingActionItems(id),
     getLastMeetingPendingActions(id),
+    getCustomTemplates(),
   ]);
 
   return (
@@ -41,6 +43,7 @@ export default async function PrepareMeetingPage({ params }: Props) {
         recentMeetings={recentMeetings}
         pendingActions={pendingActions}
         carryoverData={carryoverData}
+        customTemplates={customTemplates}
       />
     </div>
   );

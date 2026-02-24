@@ -129,3 +129,13 @@ model ActionItemTag {
   @@id([actionItemId, tagId])
   @@index([tagId])
 }
+
+model MeetingTemplate {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String   @default("")
+  topics      Json
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

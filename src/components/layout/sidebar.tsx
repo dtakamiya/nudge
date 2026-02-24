@@ -1,6 +1,15 @@
 "use client";
 
-import { BarChart2, LayoutDashboard, ListChecks, Menu, UserPlus, Users, X } from "lucide-react";
+import {
+  BarChart2,
+  LayoutDashboard,
+  ListChecks,
+  Menu,
+  Settings,
+  UserPlus,
+  Users,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -27,6 +36,7 @@ const navItems = [
   { href: "/members/new", label: "メンバー追加", icon: UserPlus },
   { href: "/actions", label: "アクション一覧", icon: ListChecks },
   { href: "/analytics", label: "ミーティング分析", icon: BarChart2 },
+  { href: "/settings/templates", label: "テンプレート管理", icon: Settings },
 ];
 
 function NavLinks({
