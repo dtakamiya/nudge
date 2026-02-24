@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -32,7 +32,11 @@ export function CheckinSection({
   onConditionChange,
   onCheckinNoteChange,
 }: CheckinSectionProps) {
-  const [safetyMessage] = useState(() => getRandomCheckinMessage());
+  const [safetyMessage, setSafetyMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSafetyMessage(getRandomCheckinMessage());
+  }, []);
 
   return (
     <Card>

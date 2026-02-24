@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,10 +11,14 @@ interface IcebreakerCardProps {
 }
 
 export function IcebreakerCard({ className }: IcebreakerCardProps) {
-  const [current, setCurrent] = useState<Icebreaker>(() => getRandomIcebreaker());
+  const [current, setCurrent] = useState<Icebreaker | null>(null);
+
+  useEffect(() => {
+    setCurrent(getRandomIcebreaker());
+  }, []);
 
   const handleRefresh = () => {
-    setCurrent((prev) => getRandomIcebreaker(prev.id));
+    setCurrent((prev) => getRandomIcebreaker(prev?.id));
   };
 
   return (
@@ -22,10 +26,14 @@ export function IcebreakerCard({ className }: IcebreakerCardProps) {
       <CardContent className="pt-4">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-2">
-            <Badge variant="secondary" className="text-xs">
-              {current.category}
-            </Badge>
-            <p className="text-sm font-medium text-slate-800">{current.question}</p>
+            {current && (
+              <>
+                <Badge variant="secondary" className="text-xs">
+                  {current.category}
+                </Badge>
+                <p className="text-sm font-medium text-slate-800">{current.question}</p>
+              </>
+            )}
           </div>
           <button
             type="button"
