@@ -279,3 +279,23 @@ export async function getLastMeetingAllActions(
     pendingActions,
   };
 }
+
+export async function getMyTasks(filters: { memberId?: string } = {}) {
+  const where: Prisma.ActionItemWhereInput = {
+    status: { not: "DONE" },
+  };
+  if (filters.memberId) where.memberId = filters.memberId;
+
+  const items = await prisma.actionItem.findMany({
+    where,
+    orderBy: [{ dueDate: "asc" }, { member: { name: "asc" } }, { createdAt: "desc" }],
+    take: 200,
+    include: {
+      member: { select: { id: true, name: true } },
+      meeting: { select: { id: true, date: true } },
+      tags: { include: { tag: true } },
+    },
+  });
+
+  return items;
+}
