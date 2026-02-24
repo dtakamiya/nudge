@@ -18,6 +18,8 @@ export const TOAST_MESSAGES = {
     recordingEnd: "ミーティングを終了しました",
     recordingEndError: "ミーティングの終了に失敗しました",
     autoSaveError: "自動保存に失敗しました",
+    summaryCopied: "サマリーをクリップボードにコピーしました",
+    summaryCopyError: "コピーに失敗しました",
   },
   actionItem: {
     statusChangeSuccess: "ステータスを更新しました",

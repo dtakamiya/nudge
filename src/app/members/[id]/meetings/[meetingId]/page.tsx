@@ -54,6 +54,7 @@ export default async function MeetingDetailPage({ params }: Props) {
           <MeetingDetailPageClient
             meetingId={meetingId}
             memberId={id}
+            memberName={meeting.member.name}
             date={meeting.date}
             mood={meeting.mood}
             conditionHealth={meeting.conditionHealth}
