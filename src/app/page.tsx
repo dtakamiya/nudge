@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { BrowserNotification } from "@/components/dashboard/browser-notification";
 import { DashboardSummary } from "@/components/dashboard/dashboard-summary";
 import { FlashToast } from "@/components/dashboard/flash-toast";
+import { HealthScoreWidget } from "@/components/dashboard/health-score-widget";
 import { OnboardingCard } from "@/components/dashboard/onboarding-card";
 import { RecentActivityFeed } from "@/components/dashboard/recent-activity-feed";
 import { RecommendedMeetingsSection } from "@/components/dashboard/recommended-meetings-section";
@@ -16,6 +17,7 @@ import {
 } from "@/lib/actions/analytics-actions";
 import {
   getDashboardSummary,
+  getHealthScore,
   getRecentActivity,
   getUpcomingActions,
 } from "@/lib/actions/dashboard-actions";
@@ -28,6 +30,7 @@ export default async function DashboardPage() {
   const [
     members,
     summary,
+    healthScore,
     recentActivity,
     upcomingActions,
     recommendedMeetings,
@@ -36,6 +39,7 @@ export default async function DashboardPage() {
   ] = await Promise.all([
     getMembers(),
     getDashboardSummary(),
+    getHealthScore(),
     getRecentActivity(),
     getUpcomingActions(),
     getRecommendedMeetings(),
@@ -56,6 +60,12 @@ export default async function DashboardPage() {
       {!isFirstTime && <BrowserNotification reminders={overdueReminders} />}
 
       {isFirstTime ? <OnboardingCard /> : <DashboardSummary summary={summary} />}
+
+      {!isFirstTime && (
+        <div className="mb-8">
+          <HealthScoreWidget data={healthScore} />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div className="lg:col-span-2 rounded-xl border bg-card p-5">

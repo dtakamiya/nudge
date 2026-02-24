@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/prisma";
 
 import { updateActionItemStatus } from "../action-item-actions";
-import { getDashboardSummary } from "../dashboard-actions";
+import { getDashboardSummary, getHealthScore } from "../dashboard-actions";
 import { createMeeting } from "../meeting-actions";
 import { createMember } from "../member-actions";
 
@@ -155,5 +155,106 @@ describe("getDashboardSummary", () => {
 
     const summary = await getDashboardSummary();
     expect(summary.overdueActions).toBe(0);
+  });
+});
+
+describe("getHealthScore", () => {
+  it("メンバーが0人の場合はスコア100・各カウント0を返す", async () => {
+    const result = await getHealthScore();
+    expect(result.score).toBe(100);
+    expect(result.healthyCount).toBe(0);
+    expect(result.warningCount).toBe(0);
+    expect(result.dangerCount).toBe(0);
+    expect(result.memberStatuses).toHaveLength(0);
+  });
+
+  it("全メンバーが健全な場合はスコア100を返す", async () => {
+    const r1 = await createMember({ name: "A" });
+    const r2 = await createMember({ name: "B" });
+    if (!r1.success || !r2.success) throw new Error("member creation failed");
+
+    // 両メンバーとも直近でミーティング済み（超過なし）
+    const recentDate = new Date();
+    recentDate.setDate(recentDate.getDate() - 1);
+    await createMeeting({
+      memberId: r1.data.id,
+      date: recentDate.toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+    await createMeeting({
+      memberId: r2.data.id,
+      date: recentDate.toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+
+    const result = await getHealthScore();
+    expect(result.score).toBe(100);
+    expect(result.healthyCount).toBe(2);
+    expect(result.warningCount).toBe(0);
+    expect(result.dangerCount).toBe(0);
+  });
+
+  it("ミーティング未実施のメンバーは danger になる", async () => {
+    const r1 = await createMember({ name: "NoMeeting" });
+    if (!r1.success) throw new Error("member creation failed");
+    // ミーティングなし
+
+    const result = await getHealthScore();
+    expect(result.dangerCount).toBe(1);
+    expect(result.score).toBe(0);
+    const status = result.memberStatuses.find((s) => s.name === "NoMeeting");
+    expect(status?.status).toBe("danger");
+  });
+
+  it("危険・注意・健全が混在する場合のスコアを計算する", async () => {
+    const r1 = await createMember({ name: "Healthy" });
+    const r2 = await createMember({ name: "Warning" });
+    const r3 = await createMember({ name: "Danger" });
+    if (!r1.success || !r2.success || !r3.success) throw new Error("member creation failed");
+
+    // Healthy: 直近ミーティング（超過なし）
+    const recentDate = new Date();
+    recentDate.setDate(recentDate.getDate() - 1);
+    await createMeeting({
+      memberId: r1.data.id,
+      date: recentDate.toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+
+    // Warning: 4〜7日超過 (interval=14, last=18日前 → next=4日前)
+    const warningDate = new Date();
+    warningDate.setDate(warningDate.getDate() - 18);
+    await createMeeting({
+      memberId: r2.data.id,
+      date: warningDate.toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+
+    // Danger: ミーティングなし
+    // r3 has no meeting
+
+    const result = await getHealthScore();
+    expect(result.healthyCount).toBe(1);
+    expect(result.warningCount).toBe(1);
+    expect(result.dangerCount).toBe(1);
+    // スコア = healthy(1) / total(3) * 100 = 33
+    expect(result.score).toBe(33);
+  });
+
+  it("memberStatuses に id・name・status・overdueDays が含まれる", async () => {
+    const r = await createMember({ name: "Test" });
+    if (!r.success) throw new Error("member creation failed");
+
+    const result = await getHealthScore();
+    expect(result.memberStatuses).toHaveLength(1);
+    const s = result.memberStatuses[0];
+    expect(s).toHaveProperty("id");
+    expect(s).toHaveProperty("name", "Test");
+    expect(s).toHaveProperty("status");
+    expect(s).toHaveProperty("overdueDays");
   });
 });
