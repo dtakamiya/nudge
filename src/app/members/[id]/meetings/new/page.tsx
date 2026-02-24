@@ -63,7 +63,19 @@ export default async function NewMeetingPage({ params, searchParams }: Props) {
       </h1>
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1">
-          <MeetingForm memberId={id} initialTopics={initialTopics} />
+          <MeetingForm
+            memberId={id}
+            initialTopics={initialTopics}
+            previousConditions={
+              previousMeeting
+                ? {
+                    health: previousMeeting.conditionHealth,
+                    mood: previousMeeting.conditionMood,
+                    workload: previousMeeting.conditionWorkload,
+                  }
+                : undefined
+            }
+          />
         </div>
         <div className="w-full lg:w-80 shrink-0">
           <PreviousMeetingSidebar

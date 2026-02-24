@@ -1,5 +1,7 @@
 "use client";
 
+import { calculateConditionDiff, formatConditionDiff } from "@/lib/condition-diff";
+
 export type ConditionField = "conditionHealth" | "conditionMood" | "conditionWorkload";
 
 interface ConditionAxis {
@@ -64,10 +66,19 @@ const CONDITION_AXES: ConditionAxis[] = [
   },
 ];
 
+const DIFF_STYLE: Record<"up" | "same" | "down", string> = {
+  up: "text-emerald-600",
+  same: "text-slate-500",
+  down: "text-rose-600",
+};
+
 interface ConditionSelectorProps {
   conditionHealth: number | null;
   conditionMood: number | null;
   conditionWorkload: number | null;
+  previousConditionHealth?: number | null;
+  previousConditionMood?: number | null;
+  previousConditionWorkload?: number | null;
   onConditionChange: (field: ConditionField, value: number | null) => void;
 }
 
@@ -75,12 +86,21 @@ export function ConditionSelector({
   conditionHealth,
   conditionMood,
   conditionWorkload,
+  previousConditionHealth,
+  previousConditionMood,
+  previousConditionWorkload,
   onConditionChange,
 }: ConditionSelectorProps) {
   const currentValues: Record<ConditionField, number | null> = {
     conditionHealth,
     conditionMood,
     conditionWorkload,
+  };
+
+  const previousValues: Record<ConditionField, number | null | undefined> = {
+    conditionHealth: previousConditionHealth,
+    conditionMood: previousConditionMood,
+    conditionWorkload: previousConditionWorkload,
   };
 
   const handleSelect = (field: ConditionField, optionValue: number) => {
@@ -92,6 +112,9 @@ export function ConditionSelector({
     <div className="space-y-3">
       {CONDITION_AXES.map((axis) => {
         const currentValue = currentValues[axis.field];
+        const previousValue = previousValues[axis.field] ?? null;
+        const diffResult = calculateConditionDiff(currentValue, previousValue);
+        const diffText = formatConditionDiff(diffResult);
         return (
           <div key={axis.field} className="flex items-center gap-3">
             <div className="flex w-20 shrink-0 items-center gap-1">
@@ -129,6 +152,11 @@ export function ConditionSelector({
                 </span>
                 <span className="text-xs text-slate-400">{axis.maxLabel}</span>
               </div>
+              {diffText && diffResult && (
+                <span className={`text-xs font-medium ${DIFF_STYLE[diffResult.direction]}`}>
+                  {diffText}
+                </span>
+              )}
             </div>
           </div>
         );

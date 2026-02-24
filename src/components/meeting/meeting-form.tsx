@@ -76,10 +76,17 @@ type MeetingInitialData = {
   }>;
 };
 
+type PreviousConditions = {
+  readonly health: number | null;
+  readonly mood: number | null;
+  readonly workload: number | null;
+};
+
 type Props = {
   memberId: string;
   initialTopics?: Array<{ category: string; title: string; notes: string; sortOrder: number }>;
   initialData?: MeetingInitialData;
+  previousConditions?: PreviousConditions;
   onSuccess?: () => void;
 };
 
@@ -97,7 +104,13 @@ function buildTagParams(tags: TagData[]) {
   return { tagIds, newTagNames };
 }
 
-export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }: Props) {
+export function MeetingForm({
+  memberId,
+  initialTopics,
+  initialData,
+  previousConditions,
+  onSuccess,
+}: Props) {
   const router = useRouter();
   const isEditing = !!initialData;
 
@@ -388,6 +401,9 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
           conditionMood={conditionMood}
           conditionWorkload={conditionWorkload}
           checkinNote={checkinNote}
+          previousConditionHealth={previousConditions?.health}
+          previousConditionMood={previousConditions?.mood}
+          previousConditionWorkload={previousConditions?.workload}
           onConditionChange={handleConditionChange}
           onCheckinNoteChange={setCheckinNote}
         />
@@ -517,6 +533,9 @@ export function MeetingForm({ memberId, initialTopics, initialData, onSuccess }:
           conditionMood,
           conditionWorkload,
           checkinNote,
+          previousConditionHealth: previousConditions?.health,
+          previousConditionMood: previousConditions?.mood,
+          previousConditionWorkload: previousConditions?.workload,
           topicCount: validTopicCount,
           actionItemCount: validActionCount,
           topicTitles,

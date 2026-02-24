@@ -40,6 +40,12 @@ type ActionItem = {
   readonly tags?: ReadonlyArray<TagData>;
 };
 
+type PreviousConditions = {
+  readonly health: number | null;
+  readonly mood: number | null;
+  readonly workload: number | null;
+};
+
 type Props = {
   readonly meetingId: string;
   readonly memberId: string;
@@ -53,6 +59,7 @@ type Props = {
   readonly actionItems: ReadonlyArray<ActionItem>;
   readonly startedAt?: Date | null;
   readonly endedAt?: Date | null;
+  readonly previousConditions?: PreviousConditions;
 };
 
 export function MeetingDetailPageClient({
@@ -68,6 +75,7 @@ export function MeetingDetailPageClient({
   actionItems,
   startedAt,
   endedAt,
+  previousConditions,
 }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [isRecording, setIsRecording] = useState(startedAt != null && endedAt == null);
@@ -157,6 +165,7 @@ export function MeetingDetailPageClient({
               tags: a.tags ? [...a.tags] : [],
             })),
           }}
+          previousConditions={previousConditions}
           onSuccess={handleEditSuccess}
         />
         <CoachingSheet />

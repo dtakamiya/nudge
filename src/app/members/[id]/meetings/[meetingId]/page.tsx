@@ -7,14 +7,17 @@ import { MeetingDetailPageClient } from "@/components/meeting/meeting-detail-pag
 import { MeetingHeaderActions } from "@/components/meeting/meeting-header-actions";
 import { PrintButton } from "@/components/meeting/print-button";
 import { Button } from "@/components/ui/button";
-import { getMeeting } from "@/lib/actions/meeting-actions";
+import { getMeeting, getPreviousMeeting } from "@/lib/actions/meeting-actions";
 import { formatDate } from "@/lib/format";
 
 type Props = { params: Promise<{ id: string; meetingId: string }> };
 
 export default async function MeetingDetailPage({ params }: Props) {
   const { id, meetingId } = await params;
-  const meeting = await getMeeting(meetingId);
+  const [meeting, previousMeeting] = await Promise.all([
+    getMeeting(meetingId),
+    getPreviousMeeting(id, meetingId),
+  ]);
   if (!meeting) {
     notFound();
   }
@@ -59,6 +62,15 @@ export default async function MeetingDetailPage({ params }: Props) {
             checkinNote={meeting.checkinNote}
             startedAt={meeting.startedAt}
             endedAt={meeting.endedAt}
+            previousConditions={
+              previousMeeting
+                ? {
+                    health: previousMeeting.conditionHealth,
+                    mood: previousMeeting.conditionMood,
+                    workload: previousMeeting.conditionWorkload,
+                  }
+                : undefined
+            }
             topics={meeting.topics.map((t) => ({
               id: t.id,
               category: t.category,

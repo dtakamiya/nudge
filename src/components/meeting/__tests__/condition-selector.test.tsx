@@ -126,4 +126,69 @@ describe("ConditionSelector", () => {
     expect(minEmojis).toHaveLength(3);
     expect(maxEmojis).toHaveLength(3);
   });
+
+  describe("前回との差分表示", () => {
+    it("前回データがない場合は差分が表示されないこと", () => {
+      render(<ConditionSelector {...defaultProps} conditionHealth={3} />);
+      expect(screen.queryByText(/前回より/)).toBeNull();
+      expect(screen.queryByText(/前回と同じ/)).toBeNull();
+    });
+
+    it("現在値がない場合は差分が表示されないこと", () => {
+      render(
+        <ConditionSelector {...defaultProps} conditionHealth={null} previousConditionHealth={3} />,
+      );
+      expect(screen.queryByText(/前回より/)).toBeNull();
+    });
+
+    it("体調が前回より上がった場合に'↑ 前回より+1'が表示されること", () => {
+      render(
+        <ConditionSelector {...defaultProps} conditionHealth={4} previousConditionHealth={3} />,
+      );
+      expect(screen.getByText("↑ 前回より+1")).toBeInTheDocument();
+    });
+
+    it("体調が前回と同じ場合に'─ 前回と同じ'が表示されること", () => {
+      render(
+        <ConditionSelector {...defaultProps} conditionHealth={3} previousConditionHealth={3} />,
+      );
+      expect(screen.getByText("─ 前回と同じ")).toBeInTheDocument();
+    });
+
+    it("体調が前回より下がった場合に'↓ 前回より-2'が表示されること", () => {
+      render(
+        <ConditionSelector {...defaultProps} conditionHealth={1} previousConditionHealth={3} />,
+      );
+      expect(screen.getByText("↓ 前回より-2")).toBeInTheDocument();
+    });
+
+    it("気分の差分が表示されること", () => {
+      render(<ConditionSelector {...defaultProps} conditionMood={5} previousConditionMood={3} />);
+      expect(screen.getByText("↑ 前回より+2")).toBeInTheDocument();
+    });
+
+    it("業務量の差分が表示されること", () => {
+      render(
+        <ConditionSelector {...defaultProps} conditionWorkload={2} previousConditionWorkload={4} />,
+      );
+      expect(screen.getByText("↓ 前回より-2")).toBeInTheDocument();
+    });
+
+    it("複数軸に差分がある場合に各々表示されること", () => {
+      render(
+        <ConditionSelector
+          {...defaultProps}
+          conditionHealth={4}
+          previousConditionHealth={3}
+          conditionMood={2}
+          previousConditionMood={2}
+          conditionWorkload={3}
+          previousConditionWorkload={5}
+        />,
+      );
+      expect(screen.getByText("↑ 前回より+1")).toBeInTheDocument();
+      expect(screen.getByText("─ 前回と同じ")).toBeInTheDocument();
+      expect(screen.getByText("↓ 前回より-2")).toBeInTheDocument();
+    });
+  });
 });
