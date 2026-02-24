@@ -166,7 +166,7 @@ export function MeetingDetailPageClient({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-2 print:hidden">
         {!startedAt && !endedAt && (
           <Button variant="default" size="sm" onClick={handleStartMeeting} disabled={isStarting}>
             <Play className="w-4 h-4 mr-1.5" />
