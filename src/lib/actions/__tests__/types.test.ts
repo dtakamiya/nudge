@@ -48,6 +48,44 @@ describe("runAction", () => {
     }
   });
 
+  it("ZodError がスローされた場合に fieldErrors にフィールドごとのエラーを返す", async () => {
+    const schema = z.object({
+      title: z.string().min(1, "タイトルは必須です"),
+      age: z.number().min(0, "年齢は0以上で入力してください"),
+    });
+    const result = await runAction(async () => {
+      schema.parse({ title: "", age: -1 });
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.fieldErrors).toBeDefined();
+      expect(result.fieldErrors?.title).toEqual(["タイトルは必須です"]);
+      expect(result.fieldErrors?.age).toEqual(["年齢は0以上で入力してください"]);
+    }
+  });
+
+  it("ZodError が単一フィールドの場合も fieldErrors に展開される", async () => {
+    const schema = z.object({ name: z.string().min(1, "名前は必須です") });
+    const result = await runAction(async () => {
+      schema.parse({ name: "" });
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.fieldErrors).toBeDefined();
+      expect(result.fieldErrors?.name).toEqual(["名前は必須です"]);
+    }
+  });
+
+  it("通常の Error がスローされた場合は fieldErrors を含まない", async () => {
+    const result = await runAction(async () => {
+      throw new Error("通常エラー");
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.fieldErrors).toBeUndefined();
+    }
+  });
+
   it("エラー発生時に console.error でサーバーサイドログを出力する", async () => {
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     await runAction(async () => {

@@ -6,7 +6,9 @@ import { ZodError } from "zod";
  * Server Action の統一エラーハンドリング型。
  * すべての書き込み系 Server Action はこの型を返却する。
  */
-export type ActionResult<T = void> = { success: true; data: T } | { success: false; error: string };
+export type ActionResult<T = void> =
+  | { success: true; data: T }
+  | { success: false; error: string; fieldErrors?: Record<string, string[]> };
 
 /**
  * Server Action のエラーを ActionResult に変換するヘルパー。
@@ -18,14 +20,19 @@ export async function runAction<T>(fn: () => Promise<T>): Promise<ActionResult<T
     return { success: true, data };
   } catch (err) {
     console.error("[Server Action Error]", err);
-    let message: string;
     if (err instanceof ZodError) {
-      message = err.issues.map((issue) => issue.message).join("、");
-    } else if (err instanceof Error) {
-      message = err.message;
-    } else {
-      message = "予期しないエラーが発生しました";
+      const message = err.issues.map((issue) => issue.message).join("、");
+      const fieldErrors: Record<string, string[]> = {};
+      for (const issue of err.issues) {
+        const field = issue.path.join(".");
+        if (!fieldErrors[field]) {
+          fieldErrors[field] = [];
+        }
+        fieldErrors[field].push(issue.message);
+      }
+      return { success: false, error: message, fieldErrors };
     }
+    const message = err instanceof Error ? err.message : "予期しないエラーが発生しました";
     return { success: false, error: message };
   }
 }
