@@ -7,6 +7,7 @@ import { CheckinTrendSection } from "@/components/analytics/checkin-trend-sectio
 import { TopicAnalyticsSection } from "@/components/analytics/topic-analytics-section";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { MeetingHistory } from "@/components/meeting/meeting-history";
+import { CalendarExportButton } from "@/components/member/calendar-export-button";
 import { MemberActionsDropdown } from "@/components/member/member-actions-dropdown";
 import { MemberQuickActions } from "@/components/member/member-quick-actions";
 import { MemberStatsBar } from "@/components/member/member-stats-bar";
@@ -16,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getMoodTrend } from "@/lib/actions/meeting-actions";
 import { getMember, getMemberMeetings } from "@/lib/actions/member-actions";
+import { calcNextRecommendedDate } from "@/lib/schedule";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -36,6 +38,11 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
   if (!member) {
     notFound();
   }
+
+  const nextMeetingDate = calcNextRecommendedDate(
+    member.lastMeetingDate,
+    member.meetingIntervalDays,
+  );
 
   return (
     <div className="animate-fade-in-up">
@@ -63,6 +70,7 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
           <Link href={`/members/${id}/meetings/new`}>
             <Button variant="outline">新規1on1</Button>
           </Link>
+          <CalendarExportButton memberName={member.name} nextMeetingDate={nextMeetingDate} />
           <MemberActionsDropdown
             member={{
               id: member.id,
