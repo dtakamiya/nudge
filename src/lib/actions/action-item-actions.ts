@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 
 import type { ActionItem, Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import type {
+  CarryoverAction,
+  DateFilterType,
+  LastMeetingPendingActionsResult,
+  SortByType,
+} from "@/lib/types";
 import type { ActionItemStatusType, UpdateActionItemInput } from "@/lib/validations/action-item";
 import {
   updateActionItemSchema,
@@ -12,8 +18,7 @@ import {
 
 import { type ActionResult, runAction } from "./types";
 
-export type DateFilterType = "all" | "overdue" | "this-week" | "this-month";
-export type SortByType = "dueDate" | "createdAt" | "memberName";
+export type { CarryoverAction, DateFilterType, LastMeetingPendingActionsResult, SortByType };
 
 type ActionItemFilters = {
   status?: ActionItemStatusType;
@@ -142,19 +147,6 @@ export async function updateActionItem(
     return result;
   });
 }
-
-export type CarryoverAction = {
-  id: string;
-  title: string;
-  status: string;
-  dueDate: Date | null;
-};
-
-export type LastMeetingPendingActionsResult = {
-  meetingId: string;
-  meetingDate: Date;
-  actions: CarryoverAction[];
-} | null;
 
 export async function getLastMeetingPendingActions(
   memberId: string,

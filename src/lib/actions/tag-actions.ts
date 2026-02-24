@@ -5,17 +5,13 @@ import { revalidatePath } from "next/cache";
 import type { Prisma, Tag } from "@/generated/prisma/client";
 import { TAG_SUGGESTIONS_LIMIT } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import type { TagWithCount } from "@/lib/types";
 import type { CreateTagInput, UpdateTagInput } from "@/lib/validations/tag";
 import { createTagSchema, updateTagSchema } from "@/lib/validations/tag";
 
 import { type ActionResult, runAction } from "./types";
 
-export type TagWithCount = {
-  id: string;
-  name: string;
-  color: string;
-  _count: { topics: number; actionItems: number };
-};
+export type { TagWithCount };
 
 // タグ一覧を使用頻度順（降順）で取得
 export async function getTags(): Promise<TagWithCount[]> {

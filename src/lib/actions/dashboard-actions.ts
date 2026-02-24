@@ -2,14 +2,22 @@
 
 import { prisma } from "@/lib/prisma";
 import { isOverdue } from "@/lib/schedule";
+import type {
+  ActionActivityItem,
+  ActionItemWithMember,
+  ActivityItem,
+  DashboardSummary,
+  MeetingActivityItem,
+  UpcomingActionsData,
+} from "@/lib/types";
 
-export type DashboardSummary = {
-  needsFollowUp: number;
-  actionCompletionRate: number;
-  totalActions: number;
-  completedActions: number;
-  meetingsThisMonth: number;
-  overdueActions: number;
+export type {
+  ActionActivityItem,
+  ActionItemWithMember,
+  ActivityItem,
+  DashboardSummary,
+  MeetingActivityItem,
+  UpcomingActionsData,
 };
 
 export async function getDashboardSummary(): Promise<DashboardSummary> {
@@ -62,25 +70,6 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
   };
 }
 
-export type MeetingActivityItem = {
-  type: "meeting";
-  id: string;
-  memberId: string;
-  memberName: string;
-  date: Date;
-};
-
-export type ActionActivityItem = {
-  type: "action";
-  id: string;
-  memberId: string;
-  memberName: string;
-  title: string;
-  completedAt: Date;
-};
-
-export type ActivityItem = MeetingActivityItem | ActionActivityItem;
-
 export async function getRecentActivity(): Promise<ActivityItem[]> {
   const [recentMeetings, recentCompletedActions] = await Promise.all([
     prisma.meeting.findMany({
@@ -132,20 +121,6 @@ export async function getRecentActivity(): Promise<ActivityItem[]> {
 
   return merged.slice(0, 8);
 }
-
-export type ActionItemWithMember = {
-  id: string;
-  title: string;
-  memberId: string;
-  memberName: string;
-  dueDate: Date;
-  status: string;
-};
-
-export type UpcomingActionsData = {
-  today: ActionItemWithMember[];
-  thisWeek: ActionItemWithMember[];
-};
 
 export async function getUpcomingActions(): Promise<UpcomingActionsData> {
   const now = new Date();

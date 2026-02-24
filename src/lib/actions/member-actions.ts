@@ -2,33 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 
-import type { ActionItem, Meeting, Member, Topic } from "@/generated/prisma/client";
+import type { Member } from "@/generated/prisma/client";
 import { MEETINGS_PAGE_SIZE } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import type { MeetingsPage, MeetingWithRelations, MemberWithStats } from "@/lib/types";
 import type { CreateMemberInput, UpdateMemberInput } from "@/lib/validations/member";
 import { createMemberSchema, updateMemberSchema } from "@/lib/validations/member";
 
 import { type ActionResult, runAction } from "./types";
 
-type MeetingWithRelations = Meeting & { topics: Topic[]; actionItems: ActionItem[] };
-
-type ActionItemWithMeeting = ActionItem & { meeting: { date: Date } | null };
-
-export type MemberWithStats = Member & {
-  actionItems: ActionItemWithMeeting[];
-  lastMeetingDate: Date | null;
-  totalMeetingCount: number;
-  pendingActionItems: ActionItemWithMeeting[];
-};
-
-export type MeetingsPage = {
-  meetings: MeetingWithRelations[];
-  total: number;
-  page: number;
-  pageSize: number;
-  hasNext: boolean;
-  hasPrev: boolean;
-};
+export type { MeetingsPage, MemberWithStats };
 
 export async function getMembers() {
   const now = new Date();

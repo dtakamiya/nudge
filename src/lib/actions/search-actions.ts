@@ -1,48 +1,23 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import type {
+  ActionItemSearchResult,
+  MemberSearchResult,
+  SearchResults,
+  TagSearchResult,
+  TopicSearchResult,
+} from "@/lib/types";
 import { searchQuerySchema } from "@/lib/validations/search";
 
 import { type ActionResult, runAction } from "./types";
 
-export type MemberSearchResult = {
-  id: string;
-  name: string;
-  department: string | null;
-  position: string | null;
-};
-
-export type TopicSearchResult = {
-  id: string;
-  title: string;
-  notes: string | null;
-  category: string;
-  meetingId: string;
-  memberId: string;
-  memberName: string;
-};
-
-export type ActionItemSearchResult = {
-  id: string;
-  title: string;
-  description: string | null;
-  status: string;
-  memberId: string;
-  memberName: string;
-  meetingId: string | null;
-};
-
-export type TagSearchResult = {
-  id: string;
-  name: string;
-  color: string;
-};
-
-export type SearchResults = {
-  members: MemberSearchResult[];
-  topics: TopicSearchResult[];
-  actionItems: ActionItemSearchResult[];
-  tags: TagSearchResult[];
+export type {
+  ActionItemSearchResult,
+  MemberSearchResult,
+  SearchResults,
+  TagSearchResult,
+  TopicSearchResult,
 };
 
 const SEARCH_LIMIT = 5;
