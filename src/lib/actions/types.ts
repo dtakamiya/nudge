@@ -24,7 +24,7 @@ export async function runAction<T>(fn: () => Promise<T>): Promise<ActionResult<T
       const message = err.issues.map((issue) => issue.message).join("、");
       const fieldErrors: Record<string, string[]> = {};
       for (const issue of err.issues) {
-        const field = issue.path.join(".");
+        const field = issue.path.length > 0 ? issue.path.join(".") : "_root";
         if (!fieldErrors[field]) {
           fieldErrors[field] = [];
         }

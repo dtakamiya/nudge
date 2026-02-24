@@ -86,6 +86,30 @@ describe("runAction", () => {
     }
   });
 
+  it("ネストされたフィールドの ZodError はドット区切りキーで fieldErrors に展開される", async () => {
+    const schema = z.object({
+      topics: z.array(z.object({ title: z.string().min(1, "タイトルは必須") })),
+    });
+    const result = await runAction(async () => {
+      schema.parse({ topics: [{ title: "" }] });
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.fieldErrors?.["topics.0.title"]).toEqual(["タイトルは必須"]);
+    }
+  });
+
+  it("path が空の ZodError は _root キーで fieldErrors に展開される", async () => {
+    const schema = z.string().min(1, "値は必須です");
+    const result = await runAction(async () => {
+      schema.parse("");
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.fieldErrors?.["_root"]).toEqual(["値は必須です"]);
+    }
+  });
+
   it("エラー発生時に console.error でサーバーサイドログを出力する", async () => {
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     await runAction(async () => {
