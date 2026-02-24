@@ -6,7 +6,7 @@ import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recha
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TopicCategory } from "@/generated/prisma/client";
 import { useChartMounted } from "@/hooks/use-chart-mounted";
-import { type CategoryTrend } from "@/lib/actions/analytics-actions";
+import type { CategoryTrend } from "@/lib/types";
 
 export const CATEGORY_LABELS: Record<TopicCategory, string> = {
   WORK_PROGRESS: "業務進捗",

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import type { ScheduledMeeting } from "@/lib/actions/analytics-actions";
+import type { ScheduledMeeting } from "@/lib/types";
 import { getMeetingIntervalLabel } from "@/lib/constants";
 
 type Props = {

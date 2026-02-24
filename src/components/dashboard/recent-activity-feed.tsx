@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { EmptyState } from "@/components/ui/empty-state";
-import type { ActivityItem } from "@/lib/actions/dashboard-actions";
+import type { ActivityItem } from "@/lib/types";
 import { formatRelativeDate } from "@/lib/format";
 
 type Props = {

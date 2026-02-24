@@ -13,7 +13,7 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useChartMounted } from "@/hooks/use-chart-mounted";
-import type { ActionMonthlyTrend } from "@/lib/actions/analytics-actions";
+import type { ActionMonthlyTrend } from "@/lib/types";
 
 export function ActionCompletionTrendChart({ data }: { data: ActionMonthlyTrend[] }) {
   const mounted = useChartMounted();

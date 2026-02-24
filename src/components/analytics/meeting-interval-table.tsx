@@ -8,7 +8,7 @@ import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import type { RecommendedMeeting } from "@/lib/actions/analytics-actions";
+import type { RecommendedMeeting } from "@/lib/types";
 
 function DaysBadge({ member }: { member: RecommendedMeeting }) {
   if (member.lastMeetingDate === null) {

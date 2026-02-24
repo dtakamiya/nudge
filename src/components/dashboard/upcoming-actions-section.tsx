@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import type { ActionItemWithMember } from "@/lib/actions/dashboard-actions";
+import type { ActionItemWithMember } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 
 type Props = {

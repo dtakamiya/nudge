@@ -4,7 +4,7 @@ import { AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-import type { OverdueReminder } from "@/lib/actions/reminder-actions";
+import type { OverdueReminder } from "@/lib/types";
 
 const DEFAULT_LIMIT = 5;
 

@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import type { ScheduledMeeting } from "@/lib/actions/analytics-actions";
+import type { ScheduledMeeting } from "@/lib/types";
 
 import { ScheduledMeetingsSection } from "../scheduled-meetings-section";
 
