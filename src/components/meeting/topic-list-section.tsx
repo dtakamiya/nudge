@@ -1,0 +1,79 @@
+"use client";
+
+import { type Announcements, closestCenter, DndContext, type DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { screenReaderInstructions } from "@/lib/dnd-accessibility";
+
+import type { TopicFormData } from "./meeting-form.types";
+import type { TagData } from "./sortable-action-item";
+import { SortableTopicItem } from "./sortable-topic-item";
+
+type Props = {
+  topics: TopicFormData[];
+  topicIds: string[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sensors: any;
+  announcements: Announcements;
+  onAdd: () => void;
+  onUpdate: (index: number, field: "category" | "title" | "notes", value: string) => void;
+  onRemove: (index: number) => void;
+  onTagsChange: (index: number, tags: TagData[]) => void;
+  onDragEnd: (event: DragEndEvent) => void;
+};
+
+export function TopicListSection({
+  topics,
+  topicIds,
+  sensors,
+  announcements,
+  onAdd,
+  onUpdate,
+  onRemove,
+  onTagsChange,
+  onDragEnd,
+}: Props) {
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-sm font-medium">話題</CardTitle>
+          <Button type="button" variant="outline" size="sm" onClick={onAdd}>
+            + 話題を追加
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={onDragEnd}
+          accessibility={{
+            announcements,
+            screenReaderInstructions,
+          }}
+        >
+          <SortableContext items={topicIds} strategy={verticalListSortingStrategy}>
+            {topics.map((topic, index) => (
+              <SortableTopicItem
+                key={`topic-${index}`}
+                id={`topic-${index}`}
+                category={topic.category}
+                title={topic.title}
+                notes={topic.notes}
+                index={index}
+                showDelete={topics.length > 1}
+                tags={topic.tags}
+                onTagsChange={onTagsChange}
+                onUpdate={onUpdate}
+                onRemove={onRemove}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
+      </CardContent>
+    </Card>
+  );
+}
