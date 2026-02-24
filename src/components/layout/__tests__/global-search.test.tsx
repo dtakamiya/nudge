@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { GlobalSearch } from "../global-search";
 
 // next/navigation のモック
-const mockPush = vi.fn();
+const { mockPush } = vi.hoisted(() => ({ mockPush: vi.fn() }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,

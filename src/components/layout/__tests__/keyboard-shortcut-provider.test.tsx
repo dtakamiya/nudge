@@ -4,8 +4,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { KeyboardShortcutProvider } from "../keyboard-shortcut-provider";
 
-const mockPush = vi.fn();
-const mockToggleFocusMode = vi.fn();
+const { mockPush, mockToggleFocusMode } = vi.hoisted(() => ({
+  mockPush: vi.fn(),
+  mockToggleFocusMode: vi.fn(),
+}));
 let mockPathname = "/";
 
 vi.mock("next/navigation", () => ({

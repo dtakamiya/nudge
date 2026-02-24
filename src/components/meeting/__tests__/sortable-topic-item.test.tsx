@@ -5,16 +5,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { SortableTopicItem } from "../sortable-topic-item";
 
 // Mock @dnd-kit/sortable — useSortable returns no-op values for unit tests
-vi.mock("@dnd-kit/sortable", () => ({
-  useSortable: () => ({
-    attributes: {},
-    listeners: {},
-    setNodeRef: vi.fn(),
-    transform: null,
-    transition: null,
-    isDragging: false,
-  }),
-}));
 
 const defaultProps = {
   id: "topic-0",

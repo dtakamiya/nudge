@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { MemberEditDialog } from "../member-edit-dialog";
 
-const mockRefresh = vi.fn();
+const { mockRefresh } = vi.hoisted(() => ({ mockRefresh: vi.fn() }));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({

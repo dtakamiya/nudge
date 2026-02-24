@@ -1,17 +1,14 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { prisma } from "@/lib/prisma";
+import { cleanAll } from "@/test-utils";
 
 import { createMeeting } from "../meeting-actions";
 import { createMember } from "../member-actions";
 import { searchAll } from "../search-actions";
 
 beforeEach(async () => {
-  await prisma.actionItem.deleteMany();
-  await prisma.topic.deleteMany();
-  await prisma.meeting.deleteMany();
-  await prisma.member.deleteMany();
-  await prisma.tag.deleteMany();
+  await cleanAll();
 });
 
 describe("searchAll", () => {

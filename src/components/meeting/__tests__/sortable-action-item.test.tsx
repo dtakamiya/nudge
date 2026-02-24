@@ -5,16 +5,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { SortableActionItem } from "../sortable-action-item";
 
 // Mock @dnd-kit/sortable — useSortable returns no-op values for unit tests
-vi.mock("@dnd-kit/sortable", () => ({
-  useSortable: () => ({
-    attributes: {},
-    listeners: {},
-    setNodeRef: vi.fn(),
-    transform: null,
-    transition: null,
-    isDragging: false,
-  }),
-}));
 
 // Mock DatePicker to behave like a simple date input for unit tests
 vi.mock("@/components/ui/date-picker", () => ({

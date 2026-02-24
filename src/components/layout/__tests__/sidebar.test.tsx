@@ -4,8 +4,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Sidebar } from "../sidebar";
 
-const mockPathname = vi.fn().mockReturnValue("/");
-const mockPush = vi.fn();
+const { mockPathname, mockPush } = vi.hoisted(() => ({
+  mockPathname: vi.fn().mockReturnValue("/"),
+  mockPush: vi.fn(),
+}));
 
 vi.mock("next/navigation", () => ({
   usePathname: () => mockPathname(),

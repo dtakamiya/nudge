@@ -14,7 +14,9 @@ vi.mock("../action-list-full", () => ({
   ),
 }));
 
-const mockRouter = { push: vi.fn(), refresh: vi.fn() };
+const { mockRouter } = vi.hoisted(() => ({
+  mockRouter: { push: vi.fn(), refresh: vi.fn() },
+}));
 vi.mock("next/navigation", () => ({
   useRouter: () => mockRouter,
 }));

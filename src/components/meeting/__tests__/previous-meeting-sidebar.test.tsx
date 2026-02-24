@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { PreviousMeetingSidebar } from "../previous-meeting-sidebar";
 
-const mockRefresh = vi.fn();
+const { mockRefresh } = vi.hoisted(() => ({ mockRefresh: vi.fn() }));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({

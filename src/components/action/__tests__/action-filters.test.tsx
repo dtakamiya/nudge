@@ -3,9 +3,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ActionFilters, buildFilterUrl } from "../action-filters";
 
-const mockPush = vi.fn();
-const mockSearchParamsGet = vi.fn().mockReturnValue(null);
-const mockSearchParamsToString = vi.fn().mockReturnValue("");
+const { mockPush, mockSearchParamsGet, mockSearchParamsToString } = vi.hoisted(() => ({
+  mockPush: vi.fn(),
+  mockSearchParamsGet: vi.fn().mockReturnValue(null),
+  mockSearchParamsToString: vi.fn().mockReturnValue(""),
+}));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),

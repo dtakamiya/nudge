@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { MeetingDetailPageClient } from "../meeting-detail-page-client";
 
-const mockRefresh = vi.fn();
+const { mockRefresh } = vi.hoisted(() => ({ mockRefresh: vi.fn() }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), refresh: mockRefresh }),
 }));
@@ -60,31 +60,9 @@ vi.mock("../focus-mode-indicator", () => ({
 }));
 
 // Mock dnd-kit
-vi.mock("@dnd-kit/core", () => ({
-  DndContext: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  closestCenter: vi.fn(),
-  KeyboardSensor: vi.fn(),
-  PointerSensor: vi.fn(),
-  useSensor: vi.fn(),
-  useSensors: vi.fn(() => []),
-}));
 
 vi.mock("@/lib/meeting-summary", () => ({
   generateMeetingSummaryText: vi.fn().mockReturnValue("テストサマリーテキスト"),
-}));
-
-vi.mock("@dnd-kit/sortable", () => ({
-  SortableContext: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  verticalListSortingStrategy: {},
-  arrayMove: vi.fn(),
-  useSortable: () => ({
-    attributes: {},
-    listeners: {},
-    setNodeRef: vi.fn(),
-    transform: null,
-    transition: null,
-    isDragging: false,
-  }),
 }));
 
 const defaultProps = {

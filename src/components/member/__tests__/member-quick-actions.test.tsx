@@ -15,13 +15,6 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-vi.mock("sonner", () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
-}));
-
 vi.mock("@/lib/actions/action-item-actions", () => ({
   updateActionItemStatus: vi.fn().mockResolvedValue({ success: true }),
   updateActionItem: vi.fn().mockResolvedValue({ success: true }),

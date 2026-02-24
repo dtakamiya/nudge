@@ -7,20 +7,13 @@ import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 import { MemberDeleteDialog } from "../member-delete-dialog";
 
-const mockPush = vi.fn();
+const { mockPush } = vi.hoisted(() => ({ mockPush: vi.fn() }));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,
     refresh: vi.fn(),
   }),
-}));
-
-vi.mock("sonner", () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
 }));
 
 const mockDeleteMember = vi.fn();

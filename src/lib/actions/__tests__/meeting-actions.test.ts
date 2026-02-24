@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { prisma } from "@/lib/prisma";
+import { cleanDatabase } from "@/test-utils";
 
 import {
   createMeeting,
@@ -18,10 +19,7 @@ import { createMember } from "../member-actions";
 let memberId: string;
 
 beforeEach(async () => {
-  await prisma.actionItem.deleteMany();
-  await prisma.topic.deleteMany();
-  await prisma.meeting.deleteMany();
-  await prisma.member.deleteMany();
+  await cleanDatabase();
   const result = await createMember({ name: "Test Member" });
   if (!result.success) throw new Error(result.error);
   memberId = result.data.id;

@@ -12,10 +12,6 @@ vi.mock("@/lib/actions/action-item-actions", () => ({
   updateActionItemStatus: vi.fn().mockResolvedValue({ success: true }),
 }));
 
-vi.mock("sonner", () => ({
-  toast: { success: vi.fn(), error: vi.fn() },
-}));
-
 const mockActions = [
   {
     id: "a1",

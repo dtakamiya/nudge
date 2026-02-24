@@ -7,17 +7,10 @@ import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 import { MeetingForm } from "../meeting-form";
 
-const mockPush = vi.fn();
+const { mockPush } = vi.hoisted(() => ({ mockPush: vi.fn() }));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
-}));
-
-vi.mock("sonner", () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
 }));
 
 vi.mock("@/lib/actions/meeting-actions", () => ({
@@ -26,33 +19,6 @@ vi.mock("@/lib/actions/meeting-actions", () => ({
 }));
 
 // Mock dnd-kit to avoid jsdom DnD issues
-vi.mock("@dnd-kit/core", () => ({
-  DndContext: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  closestCenter: vi.fn(),
-  KeyboardSensor: vi.fn(),
-  PointerSensor: vi.fn(),
-  useSensor: vi.fn(),
-  useSensors: vi.fn(() => []),
-}));
-
-vi.mock("@dnd-kit/sortable", () => ({
-  SortableContext: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  verticalListSortingStrategy: {},
-  arrayMove: vi.fn((arr: unknown[], from: number, to: number) => {
-    const result = [...arr];
-    const [item] = result.splice(from, 1);
-    result.splice(to, 0, item);
-    return result;
-  }),
-  useSortable: () => ({
-    attributes: {},
-    listeners: {},
-    setNodeRef: vi.fn(),
-    transform: null,
-    transition: null,
-    isDragging: false,
-  }),
-}));
 
 // Mock IcebreakerCard to avoid random messages in tests
 vi.mock("../icebreaker-card", () => ({
