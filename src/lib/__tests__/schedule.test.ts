@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   calcNextRecommendedDate,
   formatNextRecommendedDate,
+  getMemberHealthStatus,
   isOverdue,
   isScheduledThisWeek,
 } from "@/lib/schedule";
@@ -95,6 +96,46 @@ describe("isScheduledThisWeek", () => {
   it("次回推奨日が過去（超過）の場合は false を返す", () => {
     const last = new Date("2026-01-01"); // next = 2026-01-15 = 過去
     expect(isScheduledThisWeek(last, 14, now)).toBe(false);
+  });
+});
+
+describe("getMemberHealthStatus", () => {
+  // now = 2026-02-22, intervalDays = 14
+  // next scheduled date = lastMeetingDate + 14 days
+  const now = new Date("2026-02-22");
+
+  it("lastMeetingDate が null の場合は danger を返す（未実施）", () => {
+    expect(getMemberHealthStatus(null, 14, now)).toBe("danger");
+  });
+
+  it("次回推奨日が未来の場合（超過なし）は healthy を返す", () => {
+    const last = new Date("2026-02-15"); // next=2026-03-01, overdue=0日
+    expect(getMemberHealthStatus(last, 14, now)).toBe("healthy");
+  });
+
+  it("超過日数がちょうど3日の場合は healthy を返す", () => {
+    const last = new Date("2026-02-05"); // next=2026-02-19, overdue=3日
+    expect(getMemberHealthStatus(last, 14, now)).toBe("healthy");
+  });
+
+  it("超過日数が4日の場合は warning を返す", () => {
+    const last = new Date("2026-02-04"); // next=2026-02-18, overdue=4日
+    expect(getMemberHealthStatus(last, 14, now)).toBe("warning");
+  });
+
+  it("超過日数がちょうど7日の場合は warning を返す", () => {
+    const last = new Date("2026-02-01"); // next=2026-02-15, overdue=7日
+    expect(getMemberHealthStatus(last, 14, now)).toBe("warning");
+  });
+
+  it("超過日数が8日以上の場合は danger を返す", () => {
+    const last = new Date("2026-01-31"); // next=2026-02-14, overdue=8日
+    expect(getMemberHealthStatus(last, 14, now)).toBe("danger");
+  });
+
+  it("intervalDays=7 で超過なしの場合は healthy を返す", () => {
+    const last = new Date("2026-02-20"); // next=2026-02-27, overdue=0日
+    expect(getMemberHealthStatus(last, 7, now)).toBe("healthy");
   });
 });
 

@@ -55,6 +55,37 @@ export function isScheduledThisWeek(
   return next >= now && next < weekEnd;
 }
 
+export type MemberHealthStatus = "healthy" | "warning" | "danger";
+
+/**
+ * メンバーの1on1健全性ステータスを返す
+ * - healthy: 設定周期から3日以内の超過（±3日の許容範囲内）
+ * - warning: 3日超〜7日以内の超過
+ * - danger: 7日超の超過、または1on1未実施
+ * @param lastMeetingDate 最終ミーティング日（null の場合は danger）
+ * @param intervalDays ミーティング間隔（日数）
+ * @param now 現在日時（省略時は new Date()）
+ */
+export function getMemberHealthStatus(
+  lastMeetingDate: Date | null,
+  intervalDays: number,
+  now: Date = new Date(),
+): MemberHealthStatus {
+  if (!lastMeetingDate) return "danger";
+
+  const next = calcNextRecommendedDate(lastMeetingDate, intervalDays);
+  if (!next) return "danger";
+
+  const overdueDays = Math.max(
+    0,
+    Math.floor((now.getTime() - next.getTime()) / (1000 * 60 * 60 * 24)),
+  );
+
+  if (overdueDays <= 3) return "healthy";
+  if (overdueDays <= 7) return "warning";
+  return "danger";
+}
+
 /**
  * 次回推奨日を人間が読みやすい文字列にフォーマットする
  * @param nextDate 次回推奨日（null の場合は「未設定」）

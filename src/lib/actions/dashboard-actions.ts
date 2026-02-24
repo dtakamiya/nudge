@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { isOverdue } from "@/lib/schedule";
+import { getMemberHealthStatus, isOverdue, type MemberHealthStatus } from "@/lib/schedule";
 import type {
   ActionActivityItem,
   ActionItemWithMember,
@@ -120,6 +120,69 @@ export async function getRecentActivity(): Promise<ActivityItem[]> {
   });
 
   return merged.slice(0, 8);
+}
+
+export type MemberHealthStatusItem = {
+  id: string;
+  name: string;
+  status: MemberHealthStatus;
+  overdueDays: number;
+};
+
+export type HealthScoreData = {
+  score: number;
+  healthyCount: number;
+  warningCount: number;
+  dangerCount: number;
+  memberStatuses: MemberHealthStatusItem[];
+};
+
+export async function getHealthScore(): Promise<HealthScoreData> {
+  const now = new Date();
+
+  const members = await prisma.member.findMany({
+    select: {
+      id: true,
+      name: true,
+      meetingIntervalDays: true,
+      meetings: {
+        orderBy: { date: "desc" },
+        take: 1,
+        select: { date: true },
+      },
+    },
+    orderBy: { name: "asc" },
+  });
+
+  if (members.length === 0) {
+    return { score: 100, healthyCount: 0, warningCount: 0, dangerCount: 0, memberStatuses: [] };
+  }
+
+  const memberStatuses: MemberHealthStatusItem[] = members.map((m) => {
+    const lastDate = m.meetings[0]?.date ? new Date(m.meetings[0].date) : null;
+    const status = getMemberHealthStatus(lastDate, m.meetingIntervalDays, now);
+    const overdueDays =
+      lastDate !== null
+        ? Math.max(
+            0,
+            Math.floor(
+              (now.getTime() -
+                new Date(
+                  lastDate.getTime() + m.meetingIntervalDays * 24 * 60 * 60 * 1000,
+                ).getTime()) /
+                (1000 * 60 * 60 * 24),
+            ),
+          )
+        : 0;
+    return { id: m.id, name: m.name, status, overdueDays };
+  });
+
+  const healthyCount = memberStatuses.filter((s) => s.status === "healthy").length;
+  const warningCount = memberStatuses.filter((s) => s.status === "warning").length;
+  const dangerCount = memberStatuses.filter((s) => s.status === "danger").length;
+  const score = Math.round((healthyCount / members.length) * 100);
+
+  return { score, healthyCount, warningCount, dangerCount, memberStatuses };
 }
 
 export async function getUpcomingActions(): Promise<UpcomingActionsData> {
