@@ -179,11 +179,16 @@ export async function getHealthScore(): Promise<HealthScoreData> {
 export async function getUpcomingActions(): Promise<UpcomingActionsData> {
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const todayEnd = new Date(todayStart);
-  todayEnd.setDate(todayEnd.getDate() + 1);
-
-  const weekEnd = new Date(todayStart);
-  weekEnd.setDate(weekEnd.getDate() + 7);
+  const todayEnd = new Date(
+    todayStart.getFullYear(),
+    todayStart.getMonth(),
+    todayStart.getDate() + 1,
+  );
+  const weekEnd = new Date(
+    todayStart.getFullYear(),
+    todayStart.getMonth(),
+    todayStart.getDate() + 7,
+  );
 
   const [todayItems, thisWeekItems] = await Promise.all([
     prisma.actionItem.findMany({

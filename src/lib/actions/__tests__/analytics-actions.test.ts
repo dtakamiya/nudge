@@ -9,9 +9,11 @@ import {
   getMeetingFrequencyByMonth,
   getMemberActionTrends,
   getMemberMeetingHeatmap,
+  getRecommendedAndScheduledMeetings,
   getRecommendedMeetings,
   getScheduledMeetingsThisWeek,
 } from "../analytics-actions";
+import { createMeeting } from "../meeting-actions";
 import { createMember } from "../member-actions";
 
 beforeEach(async () => {
@@ -737,5 +739,40 @@ describe("getCheckinTrend", () => {
     expect(result[0].health).toBe(4);
     expect(result[0].mood).toBeNull();
     expect(result[0].workload).toBeNull();
+  });
+});
+
+describe("getRecommendedAndScheduledMeetings", () => {
+  it("メンバーが0人の場合は空配列を返す", async () => {
+    const result = await getRecommendedAndScheduledMeetings();
+    expect(result.recommended).toHaveLength(0);
+    expect(result.scheduled).toHaveLength(0);
+  });
+
+  it("期限超過メンバーが recommended に含まれる", async () => {
+    const memberResult = await createMember({ name: "テストメンバー" });
+    if (!memberResult.success) throw new Error(memberResult.error);
+    const memberId = memberResult.data.id;
+
+    // 30日前にミーティングを作成
+    const oldDate = new Date();
+    oldDate.setDate(oldDate.getDate() - 30);
+    await createMeeting({
+      memberId,
+      date: oldDate.toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+
+    const result = await getRecommendedAndScheduledMeetings();
+    expect(result.recommended.some((m) => m.id === memberId)).toBe(true);
+  });
+
+  it("recommended と scheduled を含むオブジェクトを返す", async () => {
+    const result = await getRecommendedAndScheduledMeetings();
+    expect(result).toHaveProperty("recommended");
+    expect(result).toHaveProperty("scheduled");
+    expect(Array.isArray(result.recommended)).toBe(true);
+    expect(Array.isArray(result.scheduled)).toBe(true);
   });
 });
