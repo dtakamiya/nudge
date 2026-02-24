@@ -14,6 +14,7 @@ export function IcebreakerCard({ className }: IcebreakerCardProps) {
   const [current, setCurrent] = useState<Icebreaker | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrent(getRandomIcebreaker());
   }, []);
 
