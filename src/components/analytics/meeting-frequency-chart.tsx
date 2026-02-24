@@ -1,8 +1,10 @@
 "use client";
 
+import { BarChart2 } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useChartMounted } from "@/hooks/use-chart-mounted";
 import type { MeetingFrequencyMonth } from "@/lib/actions/analytics-actions";
 
@@ -18,9 +20,12 @@ export function MeetingFrequencyChart({ data }: { data: MeetingFrequencyMonth[] 
       </CardHeader>
       <CardContent className="h-[250px] w-full pt-4">
         {data.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
-            データがありません
-          </div>
+          <EmptyState
+            icon={BarChart2}
+            title="まだデータがありません"
+            description="1on1を実施すると、月次実施回数グラフが表示されます"
+            size="compact"
+          />
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>

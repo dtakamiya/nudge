@@ -1,6 +1,9 @@
 "use client";
 
+import { Calendar } from "lucide-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { HeatmapData } from "@/lib/actions/analytics-actions";
 
 type Props = {
@@ -41,9 +44,12 @@ export function MeetingHeatmap({ data }: Props) {
       </CardHeader>
       <CardContent>
         {members.length === 0 ? (
-          <div className="flex items-center justify-center py-8 text-muted-foreground text-sm">
-            データがありません
-          </div>
+          <EmptyState
+            icon={Calendar}
+            title="まだデータがありません"
+            description="1on1を実施すると、メンバー別の頻度マップが表示されます"
+            size="compact"
+          />
         ) : (
           <div className="overflow-x-auto">
             <table

@@ -1,11 +1,13 @@
 "use client";
 
+import { Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { RecommendedMeeting } from "@/lib/actions/analytics-actions";
 
 function DaysBadge({ member }: { member: RecommendedMeeting }) {
@@ -66,7 +68,13 @@ export function MeetingIntervalTable({ data }: { data: RecommendedMeeting[] }) {
       </CardHeader>
       <CardContent>
         {data.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-4">データがありません</p>
+          <EmptyState
+            icon={Users}
+            title="メンバーが登録されていません"
+            description="メンバーを追加すると、最終1on1の経過日数が表示されます"
+            action={{ label: "メンバーを追加する", href: "/members/new" }}
+            size="compact"
+          />
         ) : (
           <>
             <div className="divide-y divide-border">

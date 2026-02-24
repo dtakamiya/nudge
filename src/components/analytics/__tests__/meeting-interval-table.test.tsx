@@ -74,7 +74,15 @@ describe("MeetingIntervalTable", () => {
 
   it("renders empty state when no data", () => {
     render(<MeetingIntervalTable data={[]} />);
-    expect(screen.getByText("データがありません")).toBeDefined();
+    expect(screen.getByText("メンバーが登録されていません")).toBeDefined();
+  });
+
+  it("renders guidance and action in empty state", () => {
+    render(<MeetingIntervalTable data={[]} />);
+    expect(
+      screen.getByText("メンバーを追加すると、最終1on1の経過日数が表示されます"),
+    ).toBeDefined();
+    expect(screen.getByRole("link", { name: "メンバーを追加する" })).toBeDefined();
   });
 
   it("全員が実施済みの場合トグルボタンは表示しない", () => {

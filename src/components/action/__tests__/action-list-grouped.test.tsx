@@ -108,9 +108,16 @@ describe("ActionListGrouped", () => {
   });
 
   describe("エッジケース", () => {
-    it("空のアイテムリストで何も表示しない", () => {
-      const { container } = render(<ActionListGrouped actionItems={[]} groupBy="member" />);
-      expect(container.firstChild).toBeNull();
+    it("空のアイテムリストでEmptyStateを表示する", () => {
+      render(<ActionListGrouped actionItems={[]} groupBy="member" />);
+      expect(screen.getByText("アクションアイテムはありません")).toBeDefined();
+    });
+
+    it("空のアイテムリストのEmptyStateに説明文を表示する", () => {
+      render(<ActionListGrouped actionItems={[]} groupBy="member" />);
+      expect(
+        screen.getByText("1on1でアクションアイテムを作成すると、ここに表示されます"),
+      ).toBeDefined();
     });
 
     it("groupBy が none のとき何も表示しない", () => {

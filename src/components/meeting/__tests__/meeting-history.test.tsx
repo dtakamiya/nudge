@@ -34,6 +34,21 @@ describe("MeetingHistory", () => {
     expect(screen.getByText("まだ1on1の記録がありません")).toBeDefined();
   });
 
+  it("空状態に「最初の1on1を準備する」ボタンを表示する", () => {
+    render(
+      <MeetingHistory meetings={[]} memberId="mem1" pagination={{ ...basePagination, total: 0 }} />,
+    );
+    expect(screen.getByText("最初の1on1を準備する")).toBeDefined();
+  });
+
+  it("空状態のCTAがprepareページへリンクする", () => {
+    render(
+      <MeetingHistory meetings={[]} memberId="mem1" pagination={{ ...basePagination, total: 0 }} />,
+    );
+    const link = screen.getByRole("link", { name: "最初の1on1を準備する" });
+    expect(link.getAttribute("href")).toBe("/members/mem1/meetings/prepare");
+  });
+
   it("ミーティング一覧を表示する", () => {
     render(
       <MeetingHistory

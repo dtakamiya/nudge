@@ -36,7 +36,7 @@ export function MeetingHistory({ meetings, memberId, pagination }: Props) {
         icon={MessageSquare}
         title="まだ1on1の記録がありません"
         description="最初の1on1を記録して、継続的なフォローアップを始めましょう"
-        action={{ label: "1on1を記録する", href: `/members/${memberId}/meetings/new` }}
+        action={{ label: "最初の1on1を準備する", href: `/members/${memberId}/meetings/prepare` }}
       />
     );
   }
