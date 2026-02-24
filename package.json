@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node -e \"const{existsSync}=require('fs');if(!existsSync('./node_modules/.package-lock.json')){console.error('\\n❌ node_modules が見つかりません。先に npm install を実行してください。\\n');process.exit(1)}\"",
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
