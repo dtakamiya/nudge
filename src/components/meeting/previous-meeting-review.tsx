@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle,CheckCircle2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2 } from "lucide-react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { formatDate } from "@/lib/format";
