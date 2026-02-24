@@ -11,7 +11,7 @@ afterEach(() => {
 
 describe("ShortcutHelpDialog", () => {
   describe("表示", () => {
-    it("open=true のとき全ショートカットが表示される", () => {
+    it("open=true のときグローバルショートカットが表示される", () => {
       render(<ShortcutHelpDialog open={true} onClose={() => {}} />);
 
       expect(screen.getByText("新規メンバーを追加")).toBeDefined();
@@ -37,6 +37,35 @@ describe("ShortcutHelpDialog", () => {
       render(<ShortcutHelpDialog open={true} onClose={() => {}} />);
 
       expect(screen.getByText("キーボードショートカット")).toBeDefined();
+    });
+
+    it("context 未指定のとき記録中セクションも表示される", () => {
+      render(<ShortcutHelpDialog open={true} onClose={() => {}} />);
+
+      expect(screen.getByText("記録中")).toBeDefined();
+      expect(screen.getByText("タイマー開始/一時停止")).toBeDefined();
+      expect(screen.getByText("新しいトピックを追加")).toBeDefined();
+      expect(screen.getByText("アクションアイテムを追加")).toBeDefined();
+    });
+
+    it("context='global' のとき記録中セクションは表示されない", () => {
+      render(<ShortcutHelpDialog open={true} onClose={() => {}} context="global" />);
+
+      expect(screen.queryByText("記録中")).toBeNull();
+      expect(screen.queryByText("タイマー開始/一時停止")).toBeNull();
+    });
+
+    it("context='recording' のとき記録中セクションが表示される", () => {
+      render(<ShortcutHelpDialog open={true} onClose={() => {}} context="recording" />);
+
+      expect(screen.getByText("記録中")).toBeDefined();
+      expect(screen.getByText("タイマー開始/一時停止")).toBeDefined();
+    });
+
+    it("グローバルセクションラベルが表示される", () => {
+      render(<ShortcutHelpDialog open={true} onClose={() => {}} />);
+
+      expect(screen.getByText("グローバル")).toBeDefined();
     });
   });
 

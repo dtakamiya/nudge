@@ -2,7 +2,7 @@ import { fireEvent } from "@testing-library/dom";
 import { renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useKeyboardShortcuts } from "../use-keyboard-shortcuts";
+import { KEYBOARD_SHORTCUTS, useKeyboardShortcuts } from "../use-keyboard-shortcuts";
 
 const defaultCallbacks = () => ({
   onNewMember: vi.fn(),
@@ -12,6 +12,38 @@ const defaultCallbacks = () => ({
 
 afterEach(() => {
   vi.clearAllMocks();
+});
+
+describe("KEYBOARD_SHORTCUTS 定数", () => {
+  it("global コンテキストのショートカットが含まれる", () => {
+    const globalShortcuts = KEYBOARD_SHORTCUTS.filter((s) => s.context === "global");
+    expect(globalShortcuts.length).toBeGreaterThan(0);
+  });
+
+  it("recording コンテキストのショートカットが含まれる", () => {
+    const recordingShortcuts = KEYBOARD_SHORTCUTS.filter((s) => s.context === "recording");
+    expect(recordingShortcuts.length).toBeGreaterThan(0);
+  });
+
+  it("'?' キーのグローバルショートカットが定義されている", () => {
+    const helpShortcut = KEYBOARD_SHORTCUTS.find((s) => s.key === "?");
+    expect(helpShortcut).toBeDefined();
+    expect(helpShortcut?.context).toBe("global");
+  });
+
+  it("'Space' キーの記録中ショートカットが定義されている", () => {
+    const spaceShortcut = KEYBOARD_SHORTCUTS.find((s) => s.key === "Space");
+    expect(spaceShortcut).toBeDefined();
+    expect(spaceShortcut?.context).toBe("recording");
+  });
+
+  it("各エントリに key, description, context が含まれる", () => {
+    for (const entry of KEYBOARD_SHORTCUTS) {
+      expect(entry.key).toBeTruthy();
+      expect(entry.description).toBeTruthy();
+      expect(["global", "recording"]).toContain(entry.context);
+    }
+  });
 });
 
 describe("useKeyboardShortcuts", () => {

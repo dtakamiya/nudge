@@ -130,6 +130,14 @@ describe("Sidebar - メンバーリスト", () => {
   });
 });
 
+describe("Sidebar - ショートカットヒント", () => {
+  it("デスクトップサイドバーにショートカットヒントが表示される", () => {
+    render(<Sidebar />);
+    const hints = screen.getAllByText(/ショートカット一覧/);
+    expect(hints.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
 describe("Sidebar - モバイル", () => {
   it("モバイルトップバーに Nudge ロゴを表示する", () => {
     render(<Sidebar />);
