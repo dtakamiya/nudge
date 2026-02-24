@@ -3,16 +3,18 @@ import { notFound } from "next/navigation";
 import { CoachingPanel } from "@/components/meeting/coaching-panel";
 import { MeetingDetailHeader } from "@/components/meeting/meeting-detail-header";
 import { MeetingDetailPageClient } from "@/components/meeting/meeting-detail-page-client";
-import { getMeeting, getPreviousMeeting } from "@/lib/actions/meeting-actions";
+import { MeetingNavigation } from "@/components/meeting/meeting-navigation";
+import { getAdjacentMeetings, getMeeting, getPreviousMeeting } from "@/lib/actions/meeting-actions";
 import { formatDate } from "@/lib/format";
 
 type Props = { params: Promise<{ id: string; meetingId: string }> };
 
 export default async function MeetingDetailPage({ params }: Props) {
   const { id, meetingId } = await params;
-  const [meeting, previousMeeting] = await Promise.all([
+  const [meeting, previousMeeting, adjacentMeetings] = await Promise.all([
     getMeeting(meetingId),
     getPreviousMeeting(id, meetingId),
+    getAdjacentMeetings(id, meetingId),
   ]);
   if (!meeting) {
     notFound();
@@ -25,6 +27,11 @@ export default async function MeetingDetailPage({ params }: Props) {
         memberName={meeting.member.name}
         meetingId={meetingId}
         meetingDate={formatDate(meeting.date)}
+      />
+      <MeetingNavigation
+        memberId={id}
+        previous={adjacentMeetings.previous}
+        next={adjacentMeetings.next}
       />
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
         <div>

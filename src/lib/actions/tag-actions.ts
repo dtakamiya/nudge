@@ -11,8 +11,6 @@ import { createTagSchema, updateTagSchema } from "@/lib/validations/tag";
 
 import { type ActionResult, runAction } from "./types";
 
-export type { TagWithCount };
-
 // タグ一覧を使用頻度順（降順）で取得
 export async function getTags(): Promise<TagWithCount[]> {
   const tags = await prisma.tag.findMany({

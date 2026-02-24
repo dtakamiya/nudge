@@ -211,7 +211,10 @@ export function Sidebar({ members = [], actionCount }: SidebarProps) {
               onNavigate={() => setIsOpen(false)}
             />
             <MemberQuickList members={members} onNavigate={() => setIsOpen(false)} />
-            <div className="mt-auto pt-4 border-t border-border">
+            <div className="mt-auto pt-4 border-t border-border space-y-2">
+              <p className="px-3 py-1 text-xs text-muted-foreground">
+                <kbd className="font-mono font-medium">?</kbd> ショートカット一覧
+              </p>
               <ThemeToggle />
             </div>
           </aside>
@@ -230,7 +233,10 @@ export function Sidebar({ members = [], actionCount }: SidebarProps) {
         <GlobalSearch />
         <NavLinks pathname={pathname} actionCount={actionCount} />
         <MemberQuickList members={members} />
-        <div className="mt-auto pt-4 border-t border-border">
+        <div className="mt-auto pt-4 border-t border-border space-y-2">
+          <p className="px-3 py-1 text-xs text-muted-foreground">
+            <kbd className="font-mono font-medium">?</kbd> ショートカット一覧
+          </p>
           <ThemeToggle />
         </div>
       </aside>

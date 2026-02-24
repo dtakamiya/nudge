@@ -23,8 +23,6 @@ import {
 import { getOrCreateTagsInTx } from "./tag-actions";
 import { type ActionResult, runAction } from "./types";
 
-export type { MoodTrendEntry };
-
 export async function createMeeting(
   input: CreateMeetingInput,
 ): Promise<ActionResult<MeetingWithRelations>> {
@@ -342,6 +340,35 @@ export async function endMeeting(input: EndMeetingInput): Promise<ActionResult<M
     revalidatePath("/", "layout");
     return meeting;
   });
+}
+
+export async function getAdjacentMeetings(
+  memberId: string,
+  meetingId: string,
+): Promise<{
+  previous: { id: string; date: Date; mood: number | null } | null;
+  next: { id: string; date: Date; mood: number | null } | null;
+}> {
+  const current = await prisma.meeting.findUnique({
+    where: { id: meetingId },
+    select: { date: true },
+  });
+  if (!current) return { previous: null, next: null };
+
+  const [previous, next] = await Promise.all([
+    prisma.meeting.findFirst({
+      where: { memberId, date: { lt: current.date }, id: { not: meetingId } },
+      orderBy: { date: "desc" },
+      select: { id: true, date: true, mood: true },
+    }),
+    prisma.meeting.findFirst({
+      where: { memberId, date: { gt: current.date }, id: { not: meetingId } },
+      orderBy: { date: "asc" },
+      select: { id: true, date: true, mood: true },
+    }),
+  ]);
+
+  return { previous, next };
 }
 
 export async function updateTopicNotes(input: UpdateTopicNotesInput): Promise<ActionResult<Topic>> {

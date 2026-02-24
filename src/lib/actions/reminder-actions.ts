@@ -3,8 +3,6 @@
 import { prisma } from "@/lib/prisma";
 import type { OverdueReminder } from "@/lib/types";
 
-export type { OverdueReminder };
-
 export async function getOverdueReminders(): Promise<OverdueReminder[]> {
   const now = new Date();
 

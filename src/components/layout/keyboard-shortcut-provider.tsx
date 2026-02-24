@@ -1,12 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 import { ShortcutHelpDialog } from "@/components/layout/shortcut-help-dialog";
 import { NewMeetingDialog } from "@/components/meeting/new-meeting-dialog";
 import { useFocusMode } from "@/hooks/use-focus-mode";
-import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { type ShortcutContext, useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 
 type MemberItem = {
   readonly id: string;
@@ -17,8 +17,16 @@ type Props = {
   readonly members: ReadonlyArray<MemberItem>;
 };
 
+// /members/[id]/meetings/[meetingId] パスかつ記録中（startedAt あり）と見なす
+function useShortcutContext(): ShortcutContext {
+  const pathname = usePathname();
+  const isRecordingPage = /^\/members\/[^/]+\/meetings\/[^/]+$/.test(pathname);
+  return isRecordingPage ? "recording" : "global";
+}
+
 export function KeyboardShortcutProvider({ members }: Props) {
   const router = useRouter();
+  const context = useShortcutContext();
   const [isMeetingDialogOpen, setIsMeetingDialogOpen] = useState(false);
   const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false);
   const { toggleFocusMode } = useFocusMode();
@@ -49,7 +57,11 @@ export function KeyboardShortcutProvider({ members }: Props) {
         onClose={() => setIsMeetingDialogOpen(false)}
         members={members}
       />
-      <ShortcutHelpDialog open={isHelpDialogOpen} onClose={() => setIsHelpDialogOpen(false)} />
+      <ShortcutHelpDialog
+        open={isHelpDialogOpen}
+        onClose={() => setIsHelpDialogOpen(false)}
+        context={context}
+      />
     </>
   );
 }
