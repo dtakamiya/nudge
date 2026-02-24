@@ -6,7 +6,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useChartMounted } from "@/hooks/use-chart-mounted";
-import type { MeetingFrequencyMonth } from "@/lib/actions/analytics-actions";
+import type { MeetingFrequencyMonth } from "@/lib/types";
 
 export function MeetingFrequencyChart({ data }: { data: MeetingFrequencyMonth[] }) {
   const mounted = useChartMounted();

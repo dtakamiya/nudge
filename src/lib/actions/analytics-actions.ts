@@ -4,15 +4,32 @@ import type { TopicCategory } from "@/generated/prisma/client";
 import { toMonthKey } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import { calcNextRecommendedDate, isOverdue, isScheduledThisWeek } from "@/lib/schedule";
+import type {
+  ActionMonthlyTrend,
+  ActionTrendResult,
+  CategoryTrend,
+  HeatmapData,
+  MeetingFrequencyMonth,
+  MemberIntervalOptions,
+  MemberIntervalSort,
+  MemberMeetingHeatmapEntry,
+  MonthlyTrend,
+  RecommendedMeeting,
+  ScheduledMeeting,
+} from "@/lib/types";
 
-export type CategoryTrend = {
-  category: TopicCategory;
-  count: number;
-};
-
-export type MonthlyTrend = {
-  month: string;
-  [category: string]: number | string; // Category -> count
+export type {
+  ActionMonthlyTrend,
+  ActionTrendResult,
+  CategoryTrend,
+  HeatmapData,
+  MeetingFrequencyMonth,
+  MemberIntervalOptions,
+  MemberIntervalSort,
+  MemberMeetingHeatmapEntry,
+  MonthlyTrend,
+  RecommendedMeeting,
+  ScheduledMeeting,
 };
 
 export async function getMemberTopicTrends(memberId: string) {
@@ -50,18 +67,6 @@ export async function getMemberTopicTrends(memberId: string) {
 
   return { distribution, timeline };
 }
-
-export type ActionMonthlyTrend = {
-  month: string;
-  created: number;
-  completed: number;
-};
-
-export type ActionTrendResult = {
-  averageCompletionDays: number;
-  onTimeCompletionRate: number;
-  monthlyTrends: ActionMonthlyTrend[];
-};
 
 export async function getMemberActionTrends(memberId: string): Promise<ActionTrendResult> {
   const actions = await prisma.actionItem.findMany({
@@ -136,11 +141,6 @@ export async function getMemberActionTrends(memberId: string): Promise<ActionTre
   };
 }
 
-export type MeetingFrequencyMonth = {
-  month: string;
-  count: number;
-};
-
 export async function getMeetingFrequencyByMonth(
   monthCount: 3 | 6 | 12 = 12,
   department?: string,
@@ -177,17 +177,6 @@ export async function getDepartments(): Promise<string[]> {
   });
   return rows.map((r) => r.department).filter((d): d is string => d !== null);
 }
-
-export type RecommendedMeeting = {
-  id: string;
-  name: string;
-  department: string | null;
-  position: string | null;
-  daysSinceLast: number;
-  lastMeetingDate: Date | null;
-  meetingIntervalDays: number;
-  nextRecommendedDate: Date | null;
-};
 
 export async function getRecommendedMeetings(): Promise<RecommendedMeeting[]> {
   const now = new Date();
@@ -227,16 +216,6 @@ export async function getRecommendedMeetings(): Promise<RecommendedMeeting[]> {
     .sort((a, b) => b.daysSinceLast - a.daysSinceLast);
 }
 
-export type ScheduledMeeting = {
-  id: string;
-  name: string;
-  department: string | null;
-  position: string | null;
-  meetingIntervalDays: number;
-  nextRecommendedDate: Date;
-  lastMeetingDate: Date;
-};
-
 export async function getScheduledMeetingsThisWeek(): Promise<ScheduledMeeting[]> {
   const now = new Date();
 
@@ -270,18 +249,6 @@ export async function getScheduledMeetingsThisWeek(): Promise<ScheduledMeeting[]
     })
     .sort((a, b) => a.nextRecommendedDate.getTime() - b.nextRecommendedDate.getTime());
 }
-
-export type MemberMeetingHeatmapEntry = {
-  memberId: string;
-  memberName: string;
-  department: string | null;
-  months: { month: string; count: number }[];
-};
-
-export type HeatmapData = {
-  members: MemberMeetingHeatmapEntry[];
-  months: string[];
-};
 
 export async function getMemberMeetingHeatmap(
   monthCount: 3 | 6 | 12 = 12,
@@ -326,13 +293,6 @@ export async function getMemberMeetingHeatmap(
     return { members: [], months };
   }
 }
-
-export type MemberIntervalSort = "name" | "last_meeting" | "department";
-
-export type MemberIntervalOptions = {
-  department?: string;
-  sort?: MemberIntervalSort;
-};
 
 export async function getAllMembersWithInterval(
   options: MemberIntervalOptions = {},

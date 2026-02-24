@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import type { ActivityItem } from "@/lib/actions/dashboard-actions";
+import type { ActivityItem } from "@/lib/types";
 
 import { RecentActivityFeed } from "../recent-activity-feed";
 

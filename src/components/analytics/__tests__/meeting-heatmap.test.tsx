@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import type { HeatmapData } from "@/lib/actions/analytics-actions";
+import type { HeatmapData } from "@/lib/types";
 
 import { MeetingHeatmap } from "../meeting-heatmap";
 

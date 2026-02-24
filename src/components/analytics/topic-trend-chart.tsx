@@ -15,7 +15,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TopicCategory } from "@/generated/prisma/client";
 import { useChartMounted } from "@/hooks/use-chart-mounted";
-import { type MonthlyTrend } from "@/lib/actions/analytics-actions";
+import type { MonthlyTrend } from "@/lib/types";
 
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "./topic-distribution-chart";
 

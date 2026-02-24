@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-import type { OverdueReminder } from "@/lib/actions/reminder-actions";
+import type { OverdueReminder } from "@/lib/types";
 
 const STORAGE_KEY = "nudge_notification_date";
 

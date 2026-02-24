@@ -4,8 +4,9 @@ import { CheckSquare, MessageSquare, Search, Tag, User, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 
-import { searchAll, type SearchResults } from "@/lib/actions/search-actions";
+import { searchAll } from "@/lib/actions/search-actions";
 import { highlightText } from "@/lib/highlight";
+import type { SearchResults } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const DEBOUNCE_MS = 300;

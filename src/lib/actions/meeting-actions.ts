@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 
-import type { ActionItem, Meeting, Topic } from "@/generated/prisma/client";
+import type { Meeting, Topic } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import type { MeetingWithRelations, MoodTrendEntry } from "@/lib/types";
 import type {
   CreateMeetingInput,
   EndMeetingInput,
@@ -22,7 +23,7 @@ import {
 import { getOrCreateTagsInTx } from "./tag-actions";
 import { type ActionResult, runAction } from "./types";
 
-type MeetingWithRelations = Meeting & { topics: Topic[]; actionItems: ActionItem[] };
+export type { MoodTrendEntry };
 
 export async function createMeeting(
   input: CreateMeetingInput,
@@ -277,11 +278,6 @@ export async function updateMeeting(
     return result;
   });
 }
-
-export type MoodTrendEntry = {
-  date: Date;
-  mood: number;
-};
 
 export async function getMoodTrend(
   memberId: string,

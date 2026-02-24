@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import type { DashboardSummary as DashboardSummaryType } from "@/lib/actions/dashboard-actions";
+import type { DashboardSummary as DashboardSummaryType } from "@/lib/types";
 
 import { DashboardSummary } from "../dashboard-summary";
 

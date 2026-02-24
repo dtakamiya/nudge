@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { MemberIntervalSort } from "@/lib/actions/analytics-actions";
+import type { MemberIntervalSort } from "@/lib/types";
 
 type Props = {
   readonly departments: string[];

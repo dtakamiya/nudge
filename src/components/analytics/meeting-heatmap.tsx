@@ -4,7 +4,7 @@ import { Calendar } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import type { HeatmapData } from "@/lib/actions/analytics-actions";
+import type { HeatmapData } from "@/lib/types";
 
 type Props = {
   readonly data: HeatmapData;

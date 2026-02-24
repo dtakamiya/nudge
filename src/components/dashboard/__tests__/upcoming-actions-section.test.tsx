@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import type { ActionItemWithMember } from "@/lib/actions/dashboard-actions";
+import type { ActionItemWithMember } from "@/lib/types";
 
 import { UpcomingActionsSection } from "../upcoming-actions-section";
 
