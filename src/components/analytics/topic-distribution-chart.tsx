@@ -61,7 +61,7 @@ export function TopicDistributionChart({ data }: Props) {
         <CardDescription>これまでの1on1で話された話題の割合</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 min-h-[250px] relative">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={250}>
           <PieChart>
             <Pie
               data={chartData}

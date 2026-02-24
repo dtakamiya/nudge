@@ -33,7 +33,7 @@ export function CheckinTrendChart({ data }: { data: CheckinTrendEntry[] }) {
             グラフを表示するには3回以上のチェックインが必要です
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={260}>
             <LineChart data={data} margin={{ top: 5, right: 30, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
               <XAxis
