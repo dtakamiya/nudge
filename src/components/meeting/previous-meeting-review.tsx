@@ -73,10 +73,18 @@ export function PreviousMeetingReview({ data, selectedIds, onToggle }: Props) {
             return (
               <div
                 key={action.id}
+                role="button"
+                tabIndex={0}
                 className={`flex items-center gap-2 text-sm rounded p-2 cursor-pointer transition-colors ${
                   isSelected ? "bg-primary/10 border border-primary/30" : "hover:bg-muted/50"
                 }`}
                 onClick={() => onToggle(action.id)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onToggle(action.id);
+                  }
+                }}
               >
                 <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
                 <Checkbox

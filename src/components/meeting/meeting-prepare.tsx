@@ -34,9 +34,6 @@ type TopicDraft = {
   sortOrder: number;
 };
 
-type Topic = { id: string; category: string; title: string; notes: string };
-type MeetingData = { id: string; date: Date; topics: Topic[]; actionItems: unknown[] };
-
 type PendingAction = {
   id: string;
   title: string;
@@ -54,16 +51,13 @@ type LastMeetingData = {
 
 type Props = {
   memberId: string;
-  recentMeetings: MeetingData[];
   pendingActions: PendingAction[];
   lastMeetingData: LastMeetingData;
   customTemplates?: DbMeetingTemplate[];
 };
 
-let draftIdCounter = 0;
 function createDraftId(): string {
-  draftIdCounter += 1;
-  return `draft-${draftIdCounter}`;
+  return `draft-${crypto.randomUUID()}`;
 }
 
 function createEmptyTopic(sortOrder: number): TopicDraft {

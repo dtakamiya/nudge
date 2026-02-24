@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { MeetingPrepare } from "@/components/meeting/meeting-prepare";
 import { getLastMeetingAllActions, getPendingActionItems } from "@/lib/actions/action-item-actions";
-import { getRecentMeetings } from "@/lib/actions/meeting-actions";
 import { getMember } from "@/lib/actions/member-actions";
 import { getCustomTemplates } from "@/lib/actions/template-actions";
 import { formatDateLong } from "@/lib/format";
@@ -19,8 +18,7 @@ export default async function PrepareMeetingPage({ params }: Props) {
 
   const today = formatDateLong(new Date());
 
-  const [recentMeetings, pendingActions, lastMeetingData, customTemplates] = await Promise.all([
-    getRecentMeetings(id, 5),
+  const [pendingActions, lastMeetingData, customTemplates] = await Promise.all([
     getPendingActionItems(id),
     getLastMeetingAllActions(id),
     getCustomTemplates(),
@@ -43,7 +41,6 @@ export default async function PrepareMeetingPage({ params }: Props) {
       </div>
       <MeetingPrepare
         memberId={id}
-        recentMeetings={recentMeetings}
         pendingActions={pendingActions}
         lastMeetingData={lastMeetingData}
         customTemplates={customTemplates}
