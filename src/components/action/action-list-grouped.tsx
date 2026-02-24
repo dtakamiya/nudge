@@ -1,10 +1,11 @@
 "use client";
 
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, SquareCheck } from "lucide-react";
 import { useState } from "react";
 
 import { ActionListFull } from "@/components/action/action-list-full";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { GroupByType } from "@/lib/group-actions";
 import { groupActionItems } from "@/lib/group-actions";
 
@@ -35,7 +36,16 @@ export function ActionListGrouped({ actionItems, groupBy, statusFilter }: Props)
   const groups = groupActionItems(actionItems, groupBy);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
-  if (groups.length === 0) return null;
+  if (groupBy === "none") return null;
+  if (groups.length === 0) {
+    return (
+      <EmptyState
+        icon={SquareCheck}
+        title="アクションアイテムはありません"
+        description="1on1でアクションアイテムを作成すると、ここに表示されます"
+      />
+    );
+  }
 
   function toggleGroup(key: string) {
     setCollapsedGroups((prev) => {

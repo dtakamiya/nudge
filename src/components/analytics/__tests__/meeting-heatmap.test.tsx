@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 
 import type { HeatmapData } from "@/lib/actions/analytics-actions";
 
@@ -80,10 +80,21 @@ const sampleData: HeatmapData = {
   ],
 };
 
+afterEach(() => {
+  cleanup();
+});
+
 describe("MeetingHeatmap", () => {
-  it("メンバーがいない場合は空状態メッセージを表示する", () => {
+  it("メンバーがいない場合は空状態コンポーネントを表示する", () => {
     render(<MeetingHeatmap data={emptyData} />);
-    expect(screen.getByText("データがありません")).toBeDefined();
+    expect(screen.getByText("まだデータがありません")).toBeDefined();
+  });
+
+  it("メンバーがいない場合は説明文を表示する", () => {
+    render(<MeetingHeatmap data={emptyData} />);
+    expect(
+      screen.getByText("1on1を実施すると、メンバー別の頻度マップが表示されます"),
+    ).toBeDefined();
   });
 
   it("メンバー名を表示する", () => {
