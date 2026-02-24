@@ -21,7 +21,7 @@ type Props = { members: Member[]; tags?: Tag[] };
 
 export function buildFilterUrl(currentParams: string, key: string, value: string): string {
   const params = new URLSearchParams(currentParams);
-  if (value === "all" || value === "") {
+  if (value === "all" || value === "" || value === "none") {
     params.delete(key);
   } else {
     params.set(key, value);
@@ -59,6 +59,20 @@ export function ActionFilters({ members, tags = [] }: Props) {
         />
       </div>
       <div className="flex gap-3 flex-wrap">
+        <Select
+          value={searchParams.get("groupBy") ?? "none"}
+          onValueChange={(val) => updateFilter("groupBy", val)}
+        >
+          <SelectTrigger className="w-44">
+            <SelectValue placeholder="グループ化" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">グループなし</SelectItem>
+            <SelectItem value="member">メンバー別</SelectItem>
+            <SelectItem value="dueDate">期限別</SelectItem>
+            <SelectItem value="tag">タグ別</SelectItem>
+          </SelectContent>
+        </Select>
         <Select
           value={searchParams.get("status") ?? "all"}
           onValueChange={(val) => updateFilter("status", val)}

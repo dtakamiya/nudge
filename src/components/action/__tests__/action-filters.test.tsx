@@ -73,19 +73,27 @@ describe("buildFilterUrl", () => {
   it("フィルターが 'all' のときも page パラメータを削除する", () => {
     expect(buildFilterUrl("status=TODO&page=2", "status", "all")).toBe("/actions?");
   });
+
+  it("value が 'none' のとき該当キーを削除する", () => {
+    expect(buildFilterUrl("groupBy=member", "groupBy", "none")).toBe("/actions?");
+  });
+
+  it("groupBy パラメータを設定できる", () => {
+    expect(buildFilterUrl("", "groupBy", "member")).toBe("/actions?groupBy=member");
+  });
 });
 
 describe("ActionFilters", () => {
-  it("4つのフィルターセレクトが表示される（ステータス・メンバー・期限・並び順）", () => {
+  it("5つのフィルターセレクトが表示される（グループ化・ステータス・メンバー・期限・並び順）", () => {
     render(<ActionFilters members={mockMembers} />);
     const triggers = screen.getAllByRole("combobox");
-    expect(triggers.length).toBe(4);
+    expect(triggers.length).toBe(5);
   });
 
   it("空のメンバーリストでもレンダリングされる", () => {
     render(<ActionFilters members={[]} />);
     const triggers = screen.getAllByRole("combobox");
-    expect(triggers.length).toBe(4);
+    expect(triggers.length).toBe(5);
   });
 
   it("キーワード検索のインプットが表示される", () => {

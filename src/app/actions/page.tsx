@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import { ActionFilters } from "@/components/action/action-filters";
 import { ActionListFull } from "@/components/action/action-list-full";
+import { ActionListGrouped } from "@/components/action/action-list-grouped";
 import { ActionPagination } from "@/components/action/action-pagination";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { Badge } from "@/components/ui/badge";
@@ -9,13 +10,16 @@ import type { DateFilterType, SortByType } from "@/lib/actions/action-item-actio
 import { getActionItems } from "@/lib/actions/action-item-actions";
 import { getMembers } from "@/lib/actions/member-actions";
 import { getTags } from "@/lib/actions/tag-actions";
+import type { GroupByType } from "@/lib/group-actions";
 import type { ActionItemStatusType } from "@/lib/validations/action-item";
 
 export const dynamic = "force-dynamic";
 
 const DATE_FILTERS: DateFilterType[] = ["all", "overdue", "this-week", "this-month"];
 const SORT_OPTIONS: SortByType[] = ["dueDate", "createdAt", "memberName"];
+const GROUP_BY_OPTIONS: GroupByType[] = ["none", "member", "dueDate", "tag"];
 const PER_PAGE = 20;
+const PER_PAGE_GROUPED = 1000;
 
 type Props = {
   searchParams: Promise<{
@@ -26,6 +30,7 @@ type Props = {
     dateFilter?: string;
     sort?: string;
     page?: string;
+    groupBy?: string;
   }>;
 };
 
@@ -62,9 +67,15 @@ export default async function ActionsPage({ searchParams }: Props) {
     filters.sortBy = params.sort as SortByType;
   }
 
-  const currentPage = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
+  const groupBy: GroupByType =
+    params.groupBy && GROUP_BY_OPTIONS.includes(params.groupBy as GroupByType)
+      ? (params.groupBy as GroupByType)
+      : "none";
+
+  const isGrouped = groupBy !== "none";
+  const currentPage = isGrouped ? 1 : Math.max(1, parseInt(params.page ?? "1", 10) || 1);
   filters.page = currentPage;
-  filters.perPage = PER_PAGE;
+  filters.perPage = isGrouped ? PER_PAGE_GROUPED : PER_PAGE;
 
   const [{ items: actionItems, total, totalPages }, members, allTags] = await Promise.all([
     getActionItems(filters),
@@ -104,8 +115,22 @@ export default async function ActionsPage({ searchParams }: Props) {
       <Suspense>
         <ActionFilters members={memberList} tags={tagList} />
       </Suspense>
-      <ActionListFull actionItems={actionItemsWithTags} statusFilter={filters.status} />
-      <ActionPagination currentPage={currentPage} totalPages={totalPages} searchParams={params} />
+      {isGrouped ? (
+        <ActionListGrouped
+          actionItems={actionItemsWithTags}
+          groupBy={groupBy}
+          statusFilter={filters.status}
+        />
+      ) : (
+        <>
+          <ActionListFull actionItems={actionItemsWithTags} statusFilter={filters.status} />
+          <ActionPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            searchParams={params}
+          />
+        </>
+      )}
     </div>
   );
 }
