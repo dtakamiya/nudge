@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, type ReactNode,useContext, useEffect, useState } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 
 interface FocusModeContextValue {
   isFocusMode: boolean;
