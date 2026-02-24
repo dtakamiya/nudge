@@ -1,7 +1,7 @@
 "use server";
 
 import type { TopicCategory } from "@/generated/prisma/client";
-import { toMonthKey } from "@/lib/format";
+import { formatDate, toMonthKey } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import { calcNextRecommendedDate, isOverdue, isScheduledThisWeek } from "@/lib/schedule";
 import type {
@@ -31,6 +31,36 @@ export type {
   RecommendedMeeting,
   ScheduledMeeting,
 };
+
+export type CheckinTrendEntry = {
+  date: string;
+  health: number | null;
+  mood: number | null;
+  workload: number | null;
+};
+
+export async function getCheckinTrend(memberId: string, limit = 12): Promise<CheckinTrendEntry[]> {
+  const meetings = await prisma.meeting.findMany({
+    where: {
+      memberId,
+      OR: [
+        { conditionHealth: { not: null } },
+        { conditionMood: { not: null } },
+        { conditionWorkload: { not: null } },
+      ],
+    },
+    orderBy: { date: "asc" },
+    take: limit,
+    select: { date: true, conditionHealth: true, conditionMood: true, conditionWorkload: true },
+  });
+
+  return meetings.map((m) => ({
+    date: formatDate(m.date),
+    health: m.conditionHealth,
+    mood: m.conditionMood,
+    workload: m.conditionWorkload,
+  }));
+}
 
 export async function getMemberTopicTrends(memberId: string) {
   const topics = await prisma.topic.findMany({

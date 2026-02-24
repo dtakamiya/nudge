@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 import {
   getAllMembersWithInterval,
+  getCheckinTrend,
   getDepartments,
   getMeetingFrequencyByMonth,
   getMemberActionTrends,
@@ -614,5 +615,127 @@ describe("getAllMembersWithInterval with options", () => {
     const indexA = result.findIndex((m) => m.name === "AaaMember");
     const indexB = result.findIndex((m) => m.name === "BbbMember");
     expect(indexA).toBeLessThan(indexB);
+  });
+});
+
+describe("getCheckinTrend", () => {
+  it("チェックインデータがない場合は空配列を返す", async () => {
+    const member = await createMember({
+      name: "Empty",
+      department: undefined,
+      position: undefined,
+    });
+    if (!member.success) throw new Error("Member creation failed");
+
+    await prisma.meeting.create({
+      data: { memberId: member.data.id, date: new Date("2026-01-01T10:00:00Z") },
+    });
+
+    const result = await getCheckinTrend(member.data.id);
+    expect(result).toHaveLength(0);
+  });
+
+  it("チェックインが記録されたミーティングのみ返す", async () => {
+    const member = await createMember({
+      name: "HasCheckin",
+      department: undefined,
+      position: undefined,
+    });
+    if (!member.success) throw new Error("Member creation failed");
+
+    await prisma.meeting.create({
+      data: { memberId: member.data.id, date: new Date("2026-01-01T10:00:00Z") },
+    });
+    await prisma.meeting.create({
+      data: {
+        memberId: member.data.id,
+        date: new Date("2026-01-15T10:00:00Z"),
+        conditionHealth: 4,
+        conditionMood: 3,
+        conditionWorkload: 2,
+      },
+    });
+
+    const result = await getCheckinTrend(member.data.id);
+    expect(result).toHaveLength(1);
+    expect(result[0].health).toBe(4);
+    expect(result[0].mood).toBe(3);
+    expect(result[0].workload).toBe(2);
+  });
+
+  it("日付昇順で返す", async () => {
+    const member = await createMember({
+      name: "OrderTest",
+      department: undefined,
+      position: undefined,
+    });
+    if (!member.success) throw new Error("Member creation failed");
+
+    await prisma.meeting.create({
+      data: {
+        memberId: member.data.id,
+        date: new Date("2026-02-01T10:00:00Z"),
+        conditionHealth: 3,
+      },
+    });
+    await prisma.meeting.create({
+      data: {
+        memberId: member.data.id,
+        date: new Date("2026-01-01T10:00:00Z"),
+        conditionHealth: 5,
+      },
+    });
+
+    const result = await getCheckinTrend(member.data.id);
+    expect(result).toHaveLength(2);
+    expect(result[0].health).toBe(5);
+    expect(result[1].health).toBe(3);
+  });
+
+  it("limitで取得件数を制限する", async () => {
+    const member = await createMember({
+      name: "LimitTest",
+      department: undefined,
+      position: undefined,
+    });
+    if (!member.success) throw new Error("Member creation failed");
+
+    for (let i = 1; i <= 5; i++) {
+      await prisma.meeting.create({
+        data: {
+          memberId: member.data.id,
+          date: new Date(`2026-01-${String(i).padStart(2, "0")}T10:00:00Z`),
+          conditionMood: i,
+        },
+      });
+    }
+
+    const result = await getCheckinTrend(member.data.id, 3);
+    expect(result).toHaveLength(3);
+  });
+
+  it("一部の指標のみ記録されている場合も返す", async () => {
+    const member = await createMember({
+      name: "PartialCheckin",
+      department: undefined,
+      position: undefined,
+    });
+    if (!member.success) throw new Error("Member creation failed");
+
+    await prisma.meeting.create({
+      data: {
+        memberId: member.data.id,
+        date: new Date("2026-01-10T10:00:00Z"),
+        conditionHealth: 4,
+        conditionMood: null,
+        conditionWorkload: null,
+      },
+    });
+
+    const result = await getCheckinTrend(member.data.id);
+    expect(result).toHaveLength(1);
+    expect(result[0].health).toBe(4);
+    expect(result[0].mood).toBeNull();
+    expect(result[0].workload).toBeNull();
   });
 });
