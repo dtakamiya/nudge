@@ -16,6 +16,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Separator } from "@/components/ui/separator";
+import { useFocusMode } from "@/hooks/use-focus-mode";
 
 import { GlobalSearch } from "./global-search";
 import { ThemeToggle } from "./theme-toggle";
@@ -120,6 +121,7 @@ export function Sidebar({ members = [], actionCount }: SidebarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
+  const { isFocusMode } = useFocusMode();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -161,7 +163,11 @@ export function Sidebar({ members = [], actionCount }: SidebarProps) {
   return (
     <>
       {/* モバイルトップバー */}
-      <div className="lg:hidden print:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-sidebar border-b flex items-center px-4">
+      <div
+        className={`lg:hidden print:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-sidebar border-b flex items-center px-4 transition-all duration-300 ease-in-out ${
+          isFocusMode ? "-translate-y-full opacity-0 h-0 overflow-hidden" : ""
+        }`}
+      >
         <button
           onClick={() => setIsOpen(true)}
           className="p-3 rounded-lg hover:bg-accent transition-colors duration-150"
@@ -216,7 +222,11 @@ export function Sidebar({ members = [], actionCount }: SidebarProps) {
       )}
 
       {/* デスクトップサイドバー */}
-      <aside className="hidden lg:flex print:hidden w-56 border-r bg-sidebar p-4 flex-col gap-6 shrink-0">
+      <aside
+        className={`hidden lg:flex print:hidden w-56 border-r bg-sidebar p-4 flex-col gap-6 shrink-0 transition-all duration-300 ease-in-out ${
+          isFocusMode ? "w-0 -translate-x-full overflow-hidden p-0" : ""
+        }`}
+      >
         <Link href="/" className="text-lg font-semibold tracking-tight text-foreground">
           Nudge
         </Link>

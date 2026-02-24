@@ -13,6 +13,7 @@ export type ShortcutEntry = {
 export const KEYBOARD_SHORTCUTS: ReadonlyArray<ShortcutEntry> = [
   { key: "n", description: "新規メンバーを追加", context: "global" },
   { key: "m", description: "新規ミーティングを作成", context: "global" },
+  { key: "f", description: "フォーカスモード切り替え", context: "global" },
   { key: "⌘ K", description: "検索", context: "global" },
   { key: "?", description: "ショートカット一覧を表示", context: "global" },
   { key: "Space", description: "タイマー開始/一時停止", context: "recording" },
@@ -25,6 +26,7 @@ type ShortcutCallbacks = {
   readonly onNewMember: () => void;
   readonly onNewMeeting: () => void;
   readonly onShowHelp: () => void;
+  readonly onToggleFocusMode?: () => void;
 };
 
 function isTypingTarget(element: Element | null): boolean {
@@ -45,7 +47,7 @@ export function useKeyboardShortcuts(callbacks: ShortcutCallbacks): void {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isTypingTarget(document.activeElement)) return;
 
-      const { onNewMember, onNewMeeting, onShowHelp } = callbacksRef.current;
+      const { onNewMember, onNewMeeting, onShowHelp, onToggleFocusMode } = callbacksRef.current;
 
       switch (e.key) {
         case "n":
@@ -59,6 +61,10 @@ export function useKeyboardShortcuts(callbacks: ShortcutCallbacks): void {
         case "?":
           e.preventDefault();
           onShowHelp();
+          break;
+        case "f":
+          e.preventDefault();
+          onToggleFocusMode?.();
           break;
       }
     };

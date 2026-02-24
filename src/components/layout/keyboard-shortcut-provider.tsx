@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 
 import { ShortcutHelpDialog } from "@/components/layout/shortcut-help-dialog";
 import { NewMeetingDialog } from "@/components/meeting/new-meeting-dialog";
+import { useFocusMode } from "@/hooks/use-focus-mode";
 import { type ShortcutContext, useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 
 type MemberItem = {
@@ -28,6 +29,7 @@ export function KeyboardShortcutProvider({ members }: Props) {
   const context = useShortcutContext();
   const [isMeetingDialogOpen, setIsMeetingDialogOpen] = useState(false);
   const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false);
+  const { toggleFocusMode } = useFocusMode();
 
   const handleNewMember = useCallback(() => {
     router.push("/members/new");
@@ -45,6 +47,7 @@ export function KeyboardShortcutProvider({ members }: Props) {
     onNewMember: handleNewMember,
     onNewMeeting: handleNewMeeting,
     onShowHelp: handleShowHelp,
+    onToggleFocusMode: toggleFocusMode,
   });
 
   return (

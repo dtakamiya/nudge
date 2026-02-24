@@ -1,13 +1,9 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { CoachingPanel } from "@/components/meeting/coaching-panel";
+import { MeetingDetailHeader } from "@/components/meeting/meeting-detail-header";
 import { MeetingDetailPageClient } from "@/components/meeting/meeting-detail-page-client";
-import { MeetingHeaderActions } from "@/components/meeting/meeting-header-actions";
 import { MeetingNavigation } from "@/components/meeting/meeting-navigation";
-import { PrintButton } from "@/components/meeting/print-button";
-import { Button } from "@/components/ui/button";
 import { getAdjacentMeetings, getMeeting, getPreviousMeeting } from "@/lib/actions/meeting-actions";
 import { formatDate } from "@/lib/format";
 
@@ -26,36 +22,17 @@ export default async function MeetingDetailPage({ params }: Props) {
 
   return (
     <div className="animate-fade-in-up">
-      <div className="print:hidden">
-        <Breadcrumb
-          items={[
-            { label: "ダッシュボード", href: "/" },
-            { label: meeting.member.name, href: `/members/${id}` },
-            { label: formatDate(meeting.date) },
-          ]}
-        />
-      </div>
+      <MeetingDetailHeader
+        memberId={id}
+        memberName={meeting.member.name}
+        meetingId={meetingId}
+        meetingDate={formatDate(meeting.date)}
+      />
       <MeetingNavigation
         memberId={id}
         previous={adjacentMeetings.previous}
         next={adjacentMeetings.next}
       />
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          {meeting.member.name}との1on1
-        </h1>
-        <div className="flex gap-2 print:hidden">
-          <PrintButton />
-          <MeetingHeaderActions
-            meetingId={meetingId}
-            memberId={id}
-            meetingDate={formatDate(meeting.date)}
-          />
-          <Link href={`/members/${id}`}>
-            <Button variant="outline">戻る</Button>
-          </Link>
-        </div>
-      </div>
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
         <div>
           <MeetingDetailPageClient
