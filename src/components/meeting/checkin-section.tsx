@@ -14,6 +14,9 @@ interface CheckinSectionProps {
   conditionMood: number | null;
   conditionWorkload: number | null;
   checkinNote: string;
+  previousConditionHealth?: number | null;
+  previousConditionMood?: number | null;
+  previousConditionWorkload?: number | null;
   onConditionChange: (field: ConditionField, value: number | null) => void;
   onCheckinNoteChange: (note: string) => void;
 }
@@ -23,6 +26,9 @@ export function CheckinSection({
   conditionMood,
   conditionWorkload,
   checkinNote,
+  previousConditionHealth,
+  previousConditionMood,
+  previousConditionWorkload,
   onConditionChange,
   onCheckinNoteChange,
 }: CheckinSectionProps) {
@@ -45,6 +51,9 @@ export function CheckinSection({
             conditionHealth={conditionHealth}
             conditionMood={conditionMood}
             conditionWorkload={conditionWorkload}
+            previousConditionHealth={previousConditionHealth}
+            previousConditionMood={previousConditionMood}
+            previousConditionWorkload={previousConditionWorkload}
             onConditionChange={onConditionChange}
           />
         </div>

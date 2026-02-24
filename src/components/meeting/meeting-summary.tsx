@@ -1,3 +1,4 @@
+import { calculateConditionDiff, formatConditionDiff } from "@/lib/condition-diff";
 import { formatDateLong } from "@/lib/format";
 
 import { ConditionBar } from "./condition-bar";
@@ -13,6 +14,30 @@ export interface MeetingSummaryProps {
   topicTitles?: string[];
   actionItemTitles?: string[];
   showWarnings?: boolean;
+  previousConditionHealth?: number | null;
+  previousConditionMood?: number | null;
+  previousConditionWorkload?: number | null;
+}
+
+const DIFF_STYLE: Record<"up" | "same" | "down", string> = {
+  up: "text-emerald-600",
+  same: "text-slate-500",
+  down: "text-rose-600",
+};
+
+function ConditionDiffBadge({
+  current,
+  previous,
+}: {
+  current: number | null;
+  previous: number | null | undefined;
+}) {
+  const diffResult = calculateConditionDiff(current, previous ?? null);
+  const diffText = formatConditionDiff(diffResult);
+  if (!diffText || !diffResult) return null;
+  return (
+    <span className={`text-xs font-medium ${DIFF_STYLE[diffResult.direction]}`}>{diffText}</span>
+  );
 }
 
 export function MeetingSummary({
@@ -26,6 +51,9 @@ export function MeetingSummary({
   topicTitles,
   actionItemTitles,
   showWarnings = true,
+  previousConditionHealth,
+  previousConditionMood,
+  previousConditionWorkload,
 }: MeetingSummaryProps) {
   const hasAnyCondition =
     conditionHealth !== null || conditionMood !== null || conditionWorkload !== null;
@@ -45,18 +73,24 @@ export function MeetingSummary({
               <div className="flex items-center gap-2">
                 <span>体調🏥:</span>
                 <ConditionBar value={conditionHealth} />
+                <ConditionDiffBadge current={conditionHealth} previous={previousConditionHealth} />
               </div>
             )}
             {conditionMood !== null && (
               <div className="flex items-center gap-2">
                 <span>気分💭:</span>
                 <ConditionBar value={conditionMood} />
+                <ConditionDiffBadge current={conditionMood} previous={previousConditionMood} />
               </div>
             )}
             {conditionWorkload !== null && (
               <div className="flex items-center gap-2">
                 <span>業務量📊:</span>
                 <ConditionBar value={conditionWorkload} />
+                <ConditionDiffBadge
+                  current={conditionWorkload}
+                  previous={previousConditionWorkload}
+                />
               </div>
             )}
           </div>

@@ -131,4 +131,44 @@ describe("MeetingSummary", () => {
       expect(screen.queryByText(/アクションアイテムが設定されていません/)).toBeNull();
     });
   });
+
+  describe("前回との差分表示", () => {
+    it("前回データがない場合は差分が表示されないこと", () => {
+      render(<MeetingSummary {...baseProps} conditionHealth={3} />);
+      expect(screen.queryByText(/前回より/)).toBeNull();
+      expect(screen.queryByText(/前回と同じ/)).toBeNull();
+    });
+
+    it("体調が前回より上がった場合に差分が表示されること", () => {
+      render(<MeetingSummary {...baseProps} conditionHealth={4} previousConditionHealth={3} />);
+      expect(screen.getByText("↑ 前回より+1")).toBeInTheDocument();
+    });
+
+    it("体調が前回と同じ場合に差分が表示されること", () => {
+      render(<MeetingSummary {...baseProps} conditionHealth={3} previousConditionHealth={3} />);
+      expect(screen.getByText("─ 前回と同じ")).toBeInTheDocument();
+    });
+
+    it("体調が前回より下がった場合に差分が表示されること", () => {
+      render(<MeetingSummary {...baseProps} conditionHealth={1} previousConditionHealth={3} />);
+      expect(screen.getByText("↓ 前回より-2")).toBeInTheDocument();
+    });
+
+    it("気分・業務量の差分も表示されること", () => {
+      render(
+        <MeetingSummary
+          {...baseProps}
+          conditionHealth={4}
+          previousConditionHealth={3}
+          conditionMood={3}
+          previousConditionMood={3}
+          conditionWorkload={2}
+          previousConditionWorkload={4}
+        />,
+      );
+      expect(screen.getByText("↑ 前回より+1")).toBeInTheDocument();
+      expect(screen.getByText("─ 前回と同じ")).toBeInTheDocument();
+      expect(screen.getByText("↓ 前回より-2")).toBeInTheDocument();
+    });
+  });
 });
