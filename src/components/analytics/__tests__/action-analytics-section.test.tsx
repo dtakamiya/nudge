@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import type { ActionMonthlyTrend } from "@/lib/types";
 import * as analyticsActions from "@/lib/actions/analytics-actions";
+import type { ActionMonthlyTrend } from "@/lib/types";
 
 import { ActionAnalyticsSection } from "../action-analytics-section";
 

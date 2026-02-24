@@ -3,8 +3,8 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import type { ActionItemWithMember } from "@/lib/types";
 import { formatDate } from "@/lib/format";
+import type { ActionItemWithMember } from "@/lib/types";
 
 type Props = {
   readonly today: readonly ActionItemWithMember[];
