@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import {
   createMeeting,
   endMeeting,
+  getAdjacentMeetings,
   getMeeting,
   getPreviousMeeting,
   getRecentMeetings,
@@ -805,5 +806,81 @@ describe("updateTopicNotes", () => {
   it("存在しない topicId でエラーを返すこと", async () => {
     const result = await updateTopicNotes({ topicId: "non-existent-id", notes: "ノート" });
     expect(result.success).toBe(false);
+  });
+});
+
+describe("getAdjacentMeetings", () => {
+  async function createTestMeetings() {
+    const r1 = await createMeeting({
+      memberId,
+      date: "2026-01-01T10:00:00.000Z",
+      topics: [],
+      actionItems: [],
+      mood: 3,
+    });
+    if (!r1.success) throw new Error(r1.error);
+    const r2 = await createMeeting({
+      memberId,
+      date: "2026-02-01T10:00:00.000Z",
+      topics: [],
+      actionItems: [],
+      mood: 4,
+    });
+    if (!r2.success) throw new Error(r2.error);
+    const r3 = await createMeeting({
+      memberId,
+      date: "2026-03-01T10:00:00.000Z",
+      topics: [],
+      actionItems: [],
+      mood: 5,
+    });
+    if (!r3.success) throw new Error(r3.error);
+    return { first: r1.data, second: r2.data, third: r3.data };
+  }
+
+  it("前後両方が存在する場合: previous と next を返す", async () => {
+    const { first, second, third } = await createTestMeetings();
+    const result = await getAdjacentMeetings(memberId, second.id);
+    expect(result.previous?.id).toBe(first.id);
+    expect(result.next?.id).toBe(third.id);
+  });
+
+  it("前のみ存在する場合: previous を返し next は null", async () => {
+    const { second, third } = await createTestMeetings();
+    const result = await getAdjacentMeetings(memberId, third.id);
+    expect(result.previous?.id).toBe(second.id);
+    expect(result.next).toBeNull();
+  });
+
+  it("次のみ存在する場合: next を返し previous は null", async () => {
+    const { first, second } = await createTestMeetings();
+    const result = await getAdjacentMeetings(memberId, first.id);
+    expect(result.previous).toBeNull();
+    expect(result.next?.id).toBe(second.id);
+  });
+
+  it("ミーティングが1件のみの場合: 両方 null", async () => {
+    const r = await createMeeting({
+      memberId,
+      date: "2026-06-01T10:00:00.000Z",
+      topics: [],
+      actionItems: [],
+    });
+    if (!r.success) throw new Error(r.error);
+    const result = await getAdjacentMeetings(memberId, r.data.id);
+    expect(result.previous).toBeNull();
+    expect(result.next).toBeNull();
+  });
+
+  it("存在しない meetingId の場合: 両方 null", async () => {
+    const result = await getAdjacentMeetings(memberId, "non-existent-id");
+    expect(result.previous).toBeNull();
+    expect(result.next).toBeNull();
+  });
+
+  it("mood フィールドが含まれること", async () => {
+    const { first, second } = await createTestMeetings();
+    const result = await getAdjacentMeetings(memberId, second.id);
+    expect(result.previous?.mood).toBe(first.mood);
   });
 });

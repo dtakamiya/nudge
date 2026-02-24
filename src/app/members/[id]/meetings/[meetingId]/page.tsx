@@ -5,18 +5,20 @@ import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { CoachingPanel } from "@/components/meeting/coaching-panel";
 import { MeetingDetailPageClient } from "@/components/meeting/meeting-detail-page-client";
 import { MeetingHeaderActions } from "@/components/meeting/meeting-header-actions";
+import { MeetingNavigation } from "@/components/meeting/meeting-navigation";
 import { PrintButton } from "@/components/meeting/print-button";
 import { Button } from "@/components/ui/button";
-import { getMeeting, getPreviousMeeting } from "@/lib/actions/meeting-actions";
+import { getAdjacentMeetings, getMeeting, getPreviousMeeting } from "@/lib/actions/meeting-actions";
 import { formatDate } from "@/lib/format";
 
 type Props = { params: Promise<{ id: string; meetingId: string }> };
 
 export default async function MeetingDetailPage({ params }: Props) {
   const { id, meetingId } = await params;
-  const [meeting, previousMeeting] = await Promise.all([
+  const [meeting, previousMeeting, adjacentMeetings] = await Promise.all([
     getMeeting(meetingId),
     getPreviousMeeting(id, meetingId),
+    getAdjacentMeetings(id, meetingId),
   ]);
   if (!meeting) {
     notFound();
@@ -33,6 +35,11 @@ export default async function MeetingDetailPage({ params }: Props) {
           ]}
         />
       </div>
+      <MeetingNavigation
+        memberId={id}
+        previous={adjacentMeetings.previous}
+        next={adjacentMeetings.next}
+      />
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           {meeting.member.name}との1on1
