@@ -219,6 +219,7 @@ export function ActionListCompact({ actionItems, meetingId, memberId }: Props) {
                 size="icon-xs"
                 aria-label="編集"
                 onClick={() => handleEdit(item)}
+                className="print:hidden"
               >
                 <Pencil />
               </Button>
@@ -252,7 +253,7 @@ export function ActionListCompact({ actionItems, meetingId, memberId }: Props) {
         </div>
       )}
       {canAdd && !showAddForm && (
-        <div className="flex justify-end mt-1">
+        <div className="flex justify-end mt-1 print:hidden">
           <Button
             variant="ghost"
             size="sm"

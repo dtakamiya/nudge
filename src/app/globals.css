@@ -208,6 +208,43 @@
   animation: pulse-attention 2s ease-in-out infinite;
 }
 
+@media print {
+  @page {
+    size: A4;
+    margin: 20mm;
+  }
+
+  /* ダークモードを白背景・黒文字に上書き */
+  :root,
+  .dark {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0 0 0);
+    --muted: oklch(0.96 0 0);
+    --muted-foreground: oklch(0.45 0 0);
+    --border: oklch(0.8 0 0);
+    --primary: oklch(0.3 0.1 270);
+    --primary-foreground: oklch(1 0 0);
+  }
+
+  * {
+    animation: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  main {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in-up,
   .animate-slide-in,
