@@ -9,7 +9,10 @@ import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { MeetingHistory } from "@/components/meeting/meeting-history";
 import { CalendarExportButton } from "@/components/member/calendar-export-button";
 import { MemberActionsDropdown } from "@/components/member/member-actions-dropdown";
-import { MemberDetailTabNav } from "@/components/member/member-detail-tab-nav";
+import {
+  type MemberDetailTab,
+  MemberDetailTabNav,
+} from "@/components/member/member-detail-tab-nav";
 import { MemberQuickActions } from "@/components/member/member-quick-actions";
 import { MemberStatsBar } from "@/components/member/member-stats-bar";
 import { MemberTimeline } from "@/components/member/member-timeline";
@@ -21,14 +24,12 @@ import { getMoodTrend } from "@/lib/actions/meeting-actions";
 import { getMember, getMemberMeetings, getMemberTimeline } from "@/lib/actions/member-actions";
 import { calcNextRecommendedDate } from "@/lib/schedule";
 
-type Tab = "timeline" | "history" | "actions";
-
 type Props = {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ page?: string; tab?: string }>;
 };
 
-function resolveTab(tab: string | undefined): Tab {
+function resolveTab(tab: string | undefined): MemberDetailTab {
   if (tab === "history" || tab === "actions") return tab;
   return "timeline";
 }

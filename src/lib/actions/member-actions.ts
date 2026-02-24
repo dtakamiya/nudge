@@ -103,6 +103,7 @@ export async function getMemberMeetings(
 }
 
 export async function getMemberTimeline(memberId: string): Promise<MemberTimelineEntry[]> {
+  if (!memberId) return [];
   const now = new Date();
   const [meetings, completedActions, overdueActions] = await Promise.all([
     prisma.meeting.findMany({
