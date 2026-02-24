@@ -1,9 +1,8 @@
 import { Suspense } from "react";
 
 import { ActionFilters } from "@/components/action/action-filters";
-import { ActionListFull } from "@/components/action/action-list-full";
-import { ActionListGrouped } from "@/components/action/action-list-grouped";
-import { ActionPagination } from "@/components/action/action-pagination";
+import { ActionListSkeleton } from "@/components/action/action-list-skeleton";
+import { ActionsBulkContainer } from "@/components/action/actions-bulk-container";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { getActionItems } from "@/lib/actions/action-item-actions";
@@ -115,22 +114,17 @@ export default async function ActionsPage({ searchParams }: Props) {
       <Suspense>
         <ActionFilters members={memberList} tags={tagList} />
       </Suspense>
-      {isGrouped ? (
-        <ActionListGrouped
+      <Suspense fallback={<ActionListSkeleton />}>
+        <ActionsBulkContainer
           actionItems={actionItemsWithTags}
           groupBy={groupBy}
+          isGrouped={isGrouped}
           statusFilter={filters.status}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          searchParams={params}
         />
-      ) : (
-        <>
-          <ActionListFull actionItems={actionItemsWithTags} statusFilter={filters.status} />
-          <ActionPagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            searchParams={params}
-          />
-        </>
-      )}
+      </Suspense>
     </div>
   );
 }

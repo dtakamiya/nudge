@@ -347,9 +347,10 @@ describe("getLastMeetingAllActions", () => {
   });
 
   it("完了・未完了を分けて返す", async () => {
+    const laterDate = new Date(Date.now() + 1000);
     await createMeeting({
       memberId,
-      date: new Date().toISOString(),
+      date: laterDate.toISOString(),
       topics: [],
       actionItems: [
         { title: "未完了タスク", description: "" },
@@ -371,9 +372,10 @@ describe("getLastMeetingAllActions", () => {
   });
 
   it("完了のみの場合も返す", async () => {
+    const laterDate = new Date(Date.now() + 1000);
     await createMeeting({
       memberId,
-      date: new Date().toISOString(),
+      date: laterDate.toISOString(),
       topics: [],
       actionItems: [{ title: "完了タスク", description: "" }],
     });
@@ -432,9 +434,11 @@ describe("getLastMeetingAllActions", () => {
 
 describe("getLastMeetingPendingActions", () => {
   it("前回ミーティングの未完了アクションを返す", async () => {
+    // beforeEach のミーティングより確実に新しい日付を使用（タイミング競合を防ぐ）
+    const laterDate = new Date(Date.now() + 1000);
     await createMeeting({
       memberId,
-      date: new Date().toISOString(),
+      date: laterDate.toISOString(),
       topics: [],
       actionItems: [
         { title: "未完了タスク", description: "" },

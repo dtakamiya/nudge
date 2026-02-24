@@ -30,9 +30,17 @@ type Props = {
   actionItems: ActionItemRow[];
   groupBy: GroupByType;
   statusFilter?: string;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
 };
 
-export function ActionListGrouped({ actionItems, groupBy, statusFilter }: Props) {
+export function ActionListGrouped({
+  actionItems,
+  groupBy,
+  statusFilter,
+  selectedIds,
+  onToggleSelect,
+}: Props) {
   const groups = groupActionItems(actionItems, groupBy);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
@@ -83,7 +91,12 @@ export function ActionListGrouped({ actionItems, groupBy, statusFilter }: Props)
             </button>
             {!isCollapsed && (
               <div className="ml-6">
-                <ActionListFull actionItems={group.items} statusFilter={statusFilter} />
+                <ActionListFull
+                  actionItems={group.items}
+                  statusFilter={statusFilter}
+                  selectedIds={selectedIds}
+                  onToggleSelect={onToggleSelect}
+                />
               </div>
             )}
           </div>
