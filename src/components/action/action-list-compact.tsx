@@ -5,12 +5,15 @@ import { useRouter } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 
+import { BulkActionBar } from "@/components/action/bulk-action-bar";
 import { DueDateBadge } from "@/components/action/due-date-badge";
 import { TagBadge } from "@/components/tag/tag-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
+import { useBulkSelection } from "@/hooks/use-bulk-selection";
 import {
   createActionItemForMeeting,
   updateActionItem,
@@ -49,6 +52,7 @@ type Props = {
   actionItems: ActionItemRow[];
   meetingId?: string;
   memberId?: string;
+  enableBulkSelect?: boolean;
 };
 
 const statusLabels: Record<string, string> = {
@@ -66,7 +70,7 @@ function nextStatus(current: string): string {
   return current === "TODO" ? "IN_PROGRESS" : current === "IN_PROGRESS" ? "DONE" : "TODO";
 }
 
-export function ActionListCompact({ actionItems, meetingId, memberId }: Props) {
+export function ActionListCompact({ actionItems, meetingId, memberId, enableBulkSelect }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -82,6 +86,7 @@ export function ActionListCompact({ actionItems, meetingId, memberId }: Props) {
     (currentItems, { id, status }: { id: string; status: string }) =>
       currentItems.map((item) => (item.id === id ? { ...item, status } : item)),
   );
+  const { selectedIds, toggleItem, clearAll } = useBulkSelection();
 
   const canAdd = Boolean(meetingId && memberId);
 
@@ -191,8 +196,20 @@ export function ActionListCompact({ actionItems, meetingId, memberId }: Props) {
             </div>
           </div>
         ) : (
-          <div key={item.id} className="flex items-center justify-between p-2 border rounded">
+          <div
+            key={item.id}
+            className={`flex items-center justify-between p-2 border rounded transition-colors ${
+              enableBulkSelect && selectedIds.has(item.id) ? "bg-primary/5 border-primary/30" : ""
+            }`}
+          >
             <div className="flex items-center gap-2 flex-1 min-w-0">
+              {enableBulkSelect && (
+                <Checkbox
+                  checked={selectedIds.has(item.id)}
+                  onCheckedChange={() => toggleItem(item.id)}
+                  aria-label={`${item.title}を選択`}
+                />
+              )}
               <button
                 onClick={() => cycleStatus(item.id, item.status)}
                 aria-label={`${item.title}のステータスを${statusLabels[nextStatus(item.status)]}に変更`}
@@ -265,6 +282,7 @@ export function ActionListCompact({ actionItems, meetingId, memberId }: Props) {
           </Button>
         </div>
       )}
+      {enableBulkSelect && <BulkActionBar selectedIds={selectedIds} onClearAll={clearAll} />}
     </div>
   );
 }

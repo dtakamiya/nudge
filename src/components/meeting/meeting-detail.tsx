@@ -149,6 +149,7 @@ export function MeetingDetail({
           }))}
           meetingId={meetingId}
           memberId={memberId}
+          enableBulkSelect
         />
       </div>
     </div>

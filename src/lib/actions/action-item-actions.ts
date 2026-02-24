@@ -12,6 +12,8 @@ import type {
 } from "@/lib/types";
 import type { ActionItemStatusType, UpdateActionItemInput } from "@/lib/validations/action-item";
 import {
+  bulkDeleteSchema,
+  bulkUpdateStatusSchema,
   updateActionItemSchema,
   updateActionItemStatusSchema,
 } from "@/lib/validations/action-item";
@@ -201,6 +203,38 @@ export async function createActionItemForMeeting(
     });
     revalidatePath("/", "layout");
     return result;
+  });
+}
+
+export async function bulkUpdateActionItemStatus(
+  ids: string[],
+  status: string,
+): Promise<ActionResult<{ count: number }>> {
+  return runAction(async () => {
+    const { ids: validatedIds, status: validatedStatus } = bulkUpdateStatusSchema.parse({
+      ids,
+      status,
+    });
+    const completedAt = validatedStatus === "DONE" ? new Date() : null;
+    const result = await prisma.actionItem.updateMany({
+      where: { id: { in: validatedIds } },
+      data: { status: validatedStatus, completedAt },
+    });
+    revalidatePath("/", "layout");
+    return { count: result.count };
+  });
+}
+
+export async function bulkDeleteActionItems(
+  ids: string[],
+): Promise<ActionResult<{ count: number }>> {
+  return runAction(async () => {
+    const { ids: validatedIds } = bulkDeleteSchema.parse({ ids });
+    const result = await prisma.actionItem.deleteMany({
+      where: { id: { in: validatedIds } },
+    });
+    revalidatePath("/", "layout");
+    return { count: result.count };
   });
 }
 

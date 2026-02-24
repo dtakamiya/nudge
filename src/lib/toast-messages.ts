@@ -28,6 +28,10 @@ export const TOAST_MESSAGES = {
     updateError: "アクションアイテムの更新に失敗しました",
     createSuccess: "アクションアイテムを追加しました",
     createError: "アクションアイテムの追加に失敗しました",
+    bulkStatusChangeSuccess: (count: number) => `${count}件のステータスを更新しました`,
+    bulkStatusChangeError: "一括ステータス変更に失敗しました",
+    bulkDeleteSuccess: (count: number) => `${count}件のアクションアイテムを削除しました`,
+    bulkDeleteError: "一括削除に失敗しました",
   },
   prepare: {
     topicCopied: "話題をアジェンダにコピーしました",

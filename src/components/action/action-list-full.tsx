@@ -10,6 +10,7 @@ import { DueDateBadge } from "@/components/action/due-date-badge";
 import { TagBadge } from "@/components/tag/tag-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { DatePicker } from "@/components/ui/date-picker";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
@@ -47,9 +48,14 @@ type EditFormState = {
   dueDate: string;
 };
 
-type Props = { actionItems: ActionItemRow[]; statusFilter?: string };
+type Props = {
+  actionItems: ActionItemRow[];
+  statusFilter?: string;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
+};
 
-export function ActionListFull({ actionItems, statusFilter }: Props) {
+export function ActionListFull({ actionItems, statusFilter, selectedIds, onToggleSelect }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -69,6 +75,8 @@ export function ActionListFull({ actionItems, statusFilter }: Props) {
       return updated;
     },
   );
+
+  const isBulkMode = selectedIds !== undefined && onToggleSelect !== undefined;
 
   if (actionItems.length === 0) {
     return (
@@ -124,84 +132,97 @@ export function ActionListFull({ actionItems, statusFilter }: Props) {
 
   return (
     <div className={`flex flex-col gap-3 ${isPending ? "opacity-80" : ""}`}>
-      {optimisticItems.map((item) => (
-        <Card key={item.id} className="hover:shadow-sm hover:border-[oklch(0.88_0.008_260)]">
-          {editingId === item.id ? (
-            <CardContent className="p-4 flex flex-col gap-3">
-              <div className="flex flex-col gap-2">
-                <Input
-                  value={editForm.title}
-                  onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                  placeholder="タイトル"
-                />
-                <Input
-                  value={editForm.description}
-                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                  placeholder="説明"
-                />
-                <DatePicker
-                  value={editForm.dueDate}
-                  onChange={(value) => setEditForm({ ...editForm, dueDate: value })}
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <Button variant="outline" size="sm" onClick={handleCancel}>
-                  キャンセル
-                </Button>
-                <Button size="sm" onClick={handleSave} disabled={!editForm.title.trim()}>
-                  保存
-                </Button>
-              </div>
-            </CardContent>
-          ) : (
-            <CardContent className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Select
-                  value={item.status}
-                  onValueChange={(val) => handleStatusChange(item.id, val)}
-                >
-                  <SelectTrigger className="w-28">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="TODO">未着手</SelectItem>
-                    <SelectItem value="IN_PROGRESS">進行中</SelectItem>
-                    <SelectItem value="DONE">完了</SelectItem>
-                  </SelectContent>
-                </Select>
-                <div>
-                  <p className="font-medium">{item.title}</p>
-                  <p className="text-sm text-muted-foreground">
-                    <Link href={`/members/${item.member.id}`} className="hover:underline">
-                      {item.member.name}
-                    </Link>
-                    {" ・ "}
-                    {formatDate(item.meeting.date)}
-                  </p>
-                  {item.tags && item.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {item.tags.map((tag) => (
-                        <TagBadge key={tag.id} name={tag.name} color={tag.color} size="sm" />
-                      ))}
-                    </div>
-                  )}
+      {optimisticItems.map((item) => {
+        const isSelected = isBulkMode && selectedIds.has(item.id);
+        return (
+          <Card
+            key={item.id}
+            className={`hover:shadow-sm hover:border-[oklch(0.88_0.008_260)] transition-colors ${isSelected ? "bg-primary/5 border-primary/30" : ""}`}
+          >
+            {editingId === item.id ? (
+              <CardContent className="p-4 flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
+                  <Input
+                    value={editForm.title}
+                    onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                    placeholder="タイトル"
+                  />
+                  <Input
+                    value={editForm.description}
+                    onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                    placeholder="説明"
+                  />
+                  <DatePicker
+                    value={editForm.dueDate}
+                    onChange={(value) => setEditForm({ ...editForm, dueDate: value })}
+                  />
                 </div>
-              </div>
-              <div className="flex items-center gap-3">
-                {item.dueDate && <DueDateBadge dueDate={item.dueDate} status={item.status} />}
-                <Button
-                  variant="ghost"
-                  size="icon-xs"
-                  aria-label="編集"
-                  onClick={() => handleEdit(item)}
-                >
-                  <Pencil />
-                </Button>
-              </div>
-            </CardContent>
-          )}
-        </Card>
-      ))}
+                <div className="flex gap-2 justify-end">
+                  <Button variant="outline" size="sm" onClick={handleCancel}>
+                    キャンセル
+                  </Button>
+                  <Button size="sm" onClick={handleSave} disabled={!editForm.title.trim()}>
+                    保存
+                  </Button>
+                </div>
+              </CardContent>
+            ) : (
+              <CardContent className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {isBulkMode && (
+                    <Checkbox
+                      checked={isSelected}
+                      onCheckedChange={() => onToggleSelect(item.id)}
+                      aria-label={`${item.title}を選択`}
+                    />
+                  )}
+                  <Select
+                    value={item.status}
+                    onValueChange={(val) => handleStatusChange(item.id, val)}
+                  >
+                    <SelectTrigger className="w-28">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="TODO">未着手</SelectItem>
+                      <SelectItem value="IN_PROGRESS">進行中</SelectItem>
+                      <SelectItem value="DONE">完了</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div>
+                    <p className="font-medium">{item.title}</p>
+                    <p className="text-sm text-muted-foreground">
+                      <Link href={`/members/${item.member.id}`} className="hover:underline">
+                        {item.member.name}
+                      </Link>
+                      {" ・ "}
+                      {formatDate(item.meeting.date)}
+                    </p>
+                    {item.tags && item.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {item.tags.map((tag) => (
+                          <TagBadge key={tag.id} name={tag.name} color={tag.color} size="sm" />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  {item.dueDate && <DueDateBadge dueDate={item.dueDate} status={item.status} />}
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    aria-label="編集"
+                    onClick={() => handleEdit(item)}
+                  >
+                    <Pencil />
+                  </Button>
+                </div>
+              </CardContent>
+            )}
+          </Card>
+        );
+      })}
     </div>
   );
 }
