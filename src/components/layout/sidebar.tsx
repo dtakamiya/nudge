@@ -2,6 +2,7 @@
 
 import {
   BarChart2,
+  ClipboardCheck,
   LayoutDashboard,
   ListChecks,
   Menu,
@@ -35,6 +36,7 @@ const navItems = [
   { href: "/", label: "ダッシュボード", icon: LayoutDashboard },
   { href: "/members", label: "メンバー一覧", icon: Users },
   { href: "/members/new", label: "メンバー追加", icon: UserPlus },
+  { href: "/tasks", label: "マイタスク", icon: ClipboardCheck },
   { href: "/actions", label: "アクション一覧", icon: ListChecks },
   { href: "/analytics", label: "ミーティング分析", icon: BarChart2 },
   { href: "/settings/templates", label: "テンプレート管理", icon: Settings },
@@ -55,7 +57,7 @@ function NavLinks({
         const isActive =
           item.href === "/" || item.href === "/members"
             ? pathname === item.href
-            : pathname.startsWith(item.href);
+            : pathname === item.href || pathname.startsWith(item.href + "/");
         const badge = item.href === "/actions" && actionCount != null && actionCount > 0;
         return (
           <Link
