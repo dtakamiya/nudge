@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -56,6 +56,10 @@ vi.mock("@dnd-kit/core", () => ({
   useSensors: vi.fn(() => []),
 }));
 
+vi.mock("@/lib/meeting-summary", () => ({
+  generateMeetingSummaryText: vi.fn().mockReturnValue("テストサマリーテキスト"),
+}));
+
 vi.mock("@dnd-kit/sortable", () => ({
   SortableContext: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   verticalListSortingStrategy: {},
@@ -73,6 +77,7 @@ vi.mock("@dnd-kit/sortable", () => ({
 const defaultProps = {
   meetingId: "meeting-1",
   memberId: "member-1",
+  memberName: "田中太郎",
   date: new Date("2026-02-20T10:00:00.000Z"),
   topics: [
     {
@@ -111,6 +116,26 @@ describe("MeetingDetailPageClient", () => {
   it("shows edit button in view mode", () => {
     render(<MeetingDetailPageClient {...defaultProps} />);
     expect(screen.getByRole("button", { name: /編集/ })).toBeTruthy();
+  });
+
+  it("shows copy summary button in view mode", () => {
+    render(<MeetingDetailPageClient {...defaultProps} />);
+    expect(screen.getByRole("button", { name: /サマリーをコピー/ })).toBeTruthy();
+  });
+
+  it("calls generateMeetingSummaryText with memberName when copy button is clicked", async () => {
+    const { generateMeetingSummaryText } = await import("@/lib/meeting-summary");
+    const mockGenerate = vi.mocked(generateMeetingSummaryText);
+
+    const user = userEvent.setup();
+    render(<MeetingDetailPageClient {...defaultProps} />);
+    await user.click(screen.getByRole("button", { name: /サマリーをコピー/ }));
+
+    await waitFor(() => {
+      expect(mockGenerate).toHaveBeenCalledWith(
+        expect.objectContaining({ memberName: "田中太郎" }),
+      );
+    });
   });
 
   it("switches to edit mode when edit button is clicked", async () => {

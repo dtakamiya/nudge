@@ -1,12 +1,13 @@
 "use client";
 
-import { Pencil, Play } from "lucide-react";
+import { Copy, Pencil, Play } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { startMeeting } from "@/lib/actions/meeting-actions";
+import { generateMeetingSummaryText } from "@/lib/meeting-summary";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 import { CoachingSheet } from "./coaching-sheet";
@@ -49,6 +50,7 @@ type PreviousConditions = {
 type Props = {
   readonly meetingId: string;
   readonly memberId: string;
+  readonly memberName: string;
   readonly date: Date;
   readonly mood?: number | null;
   readonly conditionHealth?: number | null;
@@ -65,6 +67,7 @@ type Props = {
 export function MeetingDetailPageClient({
   meetingId,
   memberId,
+  memberName,
   date,
   mood,
   conditionHealth,
@@ -106,6 +109,23 @@ export function MeetingDetailPageClient({
       toast.error(TOAST_MESSAGES.meeting.recordingStartError);
     } finally {
       setIsStarting(false);
+    }
+  }
+
+  async function handleCopySummary() {
+    const summaryText = generateMeetingSummaryText({
+      memberName,
+      date,
+      topics: topics.map((t) => ({ category: t.category, title: t.title, notes: t.notes })),
+      actionItems: actionItems.map((a) => ({ title: a.title, dueDate: a.dueDate })),
+      startedAt: startedAt ?? null,
+      endedAt: endedAt ?? null,
+    });
+    try {
+      await navigator.clipboard.writeText(summaryText);
+      toast.success(TOAST_MESSAGES.meeting.summaryCopied);
+    } catch {
+      toast.error(TOAST_MESSAGES.meeting.summaryCopyError);
     }
   }
 
@@ -182,6 +202,10 @@ export function MeetingDetailPageClient({
             {isStarting ? "記録開始中..." : "記録を開始"}
           </Button>
         )}
+        <Button variant="outline" size="sm" onClick={handleCopySummary}>
+          <Copy className="w-4 h-4 mr-1.5" />
+          サマリーをコピー
+        </Button>
         <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
           <Pencil className="w-4 h-4 mr-1.5" />
           編集
