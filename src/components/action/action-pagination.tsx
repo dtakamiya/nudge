@@ -5,13 +5,35 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 
+type ActionSearchParams = {
+  status?: string;
+  memberId?: string;
+  tag?: string;
+  q?: string;
+  dateFilter?: string;
+  sort?: string;
+};
+
 type Props = {
   currentPage: number;
   totalPages: number;
-  buildPageUrl: (page: number) => string;
+  searchParams: ActionSearchParams;
 };
 
-export function ActionPagination({ currentPage, totalPages, buildPageUrl }: Props) {
+function buildPageUrl(searchParams: ActionSearchParams, page: number): string {
+  const p = new URLSearchParams();
+  if (searchParams.status) p.set("status", searchParams.status);
+  if (searchParams.memberId) p.set("memberId", searchParams.memberId);
+  if (searchParams.tag) p.set("tag", searchParams.tag);
+  if (searchParams.q) p.set("q", searchParams.q);
+  if (searchParams.dateFilter) p.set("dateFilter", searchParams.dateFilter);
+  if (searchParams.sort) p.set("sort", searchParams.sort);
+  if (page > 1) p.set("page", String(page));
+  const query = p.toString();
+  return `/actions${query ? `?${query}` : ""}`;
+}
+
+export function ActionPagination({ currentPage, totalPages, searchParams }: Props) {
   if (totalPages <= 1) return null;
 
   const pages = buildPageNumbers(currentPage, totalPages);
@@ -24,7 +46,7 @@ export function ActionPagination({ currentPage, totalPages, buildPageUrl }: Prop
             <ChevronLeft className="h-4 w-4" />
           </span>
         ) : (
-          <Link href={buildPageUrl(currentPage - 1)} aria-label="前のページ">
+          <Link href={buildPageUrl(searchParams, currentPage - 1)} aria-label="前のページ">
             <ChevronLeft className="h-4 w-4" />
           </Link>
         )}
@@ -45,7 +67,7 @@ export function ActionPagination({ currentPage, totalPages, buildPageUrl }: Prop
             {p === currentPage ? (
               <span>{p}</span>
             ) : (
-              <Link href={buildPageUrl(p as number)} aria-label={`${p}ページ目`}>
+              <Link href={buildPageUrl(searchParams, p as number)} aria-label={`${p}ページ目`}>
                 {p}
               </Link>
             )}
@@ -59,7 +81,7 @@ export function ActionPagination({ currentPage, totalPages, buildPageUrl }: Prop
             <ChevronRight className="h-4 w-4" />
           </span>
         ) : (
-          <Link href={buildPageUrl(currentPage + 1)} aria-label="次のページ">
+          <Link href={buildPageUrl(searchParams, currentPage + 1)} aria-label="次のページ">
             <ChevronRight className="h-4 w-4" />
           </Link>
         )}
