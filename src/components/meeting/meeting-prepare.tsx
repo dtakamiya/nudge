@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import type { MeetingTemplate as DbMeetingTemplate } from "@/generated/prisma/client";
 import type { MeetingTemplate, TopicCategory } from "@/lib/meeting-templates";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
@@ -59,6 +60,7 @@ type Props = {
   recentMeetings: MeetingData[];
   pendingActions: PendingAction[];
   carryoverData: CarryoverData;
+  customTemplates?: DbMeetingTemplate[];
 };
 
 const categoryOptions = [
@@ -73,7 +75,13 @@ function createEmptyTopic(sortOrder: number): TopicDraft {
   return { category: "WORK_PROGRESS", title: "", notes: "", sortOrder };
 }
 
-export function MeetingPrepare({ memberId, recentMeetings, pendingActions, carryoverData }: Props) {
+export function MeetingPrepare({
+  memberId,
+  recentMeetings,
+  pendingActions,
+  carryoverData,
+  customTemplates = [],
+}: Props) {
   const [topics, setTopics] = useState<TopicDraft[]>([createEmptyTopic(0)]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>();
   const agendaRef = useRef<HTMLDivElement>(null);
@@ -189,7 +197,11 @@ export function MeetingPrepare({ memberId, recentMeetings, pendingActions, carry
       <div className="flex flex-col gap-4">
         <div>
           <h3 className="text-sm font-medium mb-3">テンプレート</h3>
-          <TemplateSelector onSelect={handleTemplateSelect} selectedId={selectedTemplateId} />
+          <TemplateSelector
+            onSelect={handleTemplateSelect}
+            selectedId={selectedTemplateId}
+            customTemplates={customTemplates}
+          />
         </div>
 
         <div ref={agendaRef}>
