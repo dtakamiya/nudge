@@ -66,11 +66,11 @@ export async function getMemberTopicTrends(memberId: string) {
     const date = new Date(topic.meeting.date);
     const monthKey = toMonthKey(date);
 
-    if (!monthlyMap.has(monthKey)) {
-      monthlyMap.set(monthKey, {});
-    }
-    const monthRecord = monthlyMap.get(monthKey)!;
-    monthRecord[topic.category] = (monthRecord[topic.category] || 0) + 1;
+    const existing = monthlyMap.get(monthKey) ?? {};
+    monthlyMap.set(monthKey, {
+      ...existing,
+      [topic.category]: (existing[topic.category] || 0) + 1,
+    });
   }
 
   const distribution: CategoryTrend[] = Array.from(distributionMap.entries())
@@ -130,19 +130,18 @@ export async function getMemberActionTrends(memberId: string): Promise<ActionTre
     // Collect created
     const createdDate = new Date(action.createdAt);
     const createdMonthKey = toMonthKey(createdDate);
-    if (!monthlyMap.has(createdMonthKey)) {
-      monthlyMap.set(createdMonthKey, { created: 0, completed: 0 });
-    }
-    monthlyMap.get(createdMonthKey)!.created++;
+    const existingCreated = monthlyMap.get(createdMonthKey) ?? { created: 0, completed: 0 };
+    monthlyMap.set(createdMonthKey, { ...existingCreated, created: existingCreated.created + 1 });
 
     // Collect completed
     if (action.completedAt) {
       const completedDate = new Date(action.completedAt);
       const completedMonthKey = toMonthKey(completedDate);
-      if (!monthlyMap.has(completedMonthKey)) {
-        monthlyMap.set(completedMonthKey, { created: 0, completed: 0 });
-      }
-      monthlyMap.get(completedMonthKey)!.completed++;
+      const existingCompleted = monthlyMap.get(completedMonthKey) ?? { created: 0, completed: 0 };
+      monthlyMap.set(completedMonthKey, {
+        ...existingCompleted,
+        completed: existingCompleted.completed + 1,
+      });
     }
   }
 
@@ -161,8 +160,8 @@ export async function getMeetingFrequencyByMonth(
   monthCount: 3 | 6 | 12 = 12,
   department?: string,
 ): Promise<MeetingFrequencyMonth[]> {
-  const since = new Date();
-  since.setMonth(since.getMonth() - monthCount);
+  const now = new Date();
+  const since = new Date(now.getFullYear(), now.getMonth() - monthCount, 1);
 
   const meetings = await prisma.meeting.findMany({
     where: {
@@ -175,8 +174,7 @@ export async function getMeetingFrequencyByMonth(
 
   const monthMap = new Map<string, number>();
   for (const meeting of meetings) {
-    const d = new Date(meeting.date);
-    const key = toMonthKey(d);
+    const key = toMonthKey(new Date(meeting.date));
     monthMap.set(key, (monthMap.get(key) ?? 0) + 1);
   }
 
@@ -359,4 +357,72 @@ export async function getAllMembersWithInterval(
   }
   // sort === "name" (default, already sorted by DB)
   return mapped;
+}
+
+export async function getRecommendedAndScheduledMeetings(): Promise<{
+  recommended: RecommendedMeeting[];
+  scheduled: ScheduledMeeting[];
+}> {
+  const now = new Date();
+
+  const members = await prisma.member.findMany({
+    include: {
+      meetings: {
+        orderBy: { date: "desc" },
+        take: 1,
+        select: { date: true },
+      },
+    },
+  });
+
+  const recommended: RecommendedMeeting[] = members
+    .filter((m) => {
+      const lastDate = m.meetings[0]?.date ?? null;
+      return isOverdue(lastDate ? new Date(lastDate) : null, m.meetingIntervalDays, now);
+    })
+    .map((m) => {
+      const lastDate = m.meetings[0]?.date ?? null;
+      const lastDateObj = lastDate ? new Date(lastDate) : null;
+      const daysSinceLast = lastDateObj
+        ? Math.floor((now.getTime() - lastDateObj.getTime()) / (1000 * 60 * 60 * 24))
+        : 9999;
+      return {
+        id: m.id,
+        name: m.name,
+        department: m.department,
+        position: m.position,
+        daysSinceLast,
+        lastMeetingDate: lastDateObj,
+        meetingIntervalDays: m.meetingIntervalDays,
+        nextRecommendedDate: calcNextRecommendedDate(lastDateObj, m.meetingIntervalDays),
+      };
+    })
+    .sort((a, b) => b.daysSinceLast - a.daysSinceLast);
+
+  const scheduled: ScheduledMeeting[] = members
+    .filter((m) => {
+      const lastDate = m.meetings[0]?.date ?? null;
+      return isScheduledThisWeek(lastDate ? new Date(lastDate) : null, m.meetingIntervalDays, now);
+    })
+    .flatMap((m) => {
+      const meetingDate = m.meetings[0]?.date;
+      if (!meetingDate) return [];
+      const lastDate = new Date(meetingDate);
+      const nextRecommendedDate = calcNextRecommendedDate(lastDate, m.meetingIntervalDays);
+      if (!nextRecommendedDate) return [];
+      return [
+        {
+          id: m.id,
+          name: m.name,
+          department: m.department,
+          position: m.position,
+          meetingIntervalDays: m.meetingIntervalDays,
+          nextRecommendedDate,
+          lastMeetingDate: lastDate,
+        },
+      ];
+    })
+    .sort((a, b) => a.nextRecommendedDate.getTime() - b.nextRecommendedDate.getTime());
+
+  return { recommended, scheduled };
 }

@@ -11,10 +11,7 @@ import { ReminderAlertBanner } from "@/components/dashboard/reminder-alert-banne
 import { ScheduledMeetingsSection } from "@/components/dashboard/scheduled-meetings-section";
 import { UpcomingActionsSection } from "@/components/dashboard/upcoming-actions-section";
 import { MemberList } from "@/components/member/member-list";
-import {
-  getRecommendedMeetings,
-  getScheduledMeetingsThisWeek,
-} from "@/lib/actions/analytics-actions";
+import { getRecommendedAndScheduledMeetings } from "@/lib/actions/analytics-actions";
 import {
   getDashboardSummary,
   getHealthScore,
@@ -33,8 +30,7 @@ export default async function DashboardPage() {
     healthScore,
     recentActivity,
     upcomingActions,
-    recommendedMeetings,
-    scheduledMeetings,
+    { recommended: recommendedMeetings, scheduled: scheduledMeetings },
     overdueReminders,
   ] = await Promise.all([
     getMembers(),
@@ -42,8 +38,7 @@ export default async function DashboardPage() {
     getHealthScore(),
     getRecentActivity(),
     getUpcomingActions(),
-    getRecommendedMeetings(),
-    getScheduledMeetingsThisWeek(),
+    getRecommendedAndScheduledMeetings(),
     getOverdueReminders(),
   ]);
 
