@@ -9,6 +9,7 @@ import {
   getMember,
   getMemberMeetings,
   getMembers,
+  getMemberTimeline,
   updateMember,
 } from "../member-actions";
 
@@ -207,5 +208,134 @@ describe("deleteMember", () => {
   it("returns error for empty id", async () => {
     const result = await deleteMember("");
     expect(result.success).toBe(false);
+  });
+});
+
+describe("getMemberTimeline", () => {
+  it("returns empty array for member with no meetings or actions", async () => {
+    const result = await createMember({ name: "Empty Timeline" });
+    if (!result.success) throw new Error(result.error);
+    const entries = await getMemberTimeline(result.data.id);
+    expect(entries).toHaveLength(0);
+  });
+
+  it("includes meeting entries sorted by date desc", async () => {
+    const memberResult = await createMember({ name: "Timeline Member" });
+    if (!memberResult.success) throw new Error(memberResult.error);
+    const date1 = new Date("2026-01-01T00:00:00Z");
+    const date2 = new Date("2026-01-10T00:00:00Z");
+    const m1 = await createMeeting({
+      memberId: memberResult.data.id,
+      date: date1.toISOString(),
+      topics: [{ title: "Topic A", category: "OTHER", sortOrder: 0 }],
+      actionItems: [{ title: "Action A", description: "", sortOrder: 0 }],
+    });
+    if (!m1.success) throw new Error(m1.error);
+    const m2 = await createMeeting({
+      memberId: memberResult.data.id,
+      date: date2.toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+    if (!m2.success) throw new Error(m2.error);
+
+    const entries = await getMemberTimeline(memberResult.data.id);
+    const meetingEntries = entries.filter((e) => e.type === "meeting");
+    expect(meetingEntries).toHaveLength(2);
+    // 降順に並んでいること
+    expect(meetingEntries[0].date.toISOString()).toBe(date2.toISOString());
+    expect(meetingEntries[1].date.toISOString()).toBe(date1.toISOString());
+    // topic/actionカウント
+    const older = meetingEntries[1];
+    if (older.type === "meeting") {
+      expect(older.topicCount).toBe(1);
+      expect(older.actionCount).toBe(1);
+    }
+  });
+
+  it("includes action_completed entries for DONE actions with completedAt", async () => {
+    const memberResult = await createMember({ name: "Completed Actions" });
+    if (!memberResult.success) throw new Error(memberResult.error);
+    const meetingDate = new Date("2026-01-05T00:00:00Z");
+    const meeting = await createMeeting({
+      memberId: memberResult.data.id,
+      date: meetingDate.toISOString(),
+      topics: [],
+      actionItems: [{ title: "Done Action", description: "", sortOrder: 0 }],
+    });
+    if (!meeting.success) throw new Error(meeting.error);
+
+    // アクションをDONEにする
+    const completedAt = new Date("2026-01-10T00:00:00Z");
+    const actionItem = await prisma.actionItem.findFirst({
+      where: { meetingId: meeting.data.id },
+    });
+    if (!actionItem) throw new Error("action item not found");
+    await prisma.actionItem.update({
+      where: { id: actionItem.id },
+      data: { status: "DONE", completedAt },
+    });
+
+    const entries = await getMemberTimeline(memberResult.data.id);
+    const completedEntries = entries.filter((e) => e.type === "action_completed");
+    expect(completedEntries).toHaveLength(1);
+    if (completedEntries[0].type === "action_completed") {
+      expect(completedEntries[0].title).toBe("Done Action");
+      expect(completedEntries[0].completedAt.toISOString()).toBe(completedAt.toISOString());
+    }
+  });
+
+  it("includes action_overdue entries for overdue non-DONE actions", async () => {
+    const memberResult = await createMember({ name: "Overdue Actions" });
+    if (!memberResult.success) throw new Error(memberResult.error);
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
+
+    await createMeeting({
+      memberId: memberResult.data.id,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [
+        {
+          title: "Overdue Action",
+          description: "",
+          sortOrder: 0,
+          dueDate: yesterday.toISOString(),
+        },
+      ],
+    });
+
+    const entries = await getMemberTimeline(memberResult.data.id);
+    const overdueEntries = entries.filter((e) => e.type === "action_overdue");
+    expect(overdueEntries).toHaveLength(1);
+    if (overdueEntries[0].type === "action_overdue") {
+      expect(overdueEntries[0].title).toBe("Overdue Action");
+    }
+  });
+
+  it("does not include non-overdue pending actions", async () => {
+    const memberResult = await createMember({ name: "Future Action" });
+    if (!memberResult.success) throw new Error(memberResult.error);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    await createMeeting({
+      memberId: memberResult.data.id,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [
+        {
+          title: "Future Action",
+          description: "",
+          sortOrder: 0,
+          dueDate: tomorrow.toISOString(),
+        },
+      ],
+    });
+
+    const entries = await getMemberTimeline(memberResult.data.id);
+    const overdueEntries = entries.filter((e) => e.type === "action_overdue");
+    expect(overdueEntries).toHaveLength(0);
   });
 });

@@ -9,31 +9,37 @@ import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { MeetingHistory } from "@/components/meeting/meeting-history";
 import { CalendarExportButton } from "@/components/member/calendar-export-button";
 import { MemberActionsDropdown } from "@/components/member/member-actions-dropdown";
+import { MemberDetailTabNav } from "@/components/member/member-detail-tab-nav";
 import { MemberQuickActions } from "@/components/member/member-quick-actions";
 import { MemberStatsBar } from "@/components/member/member-stats-bar";
+import { MemberTimeline } from "@/components/member/member-timeline";
 import { MoodTrendChart } from "@/components/member/mood-trend-chart";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getMoodTrend } from "@/lib/actions/meeting-actions";
-import { getMember, getMemberMeetings } from "@/lib/actions/member-actions";
+import { getMember, getMemberMeetings, getMemberTimeline } from "@/lib/actions/member-actions";
 import { calcNextRecommendedDate } from "@/lib/schedule";
+
+type Tab = "timeline" | "history" | "actions";
 
 type Props = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; tab?: string }>;
 };
+
+function resolveTab(tab: string | undefined): Tab {
+  if (tab === "history" || tab === "actions") return tab;
+  return "timeline";
+}
 
 export default async function MemberDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
-  const { page: pageParam } = await searchParams;
+  const { page: pageParam, tab: tabParam } = await searchParams;
+  const currentTab = resolveTab(tabParam);
   const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
 
-  const [member, meetingsPage, moodTrend] = await Promise.all([
-    getMember(id),
-    getMemberMeetings(id, page),
-    getMoodTrend(id, 10),
-  ]);
+  const [member, moodTrend] = await Promise.all([getMember(id), getMoodTrend(id, 10)]);
 
   if (!member) {
     notFound();
@@ -43,6 +49,11 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
     member.lastMeetingDate,
     member.meetingIntervalDays,
   );
+
+  const [meetingsPage, timeline] = await Promise.all([
+    currentTab === "history" ? getMemberMeetings(id, page) : Promise.resolve(null),
+    currentTab === "timeline" ? getMemberTimeline(id) : Promise.resolve(null),
+  ]);
 
   return (
     <div className="animate-fade-in-up">
@@ -104,23 +115,34 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
 
       <MemberQuickActions pendingActionItems={member.pendingActionItems} />
 
-      <h2 className="text-lg font-semibold tracking-tight mb-3 text-foreground mt-8">1on1履歴</h2>
-      <MeetingHistory
-        meetings={meetingsPage.meetings}
-        memberId={id}
-        pagination={{
-          page: meetingsPage.page,
-          total: meetingsPage.total,
-          pageSize: meetingsPage.pageSize,
-          hasNext: meetingsPage.hasNext,
-          hasPrev: meetingsPage.hasPrev,
-        }}
-      />
-      <Separator className="my-6" />
-      <h2 className="text-lg font-semibold tracking-tight mb-3 text-foreground">
-        アクションアイテム
-      </h2>
-      <ActionListCompact actionItems={member.actionItems} />
+      <div className="mt-8">
+        <MemberDetailTabNav memberId={id} currentTab={currentTab} />
+
+        {currentTab === "timeline" && timeline !== null && (
+          <MemberTimeline entries={timeline} memberId={id} />
+        )}
+
+        {currentTab === "history" && meetingsPage !== null && (
+          <MeetingHistory
+            meetings={meetingsPage.meetings}
+            memberId={id}
+            pagination={{
+              page: meetingsPage.page,
+              total: meetingsPage.total,
+              pageSize: meetingsPage.pageSize,
+              hasNext: meetingsPage.hasNext,
+              hasPrev: meetingsPage.hasPrev,
+            }}
+          />
+        )}
+
+        {currentTab === "actions" && (
+          <>
+            <Separator className="mb-6" />
+            <ActionListCompact actionItems={member.actionItems} />
+          </>
+        )}
+      </div>
     </div>
   );
 }

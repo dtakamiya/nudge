@@ -36,3 +36,42 @@ export type MeetingsPage = {
   hasNext: boolean;
   hasPrev: boolean;
 };
+
+/**
+ * タイムラインエントリ（ミーティング実施）
+ */
+export type MeetingTimelineEntry = {
+  type: "meeting";
+  id: string;
+  date: Date;
+  mood: number | null;
+  topicCount: number;
+  actionCount: number;
+};
+
+/**
+ * タイムラインエントリ（アクション完了）
+ */
+export type ActionCompletedEntry = {
+  type: "action_completed";
+  id: string;
+  title: string;
+  completedAt: Date;
+  meetingId: string;
+};
+
+/**
+ * タイムラインエントリ（アクション期限超過）
+ */
+export type ActionOverdueEntry = {
+  type: "action_overdue";
+  id: string;
+  title: string;
+  dueDate: Date;
+  meetingId: string;
+};
+
+/**
+ * メンバータイムラインエントリ（ユニオン型）
+ */
+export type MemberTimelineEntry = MeetingTimelineEntry | ActionCompletedEntry | ActionOverdueEntry;
