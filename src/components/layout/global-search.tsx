@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 
 import { searchAll, type SearchResults } from "@/lib/actions/search-actions";
+import { highlightText } from "@/lib/highlight";
 import { cn } from "@/lib/utils";
 
 const DEBOUNCE_MS = 300;
@@ -150,6 +151,7 @@ export function GlobalSearch() {
                       icon={<User size={12} />}
                       primary={member.name}
                       secondary={[member.department, member.position].filter(Boolean).join(" · ")}
+                      query={query}
                       onClick={() => handleNavigate(`/members/${member.id}`)}
                     />
                   ))}
@@ -163,6 +165,7 @@ export function GlobalSearch() {
                       icon={<MessageSquare size={12} />}
                       primary={topic.title}
                       secondary={topic.memberName}
+                      query={query}
                       onClick={() =>
                         handleNavigate(`/members/${topic.memberId}/meetings/${topic.meetingId}`)
                       }
@@ -178,6 +181,7 @@ export function GlobalSearch() {
                       icon={<CheckSquare size={12} />}
                       primary={item.title}
                       secondary={item.memberName}
+                      query={query}
                       onClick={() =>
                         item.meetingId
                           ? handleNavigate(`/members/${item.memberId}/meetings/${item.meetingId}`)
@@ -194,6 +198,7 @@ export function GlobalSearch() {
                       key={tag.id}
                       icon={<Tag size={12} />}
                       primary={tag.name}
+                      query={query}
                       onClick={() => handleNavigate(`/actions?tag=${tag.id}`)}
                     />
                   ))}
@@ -224,11 +229,13 @@ function SearchItem({
   icon,
   primary,
   secondary,
+  query,
   onClick,
 }: {
   icon: React.ReactNode;
   primary: string;
   secondary?: string;
+  query: string;
   onClick: () => void;
 }) {
   return (
@@ -245,7 +252,7 @@ function SearchItem({
     >
       <span className="mt-0.5 shrink-0 text-muted-foreground">{icon}</span>
       <div className="min-w-0">
-        <div className="truncate font-medium">{primary}</div>
+        <div className="truncate font-medium">{highlightText(primary, query)}</div>
         {secondary && <div className="truncate text-xs text-muted-foreground">{secondary}</div>}
       </div>
     </button>

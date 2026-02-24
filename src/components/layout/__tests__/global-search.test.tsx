@@ -87,7 +87,8 @@ describe("GlobalSearch", () => {
 
       await user.type(input, "田中");
       await waitFor(() => {
-        expect(screen.getByText("田中太郎")).toBeDefined();
+        const listbox = screen.getByRole("listbox");
+        expect(listbox.textContent).toContain("田中太郎");
       });
     });
 
@@ -118,7 +119,8 @@ describe("GlobalSearch", () => {
 
       await user.type(input, "キャリア");
       await waitFor(() => {
-        expect(screen.getByText("キャリア相談")).toBeDefined();
+        const listbox = screen.getByRole("listbox");
+        expect(listbox.textContent).toContain("キャリア相談");
       });
     });
 
@@ -149,7 +151,8 @@ describe("GlobalSearch", () => {
 
       await user.type(input, "プレゼン");
       await waitFor(() => {
-        expect(screen.getByText("プレゼン資料作成")).toBeDefined();
+        const listbox = screen.getByRole("listbox");
+        expect(listbox.textContent).toContain("プレゼン資料作成");
       });
     });
 
@@ -230,11 +233,14 @@ describe("GlobalSearch", () => {
       const input = screen.getByPlaceholderText("検索...");
 
       await user.type(input, "田中");
-      await waitFor(() => expect(screen.getByText("田中太郎")).toBeDefined());
+      await waitFor(() => {
+        const listbox = screen.getByRole("listbox");
+        expect(listbox.textContent).toContain("田中太郎");
+      });
 
       await user.keyboard("{Escape}");
       await waitFor(() => {
-        expect(screen.queryByText("田中太郎")).toBeNull();
+        expect(screen.queryByRole("listbox")).toBeNull();
       });
     });
   });
@@ -244,6 +250,120 @@ describe("GlobalSearch", () => {
       render(<GlobalSearch />);
       const input = screen.getByLabelText("グローバル検索");
       expect(input).toBeDefined();
+    });
+  });
+
+  describe("キーワードハイライト", () => {
+    it("メンバー名の一致部分が mark タグでハイライトされる", async () => {
+      mockSearchAll.mockResolvedValue({
+        success: true,
+        data: {
+          members: [{ id: "m1", name: "田中太郎", department: null, position: null }],
+          topics: [],
+          actionItems: [],
+          tags: [],
+        },
+      });
+
+      const user = userEvent.setup({ delay: null });
+      render(<GlobalSearch />);
+      const input = screen.getByPlaceholderText("検索...");
+
+      await user.type(input, "田中");
+      await waitFor(() => {
+        const marks = document.querySelectorAll("mark");
+        expect(marks.length).toBeGreaterThan(0);
+        expect(marks[0].textContent).toBe("田中");
+      });
+    });
+
+    it("話題タイトルの一致部分がハイライトされる", async () => {
+      mockSearchAll.mockResolvedValue({
+        success: true,
+        data: {
+          members: [],
+          topics: [
+            {
+              id: "t1",
+              title: "キャリア相談",
+              notes: null,
+              category: "CAREER",
+              meetingId: "meeting-1",
+              memberId: "m1",
+              memberName: "田中太郎",
+            },
+          ],
+          actionItems: [],
+          tags: [],
+        },
+      });
+
+      const user = userEvent.setup({ delay: null });
+      render(<GlobalSearch />);
+      const input = screen.getByPlaceholderText("検索...");
+
+      await user.type(input, "キャリア");
+      await waitFor(() => {
+        const marks = document.querySelectorAll("mark");
+        expect(marks.length).toBeGreaterThan(0);
+        expect(marks[0].textContent).toBe("キャリア");
+      });
+    });
+
+    it("アクションアイテムタイトルの一致部分がハイライトされる", async () => {
+      mockSearchAll.mockResolvedValue({
+        success: true,
+        data: {
+          members: [],
+          topics: [],
+          actionItems: [
+            {
+              id: "a1",
+              title: "プレゼン資料作成",
+              description: null,
+              status: "TODO",
+              memberId: "m1",
+              memberName: "田中太郎",
+              meetingId: null,
+            },
+          ],
+          tags: [],
+        },
+      });
+
+      const user = userEvent.setup({ delay: null });
+      render(<GlobalSearch />);
+      const input = screen.getByPlaceholderText("検索...");
+
+      await user.type(input, "プレゼン");
+      await waitFor(() => {
+        const marks = document.querySelectorAll("mark");
+        expect(marks.length).toBeGreaterThan(0);
+        expect(marks[0].textContent).toBe("プレゼン");
+      });
+    });
+
+    it("タグ名の一致部分がハイライトされる", async () => {
+      mockSearchAll.mockResolvedValue({
+        success: true,
+        data: {
+          members: [],
+          topics: [],
+          actionItems: [],
+          tags: [{ id: "tag1", name: "重要タスク", color: "#ef4444" }],
+        },
+      });
+
+      const user = userEvent.setup({ delay: null });
+      render(<GlobalSearch />);
+      const input = screen.getByPlaceholderText("検索...");
+
+      await user.type(input, "重要");
+      await waitFor(() => {
+        const marks = document.querySelectorAll("mark");
+        expect(marks.length).toBeGreaterThan(0);
+        expect(marks[0].textContent).toBe("重要");
+      });
     });
   });
 });
