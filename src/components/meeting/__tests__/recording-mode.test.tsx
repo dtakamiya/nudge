@@ -24,6 +24,14 @@ vi.mock("sonner", () => ({
   },
 }));
 
+vi.mock("@/hooks/use-focus-mode", () => ({
+  useFocusMode: () => ({
+    isFocusMode: false,
+    toggleFocusMode: vi.fn(),
+    setFocusMode: vi.fn(),
+  }),
+}));
+
 import { endMeeting, updateTopicNotes } from "@/lib/actions/meeting-actions";
 
 const mockEndMeeting = vi.mocked(endMeeting);

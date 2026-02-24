@@ -6,6 +6,7 @@ type ShortcutCallbacks = {
   readonly onNewMember: () => void;
   readonly onNewMeeting: () => void;
   readonly onShowHelp: () => void;
+  readonly onToggleFocusMode?: () => void;
 };
 
 function isTypingTarget(element: Element | null): boolean {
@@ -26,7 +27,7 @@ export function useKeyboardShortcuts(callbacks: ShortcutCallbacks): void {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isTypingTarget(document.activeElement)) return;
 
-      const { onNewMember, onNewMeeting, onShowHelp } = callbacksRef.current;
+      const { onNewMember, onNewMeeting, onShowHelp, onToggleFocusMode } = callbacksRef.current;
 
       switch (e.key) {
         case "n":
@@ -40,6 +41,10 @@ export function useKeyboardShortcuts(callbacks: ShortcutCallbacks): void {
         case "?":
           e.preventDefault();
           onShowHelp();
+          break;
+        case "f":
+          e.preventDefault();
+          onToggleFocusMode?.();
           break;
       }
     };

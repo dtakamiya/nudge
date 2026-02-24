@@ -16,6 +16,7 @@ type ShortcutEntry = {
 const SHORTCUTS: ReadonlyArray<ShortcutEntry> = [
   { key: "n", description: "新規メンバーを追加" },
   { key: "m", description: "新規ミーティングを作成" },
+  { key: "f", description: "フォーカスモード切り替え" },
   { key: "⌘ K", description: "検索" },
   { key: "?", description: "ショートカット一覧を表示" },
 ];

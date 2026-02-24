@@ -6,11 +6,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { useFocusMode } from "@/hooks/use-focus-mode";
 import { startMeeting } from "@/lib/actions/meeting-actions";
 import { generateMeetingSummaryText } from "@/lib/meeting-summary";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 import { CoachingSheet } from "./coaching-sheet";
+import { FocusModeIndicator } from "./focus-mode-indicator";
 import { MeetingDetail } from "./meeting-detail";
 import { MeetingForm } from "./meeting-form";
 import { RecordingMode } from "./recording-mode";
@@ -84,6 +86,7 @@ export function MeetingDetailPageClient({
   const [isRecording, setIsRecording] = useState(startedAt != null && endedAt == null);
   const [isStarting, setIsStarting] = useState(false);
   const router = useRouter();
+  const { setFocusMode } = useFocusMode();
 
   function handleEditSuccess() {
     setIsEditing(false);
@@ -91,6 +94,7 @@ export function MeetingDetailPageClient({
   }
 
   function handleRecordingEnd() {
+    setFocusMode(false);
     setIsRecording(false);
     router.refresh();
   }
@@ -132,6 +136,7 @@ export function MeetingDetailPageClient({
   if (isRecording) {
     return (
       <>
+        <FocusModeIndicator />
         <RecordingMode
           meetingId={meetingId}
           startedAt={startedAt ?? new Date()}

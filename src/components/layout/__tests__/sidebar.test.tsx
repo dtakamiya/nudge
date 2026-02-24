@@ -18,6 +18,14 @@ vi.mock("@/lib/actions/search-actions", () => ({
     .mockResolvedValue({ success: true, data: { members: [], topics: [], actionItems: [] } }),
 }));
 
+vi.mock("@/hooks/use-focus-mode", () => ({
+  useFocusMode: () => ({
+    isFocusMode: false,
+    toggleFocusMode: vi.fn(),
+    setFocusMode: vi.fn(),
+  }),
+}));
+
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();

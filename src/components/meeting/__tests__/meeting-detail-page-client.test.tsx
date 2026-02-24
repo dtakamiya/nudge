@@ -14,6 +14,14 @@ vi.mock("@/lib/actions/meeting-actions", () => ({
   startMeeting: vi.fn(),
 }));
 
+vi.mock("@/hooks/use-focus-mode", () => ({
+  useFocusMode: () => ({
+    isFocusMode: false,
+    toggleFocusMode: vi.fn(),
+    setFocusMode: vi.fn(),
+  }),
+}));
+
 // Mock MeetingDetail to simplify tests
 vi.mock("../meeting-detail", () => ({
   MeetingDetail: ({ date }: { date: Date }) => (
@@ -44,6 +52,11 @@ vi.mock("../recording-mode", () => ({
       <button onClick={onEnd}>mock-end</button>
     </div>
   ),
+}));
+
+// Mock FocusModeIndicator
+vi.mock("../focus-mode-indicator", () => ({
+  FocusModeIndicator: () => <div data-testid="focus-mode-indicator" />,
 }));
 
 // Mock dnd-kit

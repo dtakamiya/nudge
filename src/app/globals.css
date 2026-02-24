@@ -208,6 +208,17 @@
   animation: pulse-attention 2s ease-in-out infinite;
 }
 
+/* フォーカスモード用スタイル */
+html[data-focus-mode="true"] main {
+  padding-top: 1.5rem !important;
+}
+
+@media (min-width: 1024px) {
+  html[data-focus-mode="true"] main {
+    padding-top: 2.5rem !important;
+  }
+}
+
 @media print {
   @page {
     size: A4;

@@ -5,9 +5,18 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { KeyboardShortcutProvider } from "../keyboard-shortcut-provider";
 
 const mockPush = vi.fn();
+const mockToggleFocusMode = vi.fn();
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
+}));
+
+vi.mock("@/hooks/use-focus-mode", () => ({
+  useFocusMode: () => ({
+    isFocusMode: false,
+    toggleFocusMode: mockToggleFocusMode,
+    setFocusMode: vi.fn(),
+  }),
 }));
 
 afterEach(() => {
@@ -48,6 +57,16 @@ describe("KeyboardShortcutProvider", () => {
       fireEvent.keyDown(document, { key: "?" });
 
       expect(screen.getByText("キーボードショートカット")).toBeDefined();
+    });
+  });
+
+  describe("'f' キー — フォーカスモード切り替え", () => {
+    it("'f' キーで toggleFocusMode が呼ばれる", () => {
+      render(<KeyboardShortcutProvider members={members} />);
+
+      fireEvent.keyDown(document, { key: "f" });
+
+      expect(mockToggleFocusMode).toHaveBeenCalledOnce();
     });
   });
 });

@@ -54,7 +54,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </a>
         <Providers>
           <Sidebar members={members} actionCount={actionCount} />
-          <main id="main-content" className="flex-1 overflow-auto p-6 pt-18 lg:p-10 lg:pt-10">
+          <main
+            id="main-content"
+            className="flex-1 overflow-auto p-6 pt-18 lg:p-10 lg:pt-10 transition-all duration-300"
+          >
             <div className="max-w-5xl mx-auto">{children}</div>
           </main>
           <Toaster />
