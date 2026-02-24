@@ -18,8 +18,6 @@ import {
 
 import { type ActionResult, runAction } from "./types";
 
-export type { CarryoverAction, DateFilterType, LastMeetingPendingActionsResult, SortByType };
-
 type ActionItemFilters = {
   status?: ActionItemStatusType;
   memberId?: string;
@@ -204,4 +202,46 @@ export async function createActionItemForMeeting(
     revalidatePath("/", "layout");
     return result;
   });
+}
+
+export type LastMeetingAllActionsResult = {
+  meetingId: string;
+  meetingDate: Date;
+  completedActions: CarryoverAction[];
+  pendingActions: CarryoverAction[];
+} | null;
+
+export async function getLastMeetingAllActions(
+  memberId: string,
+): Promise<LastMeetingAllActionsResult> {
+  const lastMeeting = await prisma.meeting.findFirst({
+    where: { memberId },
+    orderBy: { date: "desc" },
+    select: { id: true, date: true },
+  });
+
+  if (!lastMeeting) return null;
+
+  const allActions = await prisma.actionItem.findMany({
+    where: { meetingId: lastMeeting.id },
+    orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
+    select: {
+      id: true,
+      title: true,
+      status: true,
+      dueDate: true,
+    },
+  });
+
+  const completedActions = allActions.filter((a) => a.status === "DONE");
+  const pendingActions = allActions.filter((a) => a.status !== "DONE");
+
+  if (completedActions.length === 0 && pendingActions.length === 0) return null;
+
+  return {
+    meetingId: lastMeeting.id,
+    meetingDate: lastMeeting.date,
+    completedActions,
+    pendingActions,
+  };
 }

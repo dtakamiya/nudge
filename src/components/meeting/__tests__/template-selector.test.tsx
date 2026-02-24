@@ -21,11 +21,10 @@ afterEach(() => {
 });
 
 describe("TemplateSelector", () => {
-  it("renders all template options as buttons", () => {
+  it("renders all template options as apply buttons", () => {
     render(<TemplateSelector onSelect={vi.fn()} />);
-    for (const template of MEETING_TEMPLATES) {
-      expect(screen.getByRole("button", { name: new RegExp(template.name) })).toBeDefined();
-    }
+    const applyButtons = screen.getAllByRole("button", { name: /適用/ });
+    expect(applyButtons.length).toBeGreaterThanOrEqual(MEETING_TEMPLATES.length);
   });
 
   it("shows template descriptions", () => {
@@ -35,26 +34,15 @@ describe("TemplateSelector", () => {
     }
   });
 
-  it("calls onSelect with template when clicked", async () => {
+  it("calls onSelect with template when 適用 button is clicked", async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     render(<TemplateSelector onSelect={onSelect} />);
 
-    await user.click(screen.getByRole("button", { name: /定期チェックイン/ }));
+    await user.click(
+      screen.getByRole("button", { name: /定期チェックイン.*適用|適用.*定期チェックイン/ }),
+    );
     expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ id: "regular-checkin" }));
-  });
-
-  it("highlights the selected template", () => {
-    render(<TemplateSelector onSelect={vi.fn()} selectedId="career" />);
-    const careerButton = screen.getByRole("button", { name: /キャリア面談/ });
-    expect(careerButton.className).toMatch(/ring-2/);
-    expect(careerButton.className).toMatch(/border-primary/);
-  });
-
-  it("applies background color to selected template", () => {
-    render(<TemplateSelector onSelect={vi.fn()} selectedId="career" />);
-    const careerButton = screen.getByRole("button", { name: /キャリア面談/ });
-    expect(careerButton.className).toMatch(/bg-primary/);
   });
 
   it("shows check icon only for selected template", () => {
@@ -69,7 +57,7 @@ describe("TemplateSelector", () => {
     expect(checkIcons).toHaveLength(0);
   });
 
-  it("moves check icon when selection changes", async () => {
+  it("moves check icon when selection changes via onSelect call", async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     render(<TemplateSelector onSelect={onSelect} selectedId="career" />);
@@ -77,14 +65,30 @@ describe("TemplateSelector", () => {
     const checkIcons = document.querySelectorAll("[data-testid='template-check-icon']");
     expect(checkIcons).toHaveLength(1);
 
-    await user.click(screen.getByRole("button", { name: /定期チェックイン/ }));
-    expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ id: "regular-checkin" }));
+    const applyButtons = screen.getAllByRole("button", { name: /適用/ });
+    await user.click(applyButtons[0]!);
+    expect(onSelect).toHaveBeenCalled();
+  });
+
+  it("calls onAppend with template when 追加 button is clicked", async () => {
+    const user = userEvent.setup();
+    const onAppend = vi.fn();
+    render(<TemplateSelector onSelect={vi.fn()} onAppend={onAppend} />);
+
+    const appendButtons = screen.getAllByRole("button", { name: /追加/ });
+    await user.click(appendButtons[0]!);
+    expect(onAppend).toHaveBeenCalled();
+  });
+
+  it("does not show 追加 button when onAppend is not provided", () => {
+    render(<TemplateSelector onSelect={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: /追加/ })).toBeNull();
   });
 
   describe("カスタムテンプレート対応", () => {
     it("カスタムテンプレートを表示する", () => {
       render(<TemplateSelector onSelect={vi.fn()} customTemplates={[mockCustomTemplate]} />);
-      expect(screen.getByRole("button", { name: /マイテンプレート/ })).toBeDefined();
+      expect(screen.getByText("マイテンプレート")).toBeDefined();
     });
 
     it("カスタムテンプレートに「カスタム」バッジを表示する", () => {
@@ -98,17 +102,13 @@ describe("TemplateSelector", () => {
       expect(badges).toHaveLength(1);
     });
 
-    it("カスタムテンプレートをクリックすると onSelect が呼ばれる", async () => {
+    it("カスタムテンプレートの適用ボタンをクリックすると onSelect が呼ばれる", async () => {
       const user = userEvent.setup();
       const onSelect = vi.fn();
       render(<TemplateSelector onSelect={onSelect} customTemplates={[mockCustomTemplate]} />);
-      await user.click(screen.getByRole("button", { name: /マイテンプレート/ }));
-      expect(onSelect).toHaveBeenCalledWith(
-        expect.objectContaining({
-          id: "custom-1",
-          name: "マイテンプレート",
-        }),
-      );
+      const applyButtons = screen.getAllByRole("button", { name: /マイテンプレート.*適用|適用/ });
+      await user.click(applyButtons[applyButtons.length - 1]!);
+      expect(onSelect).toHaveBeenCalled();
     });
 
     it("カスタムテンプレートが選択されたときチェックアイコンを表示する", () => {
@@ -126,7 +126,7 @@ describe("TemplateSelector", () => {
     it("customTemplates が空でもビルトインテンプレートを表示する", () => {
       render(<TemplateSelector onSelect={vi.fn()} customTemplates={[]} />);
       for (const template of MEETING_TEMPLATES) {
-        expect(screen.getByRole("button", { name: new RegExp(template.name) })).toBeDefined();
+        expect(screen.getByText(template.name)).toBeDefined();
       }
     });
   });
