@@ -32,7 +32,12 @@ export default defineConfig({
   webServer: {
     command: `npm run dev -- --port ${PORT}`,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    // 常に専用のテストサーバーを起動し dev.db を汚染しない
+    reuseExistingServer: false,
     timeout: 120000,
+    env: {
+      ...process.env,
+      DATABASE_URL: process.env.DATABASE_URL ?? "file:./test.db",
+    },
   },
 });
