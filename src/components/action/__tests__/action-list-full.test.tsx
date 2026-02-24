@@ -7,7 +7,7 @@ import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 import { ActionListFull } from "../action-list-full";
 
-const mockRefresh = vi.fn();
+const { mockRefresh } = vi.hoisted(() => ({ mockRefresh: vi.fn() }));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({

@@ -13,18 +13,6 @@ vi.mock("@/lib/actions/action-item-actions", () => ({
   updateActionItemStatus: vi.fn().mockResolvedValue({ success: true }),
 }));
 
-vi.mock("sonner", () => ({
-  toast: { success: vi.fn(), error: vi.fn() },
-}));
-
-vi.mock("@dnd-kit/core", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@dnd-kit/core")>();
-  return {
-    ...actual,
-    DndContext: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
-  };
-});
-
 const mockPendingActions = [
   {
     id: "a1",

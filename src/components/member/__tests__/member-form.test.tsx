@@ -7,9 +7,11 @@ import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 import { MemberForm } from "../member-form";
 
-const mockPush = vi.fn();
-const mockRefresh = vi.fn();
-const mockBack = vi.fn();
+const { mockPush, mockRefresh, mockBack } = vi.hoisted(() => ({
+  mockPush: vi.fn(),
+  mockRefresh: vi.fn(),
+  mockBack: vi.fn(),
+}));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -17,13 +19,6 @@ vi.mock("next/navigation", () => ({
     refresh: mockRefresh,
     back: mockBack,
   }),
-}));
-
-vi.mock("sonner", () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
 }));
 
 const mockCreateMember = vi.fn();

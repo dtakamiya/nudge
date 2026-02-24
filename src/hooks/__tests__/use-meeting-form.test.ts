@@ -3,38 +3,15 @@ import { describe, expect, it, vi } from "vitest";
 
 import { useMeetingForm } from "../use-meeting-form";
 
-const mockPush = vi.fn();
+const { mockPush } = vi.hoisted(() => ({ mockPush: vi.fn() }));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-vi.mock("sonner", () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
-}));
-
 vi.mock("@/lib/actions/meeting-actions", () => ({
   createMeeting: vi.fn(),
   updateMeeting: vi.fn(),
-}));
-
-vi.mock("@dnd-kit/core", () => ({
-  PointerSensor: vi.fn(),
-  KeyboardSensor: vi.fn(),
-  useSensor: vi.fn(),
-  useSensors: vi.fn(() => []),
-}));
-
-vi.mock("@dnd-kit/sortable", () => ({
-  arrayMove: vi.fn((arr: unknown[], from: number, to: number) => {
-    const result = [...arr];
-    const [item] = result.splice(from, 1);
-    result.splice(to, 0, item);
-    return result;
-  }),
 }));
 
 vi.mock("@/lib/dnd-accessibility", () => ({

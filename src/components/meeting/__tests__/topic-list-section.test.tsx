@@ -5,28 +5,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { TagData } from "../sortable-action-item";
 import { TopicListSection } from "../topic-list-section";
 
-vi.mock("@dnd-kit/core", () => ({
-  DndContext: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  closestCenter: vi.fn(),
-  KeyboardSensor: vi.fn(),
-  PointerSensor: vi.fn(),
-  useSensor: vi.fn(),
-  useSensors: vi.fn(() => []),
-}));
-
-vi.mock("@dnd-kit/sortable", () => ({
-  SortableContext: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  verticalListSortingStrategy: {},
-  useSortable: () => ({
-    attributes: {},
-    listeners: {},
-    setNodeRef: vi.fn(),
-    transform: null,
-    transition: null,
-    isDragging: false,
-  }),
-}));
-
 const mockAnnouncements = {
   onDragStart: vi.fn(() => ""),
   onDragOver: vi.fn(() => ""),

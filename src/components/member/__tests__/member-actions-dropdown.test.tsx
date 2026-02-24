@@ -4,21 +4,16 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { MemberActionsDropdown } from "../member-actions-dropdown";
 
-const mockPush = vi.fn();
-const mockRefresh = vi.fn();
+const { mockPush, mockRefresh } = vi.hoisted(() => ({
+  mockPush: vi.fn(),
+  mockRefresh: vi.fn(),
+}));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,
     refresh: mockRefresh,
   }),
-}));
-
-vi.mock("sonner", () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
 }));
 
 vi.mock("@/lib/actions/member-actions", () => ({

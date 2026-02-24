@@ -3,19 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { CheckinTrendChart } from "../checkin-trend-chart";
 
-vi.mock("recharts", () => ({
-  LineChart: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="line-chart">{children}</div>
-  ),
-  Line: () => null,
-  XAxis: () => null,
-  YAxis: () => null,
-  CartesianGrid: () => null,
-  Tooltip: () => null,
-  Legend: () => null,
-  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}));
-
 afterEach(() => cleanup());
 
 describe("CheckinTrendChart", () => {

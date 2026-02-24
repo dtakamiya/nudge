@@ -3,18 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { MeetingFrequencyChart } from "../meeting-frequency-chart";
 
-vi.mock("recharts", () => ({
-  BarChart: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="bar-chart">{children}</div>
-  ),
-  Bar: () => null,
-  XAxis: () => null,
-  YAxis: () => null,
-  CartesianGrid: () => null,
-  Tooltip: () => null,
-  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}));
-
 afterEach(() => {
   cleanup();
 });

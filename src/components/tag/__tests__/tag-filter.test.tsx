@@ -1,9 +1,13 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const mockPush = vi.fn();
-const mockSearchParamsGet = vi.fn().mockReturnValue(null);
-const mockSearchParamsToString = vi.fn().mockReturnValue("");
+import { TagFilter } from "../tag-filter";
+
+const { mockPush, mockSearchParamsGet, mockSearchParamsToString } = vi.hoisted(() => ({
+  mockPush: vi.fn(),
+  mockSearchParamsGet: vi.fn().mockReturnValue(null),
+  mockSearchParamsToString: vi.fn().mockReturnValue(""),
+}));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
@@ -12,8 +16,6 @@ vi.mock("next/navigation", () => ({
     toString: mockSearchParamsToString,
   }),
 }));
-
-import { TagFilter } from "../tag-filter";
 
 afterEach(() => {
   cleanup();

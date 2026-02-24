@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { prisma } from "@/lib/prisma";
+import { cleanDatabaseWithTags } from "@/test-utils";
 
 import {
   createTag,
@@ -13,13 +14,7 @@ import {
 } from "../tag-actions";
 
 beforeEach(async () => {
-  await prisma.actionItemTag.deleteMany();
-  await prisma.topicTag.deleteMany();
-  await prisma.actionItem.deleteMany();
-  await prisma.topic.deleteMany();
-  await prisma.meeting.deleteMany();
-  await prisma.member.deleteMany();
-  await prisma.tag.deleteMany();
+  await cleanDatabaseWithTags();
 });
 
 // ─── getTags ─────────────────────────────────────────────────────────────────

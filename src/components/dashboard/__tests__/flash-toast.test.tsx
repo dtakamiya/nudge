@@ -4,19 +4,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { FlashToast } from "../flash-toast";
 
-const mockReplace = vi.fn();
+const { mockReplace } = vi.hoisted(() => ({ mockReplace: vi.fn() }));
 
 vi.mock("next/navigation", () => ({
   useSearchParams: vi.fn(),
   useRouter: () => ({
     replace: mockReplace,
   }),
-}));
-
-vi.mock("sonner", () => ({
-  toast: {
-    success: vi.fn(),
-  },
 }));
 
 afterEach(() => {
