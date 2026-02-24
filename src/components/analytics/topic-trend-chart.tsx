@@ -61,7 +61,7 @@ export function TopicTrendChart({ data }: Props) {
         <CardDescription>月別の各カテゴリの話題数</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 min-h-[250px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={250}>
           <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
             <XAxis
