@@ -18,8 +18,6 @@ import {
 
 import { type ActionResult, runAction } from "./types";
 
-export type { CarryoverAction, DateFilterType, LastMeetingPendingActionsResult, SortByType };
-
 type ActionItemFilters = {
   status?: ActionItemStatusType;
   memberId?: string;

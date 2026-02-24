@@ -47,7 +47,7 @@ describe("PreviousMeetingReview", () => {
       <PreviousMeetingReview data={dataWithBoth} selectedIds={new Set()} onToggle={vi.fn()} />,
     );
     expect(screen.getByText("未完了タスク")).toBeTruthy();
-    expect(screen.getByText(/未完了/)).toBeTruthy();
+    expect(screen.getByText("未完了（今回に引き継ぐ項目を選択）")).toBeTruthy();
   });
 
   it("未完了アクションのチェックボックスをクリックすると onToggle が呼ばれる", async () => {

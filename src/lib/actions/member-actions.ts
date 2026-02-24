@@ -11,8 +11,6 @@ import { createMemberSchema, updateMemberSchema } from "@/lib/validations/member
 
 import { type ActionResult, runAction } from "./types";
 
-export type { MeetingsPage, MemberWithStats };
-
 export async function getMembers() {
   const now = new Date();
   const members = await prisma.member.findMany({

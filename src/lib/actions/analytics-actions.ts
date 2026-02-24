@@ -18,20 +18,6 @@ import type {
   ScheduledMeeting,
 } from "@/lib/types";
 
-export type {
-  ActionMonthlyTrend,
-  ActionTrendResult,
-  CategoryTrend,
-  HeatmapData,
-  MeetingFrequencyMonth,
-  MemberIntervalOptions,
-  MemberIntervalSort,
-  MemberMeetingHeatmapEntry,
-  MonthlyTrend,
-  RecommendedMeeting,
-  ScheduledMeeting,
-};
-
 export type CheckinTrendEntry = {
   date: string;
   health: number | null;

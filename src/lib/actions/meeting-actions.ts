@@ -23,8 +23,6 @@ import {
 import { getOrCreateTagsInTx } from "./tag-actions";
 import { type ActionResult, runAction } from "./types";
 
-export type { MoodTrendEntry };
-
 export async function createMeeting(
   input: CreateMeetingInput,
 ): Promise<ActionResult<MeetingWithRelations>> {

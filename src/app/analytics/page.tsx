@@ -10,8 +10,8 @@ import {
   getDepartments,
   getMeetingFrequencyByMonth,
   getMemberMeetingHeatmap,
-  type MemberIntervalSort,
 } from "@/lib/actions/analytics-actions";
+import type { MemberIntervalSort } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 

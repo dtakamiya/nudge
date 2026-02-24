@@ -11,15 +11,6 @@ import type {
   UpcomingActionsData,
 } from "@/lib/types";
 
-export type {
-  ActionActivityItem,
-  ActionItemWithMember,
-  ActivityItem,
-  DashboardSummary,
-  MeetingActivityItem,
-  UpcomingActionsData,
-};
-
 export async function getDashboardSummary(): Promise<DashboardSummary> {
   const now = new Date();
 
