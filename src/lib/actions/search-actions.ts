@@ -1,24 +1,10 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import type {
-  ActionItemSearchResult,
-  MemberSearchResult,
-  SearchResults,
-  TagSearchResult,
-  TopicSearchResult,
-} from "@/lib/types";
+import type { SearchResults } from "@/lib/types";
 import { searchQuerySchema } from "@/lib/validations/search";
 
 import { type ActionResult, runAction } from "./types";
-
-export type {
-  ActionItemSearchResult,
-  MemberSearchResult,
-  SearchResults,
-  TagSearchResult,
-  TopicSearchResult,
-};
 
 const SEARCH_LIMIT = 5;
 
