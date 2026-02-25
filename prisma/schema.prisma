@@ -19,6 +19,7 @@ model Member {
 
   meetings    Meeting[]
   actionItems ActionItem[]
+  goals       Goal[]
 }
 
 model Meeting {
@@ -128,6 +129,29 @@ model ActionItemTag {
 
   @@id([actionItemId, tagId])
   @@index([tagId])
+}
+
+model Goal {
+  id          String     @id @default(uuid())
+  memberId    String
+  title       String
+  description String     @default("")
+  progress    Int        @default(0)
+  status      GoalStatus @default(IN_PROGRESS)
+  dueDate     DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
+  @@index([memberId, status])
+}
+
+enum GoalStatus {
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
 }
 
 model MeetingTemplate {

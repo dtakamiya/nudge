@@ -27,11 +27,12 @@ vi.mock("next/link", () => ({
 const memberId = "member-1";
 
 describe("MemberDetailTabNav", () => {
-  it("3つのタブを表示する", () => {
+  it("4つのタブを表示する", () => {
     render(<MemberDetailTabNav memberId={memberId} currentTab="timeline" />);
     expect(screen.getByText("タイムライン")).toBeDefined();
     expect(screen.getByText("1on1履歴")).toBeDefined();
     expect(screen.getByText("アクションアイテム")).toBeDefined();
+    expect(screen.getByText("目標")).toBeDefined();
   });
 
   it("タイムラインタブのリンクURLが正しい", () => {
@@ -50,6 +51,12 @@ describe("MemberDetailTabNav", () => {
     render(<MemberDetailTabNav memberId={memberId} currentTab="timeline" />);
     const actionsLink = screen.getByRole("link", { name: "アクションアイテム" });
     expect(actionsLink.getAttribute("href")).toBe(`/members/${memberId}?tab=actions`);
+  });
+
+  it("目標タブのリンクURLが正しい", () => {
+    render(<MemberDetailTabNav memberId={memberId} currentTab="timeline" />);
+    const goalsLink = screen.getByRole("link", { name: "目標" });
+    expect(goalsLink.getAttribute("href")).toBe(`/members/${memberId}?tab=goals`);
   });
 
   it("currentTabに応じてアクティブスタイルが適用される", () => {
