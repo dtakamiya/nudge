@@ -19,15 +19,17 @@ describe("MoodTrendChart", () => {
       { date: new Date("2026-02-01"), mood: 5 },
     ];
     render(<MoodTrendChart data={data} />);
-    const svg = screen.getByRole("img");
+    // SVG 要素が存在すること
+    const svg = document.querySelector("svg");
     expect(svg).toBeInTheDocument();
-    expect(svg).toHaveAttribute("aria-label", "ミーティングの雰囲気推移グラフ");
+    // SVG は aria-hidden であること
+    expect(svg).toHaveAttribute("aria-hidden", "true");
   });
 
   it("データが 1 件でも SVG を描画する", () => {
     const data = [{ date: new Date("2026-01-01"), mood: 4 }];
     render(<MoodTrendChart data={data} />);
-    const svg = screen.getByRole("img");
+    const svg = document.querySelector("svg");
     expect(svg).toBeInTheDocument();
   });
 
@@ -37,8 +39,17 @@ describe("MoodTrendChart", () => {
       mood: (i % 5) + 1,
     }));
     render(<MoodTrendChart data={data} />);
-    // SVG テキスト要素に絵文字が含まれているか（title が表示）
-    const svg = screen.getByRole("img");
+    const svg = document.querySelector("svg");
     expect(svg).toBeInTheDocument();
+  });
+
+  it("スクリーンリーダー向けにデータサマリーを表示する", () => {
+    const data = [
+      { date: new Date("2026-01-15"), mood: 4 },
+      { date: new Date("2026-02-10"), mood: 2 },
+    ];
+    render(<MoodTrendChart data={data} />);
+    const srOnly = document.querySelector(".sr-only");
+    expect(srOnly).toBeInTheDocument();
   });
 });

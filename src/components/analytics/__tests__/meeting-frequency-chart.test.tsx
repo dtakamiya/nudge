@@ -1,7 +1,18 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { MeetingFrequencyChart } from "../meeting-frequency-chart";
+
+beforeEach(() => {
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: vi.fn().mockReturnValue({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }),
+  });
+});
 
 afterEach(() => {
   cleanup();
@@ -29,5 +40,16 @@ describe("MeetingFrequencyChart", () => {
     ];
     render(<MeetingFrequencyChart data={data} />);
     expect(screen.getByTestId("bar-chart")).toBeDefined();
+  });
+
+  it("データがあるときスクリーンリーダー向けテーブルを表示する", () => {
+    const data = [
+      { month: "2026-01", count: 3 },
+      { month: "2026-02", count: 5 },
+    ];
+    render(<MeetingFrequencyChart data={data} />);
+    const srOnly = document.querySelector(".sr-only");
+    expect(srOnly).toBeInTheDocument();
+    expect(srOnly?.textContent).toContain("2026-01");
   });
 });

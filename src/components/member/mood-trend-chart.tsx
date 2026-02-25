@@ -39,19 +39,37 @@ export function MoodTrendChart({ data }: Props) {
 
   const polylinePoints = points.map((p) => `${p.x},${p.y}`).join(" ");
 
-  // グラジエント用のエリアパス
+  // グラジェント用のエリアパス
   const areaPath =
     `M ${points[0].x},${toY(1)} ` +
     points.map((p) => `L ${p.x},${p.y}`).join(" ") +
     ` L ${points[points.length - 1].x},${toY(1)} Z`;
 
   return (
-    <div className="w-full overflow-x-auto">
+    <div
+      className="w-full overflow-x-auto"
+      aria-label={`ミーティングの雰囲気推移グラフ（直近 ${data.length} 回）`}
+    >
+      {/* スクリーンリーダー向け代替テキスト */}
+      <div className="sr-only">
+        <p>ミーティングの雰囲気推移（直近 {data.length} 回）</p>
+        <ul>
+          {data.map((entry, i) => {
+            const option = getMoodOption(entry.mood);
+            return (
+              <li key={i}>
+                {formatDate(entry.date)}: {option?.label ?? `スコア ${entry.mood}`}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      {/* チャート本体（視覚ユーザー向け） */}
       <svg
         viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
         className="w-full max-w-lg h-auto"
-        role="img"
-        aria-label="ミーティングの雰囲気推移グラフ"
+        aria-hidden="true"
       >
         <defs>
           <linearGradient id="moodGradient" x1="0" y1="0" x2="0" y2="1">

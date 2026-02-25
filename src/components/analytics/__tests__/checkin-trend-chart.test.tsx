@@ -1,7 +1,18 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CheckinTrendChart } from "../checkin-trend-chart";
+
+beforeEach(() => {
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: vi.fn().mockReturnValue({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }),
+  });
+});
 
 afterEach(() => cleanup());
 
@@ -33,5 +44,17 @@ describe("CheckinTrendChart", () => {
   it("カードタイトルを表示する", () => {
     render(<CheckinTrendChart data={[]} />);
     expect(screen.getByText("チェックイン状態の推移")).toBeDefined();
+  });
+
+  it("データが3件以上のときスクリーンリーダー向けテーブルを表示する", () => {
+    const data = [
+      { date: "2026/01/01", health: 4, mood: 3, workload: 2 },
+      { date: "2026/01/15", health: 5, mood: 4, workload: 3 },
+      { date: "2026/02/01", health: 3, mood: 5, workload: 4 },
+    ];
+    render(<CheckinTrendChart data={data} />);
+    const srOnly = document.querySelector(".sr-only");
+    expect(srOnly).toBeInTheDocument();
+    expect(srOnly?.textContent).toContain("2026/01/01");
   });
 });
