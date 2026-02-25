@@ -29,7 +29,7 @@ export function MemberDetailTabNav({ memberId, currentTab }: Props) {
           role="tab"
           aria-selected={currentTab === tab.value}
           className={cn(
-            "px-4 py-2 text-sm font-medium rounded-t-md transition-colors",
+            "px-4 py-3 text-sm font-medium rounded-t-md transition-colors",
             currentTab === tab.value
               ? "bg-primary/10 text-primary border-b-2 border-primary"
               : "text-muted-foreground hover:text-foreground hover:bg-muted",
