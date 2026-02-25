@@ -1,6 +1,14 @@
 "use client";
 
-import { AlertCircle, AlertTriangle, ArrowUpDown, CheckCircle2, Users } from "lucide-react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  CheckCircle2,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -120,22 +128,66 @@ export function MemberList({ members }: Props) {
             <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3 hidden sm:table-cell">
               部署
             </TableHead>
-            <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">
+            <TableHead
+              aria-sort={
+                sortKey === "lastMeeting"
+                  ? sortDir === "asc"
+                    ? "ascending"
+                    : "descending"
+                  : "none"
+              }
+              className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3"
+            >
               <button
                 onClick={() => toggleSort("lastMeeting")}
                 className="flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors duration-150"
               >
                 最終1on1
-                <ArrowUpDown className="w-3 h-3" />
+                {sortKey === "lastMeeting" ? (
+                  sortDir === "asc" ? (
+                    <ArrowUp className="w-3 h-3" />
+                  ) : (
+                    <ArrowDown className="w-3 h-3" />
+                  )
+                ) : (
+                  <ArrowUpDown className="w-3 h-3" />
+                )}
+                <span className="sr-only">
+                  {sortKey === "lastMeeting"
+                    ? sortDir === "asc"
+                      ? "昇順ソート中"
+                      : "降順ソート中"
+                    : "ソート可能"}
+                </span>
               </button>
             </TableHead>
-            <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">
+            <TableHead
+              aria-sort={
+                sortKey === "actions" ? (sortDir === "asc" ? "ascending" : "descending") : "none"
+              }
+              className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3"
+            >
               <button
                 onClick={() => toggleSort("actions")}
                 className="flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors duration-150"
               >
                 未完了
-                <ArrowUpDown className="w-3 h-3" />
+                {sortKey === "actions" ? (
+                  sortDir === "asc" ? (
+                    <ArrowUp className="w-3 h-3" />
+                  ) : (
+                    <ArrowDown className="w-3 h-3" />
+                  )
+                ) : (
+                  <ArrowUpDown className="w-3 h-3" />
+                )}
+                <span className="sr-only">
+                  {sortKey === "actions"
+                    ? sortDir === "asc"
+                      ? "昇順ソート中"
+                      : "降順ソート中"
+                    : "ソート可能"}
+                </span>
               </button>
             </TableHead>
             <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3 hidden md:table-cell">
