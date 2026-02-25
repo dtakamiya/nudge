@@ -93,7 +93,9 @@ describe("MeetingHeatmap", () => {
   it("メンバーがいない場合は説明文を表示する", () => {
     render(<MeetingHeatmap data={emptyData} />);
     expect(
-      screen.getByText("1on1を実施すると、メンバー別の頻度マップが表示されます"),
+      screen.getByText(
+        "メンバーと1on1を実施すると、頻度マップが表示されます。まずはメンバーを追加して1on1を始めましょう",
+      ),
     ).toBeDefined();
   });
 

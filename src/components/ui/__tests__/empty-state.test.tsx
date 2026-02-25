@@ -64,4 +64,44 @@ describe("EmptyState", () => {
     const wrapper = container.firstChild as HTMLElement;
     expect(wrapper.className).toContain("py-10");
   });
+
+  describe("variant", () => {
+    it("variant=success のとき data-variant 属性が success になる", () => {
+      const { container } = render(<EmptyState icon={Users} title="完了！" variant="success" />);
+      const wrapper = container.firstChild as HTMLElement;
+      expect(wrapper.getAttribute("data-variant")).toBe("success");
+    });
+
+    it("variant 未指定のとき data-variant 属性が default になる", () => {
+      const { container } = render(<EmptyState icon={Users} title="テスト" />);
+      const wrapper = container.firstChild as HTMLElement;
+      expect(wrapper.getAttribute("data-variant")).toBe("default");
+    });
+  });
+
+  describe("secondaryAction", () => {
+    it("secondaryAction が指定された場合、2つ目のボタンを表示する", () => {
+      render(
+        <EmptyState
+          icon={Users}
+          title="テスト"
+          action={{ label: "メインアクション", href: "/main" }}
+          secondaryAction={{ label: "サブアクション", href: "/sub" }}
+        />,
+      );
+      expect(screen.getByRole("link", { name: "メインアクション" })).toBeDefined();
+      expect(screen.getByRole("link", { name: "サブアクション" })).toBeDefined();
+    });
+
+    it("secondaryAction 未指定の場合、2つ目のボタンは表示しない", () => {
+      render(
+        <EmptyState
+          icon={Users}
+          title="テスト"
+          action={{ label: "メインアクション", href: "/main" }}
+        />,
+      );
+      expect(screen.queryByRole("link", { name: "サブアクション" })).toBeNull();
+    });
+  });
 });

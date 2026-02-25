@@ -58,9 +58,32 @@ const baseItems = [
 ];
 
 describe("ActionListFull", () => {
-  it("空リストのときメッセージを表示する", () => {
-    render(<ActionListFull actionItems={[]} />);
-    expect(screen.getByText("アクションアイテムはありません")).toBeDefined();
+  describe("空リスト表示", () => {
+    it("メンバーなし・フィルタなし → メンバー追加ガイドを表示する", () => {
+      render(<ActionListFull actionItems={[]} hasMembers={false} />);
+      expect(screen.getByText("メンバーを追加して1on1を始めましょう")).toBeDefined();
+    });
+
+    it("メンバーあり・フィルタあり → 条件一致なしメッセージを表示する", () => {
+      render(<ActionListFull actionItems={[]} hasMembers={true} hasFilter={true} />);
+      expect(screen.getByText("条件に一致するアクションアイテムがありません")).toBeDefined();
+    });
+
+    it("メンバーあり・フィルタなし → 達成感メッセージを表示する", () => {
+      render(<ActionListFull actionItems={[]} hasMembers={true} hasFilter={false} />);
+      expect(screen.getByText("すべてのアクションアイテムが完了しています！")).toBeDefined();
+    });
+
+    it("デフォルト（props未指定）でメンバーあり・フィルタなし扱いになる", () => {
+      render(<ActionListFull actionItems={[]} />);
+      expect(screen.getByText("すべてのアクションアイテムが完了しています！")).toBeDefined();
+    });
+
+    it("メンバーなし空状態はメンバー追加ボタンリンクを含む", () => {
+      render(<ActionListFull actionItems={[]} hasMembers={false} />);
+      const link = screen.getByRole("link", { name: "メンバーを追加する" });
+      expect(link.getAttribute("href")).toBe("/members/new");
+    });
   });
 
   it("アクションアイテムのタイトルとメンバー名を表示する", () => {
@@ -183,9 +206,11 @@ describe("ActionListFull", () => {
       expect(screen.getByText("ドキュメント更新")).toBeDefined();
     });
 
-    it("statusFilter を指定して空リストの場合、空状態メッセージを表示する", () => {
-      render(<ActionListFull actionItems={[]} statusFilter="DONE" />);
-      expect(screen.getByText("アクションアイテムはありません")).toBeDefined();
+    it("statusFilter を指定して空リストの場合、hasFilter=true なら条件一致なしを表示する", () => {
+      render(
+        <ActionListFull actionItems={[]} statusFilter="DONE" hasMembers={true} hasFilter={true} />,
+      );
+      expect(screen.getByText("条件に一致するアクションアイテムがありません")).toBeDefined();
     });
   });
 

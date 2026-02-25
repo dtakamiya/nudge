@@ -27,8 +27,8 @@ const baseMember = {
 describe("MemberList", () => {
   it("renders empty state when no members", () => {
     render(<MemberList members={[]} />);
-    expect(screen.getByText("メンバーがまだ登録されていません")).toBeDefined();
-    expect(screen.getByText("メンバーを追加")).toBeDefined();
+    expect(screen.getByText("最初のメンバーを追加しましょう")).toBeDefined();
+    expect(screen.getByText("メンバーを追加する")).toBeDefined();
   });
 
   it("renders member name and department", () => {

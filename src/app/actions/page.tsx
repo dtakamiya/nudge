@@ -123,6 +123,8 @@ export default async function ActionsPage({ searchParams }: Props) {
           currentPage={currentPage}
           totalPages={totalPages}
           searchParams={params}
+          hasMembers={members.length > 0}
+          hasFilter={hasFilter}
         />
       </Suspense>
     </div>

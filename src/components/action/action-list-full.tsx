@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil, SquareCheck } from "lucide-react";
+import { Pencil, SquareCheck, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
@@ -53,9 +53,55 @@ type Props = {
   statusFilter?: string;
   selectedIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
+  hasMembers?: boolean;
+  hasFilter?: boolean;
 };
 
-export function ActionListFull({ actionItems, statusFilter, selectedIds, onToggleSelect }: Props) {
+function EmptyActionState({
+  hasMembers = true,
+  hasFilter = false,
+}: {
+  hasMembers?: boolean;
+  hasFilter?: boolean;
+}) {
+  if (!hasMembers) {
+    return (
+      <EmptyState
+        icon={UserPlus}
+        title="メンバーを追加して1on1を始めましょう"
+        description="チームメンバーを追加すると、1on1でアクションアイテムを作成・管理できます"
+        action={{ label: "メンバーを追加する", href: "/members/new" }}
+        size="large"
+      />
+    );
+  }
+  if (hasFilter) {
+    return (
+      <EmptyState
+        icon={SquareCheck}
+        title="条件に一致するアクションアイテムがありません"
+        description="フィルター条件を変更して再度お試しください"
+      />
+    );
+  }
+  return (
+    <EmptyState
+      icon={SquareCheck}
+      title="すべてのアクションアイテムが完了しています！"
+      description="1on1で新しいアクションアイテムを作成すると、ここに表示されます"
+      variant="success"
+    />
+  );
+}
+
+export function ActionListFull({
+  actionItems,
+  statusFilter,
+  selectedIds,
+  onToggleSelect,
+  hasMembers,
+  hasFilter,
+}: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -79,13 +125,7 @@ export function ActionListFull({ actionItems, statusFilter, selectedIds, onToggl
   const isBulkMode = selectedIds !== undefined && onToggleSelect !== undefined;
 
   if (actionItems.length === 0) {
-    return (
-      <EmptyState
-        icon={SquareCheck}
-        title="アクションアイテムはありません"
-        description="1on1でアクションアイテムを作成すると、ここに表示されます"
-      />
-    );
+    return <EmptyActionState hasMembers={hasMembers} hasFilter={hasFilter} />;
   }
 
   function handleStatusChange(id: string, newStatus: string) {

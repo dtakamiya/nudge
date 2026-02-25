@@ -15,7 +15,9 @@ type Props = {
   readonly title: string;
   readonly description?: string;
   readonly action?: EmptyStateAction;
+  readonly secondaryAction?: EmptyStateAction;
   readonly size?: "compact" | "default" | "large";
+  readonly variant?: "default" | "success";
 };
 
 const sizeClasses = {
@@ -30,25 +32,57 @@ const iconSizeClasses = {
   large: "w-12 h-12",
 } as const;
 
-export function EmptyState({ icon: Icon, title, description, action, size = "default" }: Props) {
+const iconWrapperVariantClasses = {
+  default: "bg-muted",
+  success: "bg-[oklch(0.95_0.05_155)]",
+} as const;
+
+const iconVariantClasses = {
+  default: "text-muted-foreground",
+  success: "text-[oklch(0.35_0.1_155)]",
+} as const;
+
+function ActionButton({ action }: { readonly action: EmptyStateAction }) {
+  if (action.href) {
+    return (
+      <Link href={action.href}>
+        <Button size="sm">{action.label}</Button>
+      </Link>
+    );
+  }
   return (
-    <div className={cn("flex flex-col items-center justify-center text-center", sizeClasses[size])}>
-      <div className="rounded-full bg-muted p-3 mb-3">
-        <Icon className={cn("text-muted-foreground", iconSizeClasses[size])} strokeWidth={1.5} />
+    <Button size="sm" onClick={action.onClick}>
+      {action.label}
+    </Button>
+  );
+}
+
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  action,
+  secondaryAction,
+  size = "default",
+  variant = "default",
+}: Props) {
+  return (
+    <div
+      className={cn("flex flex-col items-center justify-center text-center", sizeClasses[size])}
+      data-variant={variant}
+    >
+      <div className={cn("rounded-full p-3 mb-3", iconWrapperVariantClasses[variant])}>
+        <Icon
+          className={cn(iconSizeClasses[size], iconVariantClasses[variant])}
+          strokeWidth={1.5}
+        />
       </div>
       <p className="text-sm font-medium text-foreground/80">{title}</p>
       {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
-      {action && (
-        <div className="mt-4">
-          {action.href ? (
-            <Link href={action.href}>
-              <Button size="sm">{action.label}</Button>
-            </Link>
-          ) : (
-            <Button size="sm" onClick={action.onClick}>
-              {action.label}
-            </Button>
-          )}
+      {(action ?? secondaryAction) && (
+        <div className="mt-4 flex gap-2">
+          {action && <ActionButton action={action} />}
+          {secondaryAction && <ActionButton action={secondaryAction} />}
         </div>
       )}
     </div>
