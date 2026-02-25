@@ -1,6 +1,6 @@
 # Backend Structure
 
-<!-- freshness: 2026-02-23 -->
+<!-- freshness: 2026-02-25 -->
 
 ## Server Actions (`src/lib/actions/`)
 
@@ -16,17 +16,18 @@ runAction<T>(fn: () => Promise<T>): Promise<ActionResult<T>>
 
 ### Action Files
 
-| File                     | Key Exports                                                                                                                |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| `member-actions.ts`      | `getMembers`, `getMember`, `createMember`, `updateMember`, `deleteMember`, `getMemberMeetings`                             |
-| `meeting-actions.ts`     | `createMeeting`, `getMeeting`, `updateMeeting`, `deleteMeeting`, `getPreviousMeeting`, `getMoodTrend`                      |
-| `action-item-actions.ts` | `getActionItems`, `updateActionItemStatus`, `updateActionItem`, `getPendingActionItems`                                    |
-| `tag-actions.ts`         | `getTags`, `createTag`, `updateTag`, `deleteTag`, `getTagSuggestions`, `getPopularTags`, `getOrCreateTagsInTx`             |
-| `dashboard-actions.ts`   | `getDashboardSummary`, `getRecentActivity`, `getUpcomingActions`, `getRecommendedMeetings`, `getScheduledMeetingsThisWeek` |
-| `analytics-actions.ts`   | `getMemberTopicTrends`, `getMemberActionTrends`, `getMeetingFrequencyByMonth`                                              |
-| `reminder-actions.ts`    | `getOverdueReminders`                                                                                                      |
-| `search-actions.ts`      | `searchMembers`, `searchActions`                                                                                           |
-| `export-actions.ts`      | `exportMeetingData` (CSV)                                                                                                  |
+| File                     | Key Exports                                                                                                                                          |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `member-actions.ts`      | `getMembers`, `getMember`, `createMember`, `updateMember`, `deleteMember`, `getMemberMeetings`                                                       |
+| `meeting-actions.ts`     | `createMeeting`, `getMeeting`, `updateMeeting`, `deleteMeeting`, `getPreviousMeeting`, `getMoodTrend`, `startMeeting`, `endMeeting`, `updateCheckin` |
+| `action-item-actions.ts` | `getActionItems`, `updateActionItemStatus`, `updateActionItem`, `getPendingActionItems`                                                              |
+| `tag-actions.ts`         | `getTags`, `createTag`, `updateTag`, `deleteTag`, `getTagSuggestions`, `getPopularTags`, `getOrCreateTagsInTx`                                       |
+| `dashboard-actions.ts`   | `getDashboardSummary`, `getRecentActivity`, `getUpcomingActions`, `getRecommendedMeetings`, `getScheduledMeetingsThisWeek`                           |
+| `analytics-actions.ts`   | `getMemberTopicTrends`, `getMemberActionTrends`, `getMeetingFrequencyByMonth`                                                                        |
+| `reminder-actions.ts`    | `getOverdueReminders`                                                                                                                                |
+| `search-actions.ts`      | `searchMembers`, `searchActions`                                                                                                                     |
+| `export-actions.ts`      | `exportMeetingData` (CSV)                                                                                                                            |
+| `template-actions.ts`    | `getTemplates`, `createTemplate`, `updateTemplate`, `deleteTemplate`                                                                                 |
 
 ### Write Flow (createMeeting example)
 
@@ -54,15 +55,16 @@ Zod parse → prisma.$transaction → create Meeting
 
 ### Models
 
-| Model           | Key Fields                                                                                          |
-| --------------- | --------------------------------------------------------------------------------------------------- |
-| `Member`        | `id` UUID, `name`, `department?`, `position?`, `meetingIntervalDays` int default 14                 |
-| `Meeting`       | `id` UUID, `memberId`, `date`, `mood?` (1–5)                                                        |
-| `Topic`         | `id` UUID, `meetingId`, `category` enum, `title`, `notes`, `sortOrder`                              |
-| `ActionItem`    | `id` UUID, `meetingId`, `memberId`, `title`, `status` enum, `dueDate?`, `completedAt?`, `sortOrder` |
-| `Tag`           | `id` UUID, `name` unique, `color` hex                                                               |
-| `TopicTag`      | composite PK (`topicId`, `tagId`)                                                                   |
-| `ActionItemTag` | composite PK (`actionItemId`, `tagId`)                                                              |
+| Model             | Key Fields                                                                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Member`          | `id` UUID, `name`, `department?`, `position?`, `meetingIntervalDays` int default 14                                                               |
+| `Meeting`         | `id` UUID, `memberId`, `date`, `mood?` (1–5), `conditionHealth?`, `conditionMood?`, `conditionWorkload?`, `checkinNote`, `startedAt?`, `endedAt?` |
+| `Topic`           | `id` UUID, `meetingId`, `category` enum, `title`, `notes`, `sortOrder`                                                                            |
+| `ActionItem`      | `id` UUID, `meetingId`, `memberId`, `title`, `status` enum, `dueDate?`, `completedAt?`, `sortOrder`                                               |
+| `Tag`             | `id` UUID, `name` unique, `color` hex                                                                                                             |
+| `TopicTag`        | composite PK (`topicId`, `tagId`)                                                                                                                 |
+| `ActionItemTag`   | composite PK (`actionItemId`, `tagId`)                                                                                                            |
+| `MeetingTemplate` | `id` UUID, `name` unique, `description`, `topics` Json, `isDefault` bool                                                                          |
 
 ### Enums
 
@@ -74,10 +76,11 @@ ActionItemStatus: TODO | IN_PROGRESS | DONE
 ### Indexes
 
 ```
-Meeting:    @@index([memberId])
-Topic:      @@index([meetingId]), @@index([meetingId, sortOrder])
-ActionItem: @@index([memberId]), @@index([memberId, status]), @@index([status])
-TopicTag:   @@index([tagId])
+Meeting:       @@index([memberId])
+Topic:         @@index([meetingId]), @@index([meetingId, sortOrder])
+ActionItem:    @@index([meetingId]), @@index([meetingId, sortOrder]),
+               @@index([memberId]), @@index([memberId, status]), @@index([status])
+TopicTag:      @@index([tagId])
 ActionItemTag: @@index([tagId])
 ```
 
@@ -89,12 +92,26 @@ ActionItemTag: @@index([tagId])
 
 ## Utilities
 
-| File               | Functions                                                             |
-| ------------------ | --------------------------------------------------------------------- |
-| `lib/format.ts`    | `formatDate`, `formatDaysElapsed`, `formatRelativeDate`, `toMonthKey` |
-| `lib/avatar.ts`    | `getInitials(name)`, `getAvatarGradient(name)`                        |
-| `lib/schedule.ts`  | `isOverdue`, `isScheduledThisWeek`, `calcNextRecommendedDate`         |
-| `lib/constants.ts` | `MEETINGS_PAGE_SIZE=10`, `CATEGORY_LABELS`, `TAG_COLOR_PALETTE`       |
+| File                       | Functions / Purpose                                                   |
+| -------------------------- | --------------------------------------------------------------------- |
+| `lib/format.ts`            | `formatDate`, `formatDaysElapsed`, `formatRelativeDate`, `toMonthKey` |
+| `lib/avatar.ts`            | `getInitials(name)`, `getAvatarGradient(name)`                        |
+| `lib/schedule.ts`          | `isOverdue`, `isScheduledThisWeek`, `calcNextRecommendedDate`         |
+| `lib/constants.ts`         | `MEETINGS_PAGE_SIZE=10`, `CATEGORY_LABELS`, `TAG_COLOR_PALETTE`       |
+| `lib/mood.ts`              | Mood score ↔ label conversion                                         |
+| `lib/condition-diff.ts`    | Check-in condition change diff between meetings                       |
+| `lib/due-date.ts`          | Due date relative label calculation                                   |
+| `lib/group-actions.ts`     | Group action items by member / status                                 |
+| `lib/group-tasks.ts`       | Group tasks by criteria                                               |
+| `lib/meeting-summary.ts`   | Meeting summary text generation                                       |
+| `lib/meeting-templates.ts` | Built-in meeting topic templates                                      |
+| `lib/coaching-tips.ts`     | Coaching assist hint definitions                                      |
+| `lib/icebreakers.ts`       | Icebreaker question list                                              |
+| `lib/checkin-messages.ts`  | Check-in response messages                                            |
+| `lib/toast-messages.ts`    | Centralized toast notification messages                               |
+| `lib/export.ts`            | Meeting data CSV export                                               |
+| `lib/ical.ts`              | iCal format export                                                    |
+| `lib/dnd-accessibility.ts` | DnD accessibility configuration                                       |
 
 ## Pagination Pattern
 

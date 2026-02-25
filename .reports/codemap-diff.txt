@@ -1,18 +1,69 @@
 Codemap Diff Report
-Generated: 2026-02-23
+Generated: 2026-02-25
+Previous freshness: 2026-02-23
+Current freshness: 2026-02-25
 
-Status: INITIAL CREATION (no previous codemaps found)
-Diff %: N/A (first run)
+===== CHANGE SUMMARY =====
 
-Files Created:
-  + codemaps/architecture.md
-  + codemaps/backend.md
-  + codemaps/frontend.md
-  + codemaps/data.md
+Overall estimated diff: ~60% (threshold: 30%) — SIGNIFICANT UPDATE
 
-Summary:
-  - 6 Prisma models (Member, Meeting, Topic, ActionItem, Tag, TopicTag, ActionItemTag)
-  - 9 Server Action files
-  - 8 route segments (/, /members/new, /members/[id], /members/[id]/meetings/*)
-  - ~45 React components across 7 feature areas
-  - 5 Zod validation schema files
+===== architecture.md =====
+Changes:
+- Freshness updated: 2026-02-23 → 2026-02-25
+- Tech Stack: added sonner, next-themes entries
+- Key Directories: added tasks/, settings/templates/ routes; 13 new lib files
+- Route Map: added /members, /tasks, /settings/templates routes
+
+===== backend.md =====
+Changes:
+- Freshness updated: 2026-02-23 → 2026-02-25
+- meeting-actions.ts: added startMeeting, endMeeting, updateCheckin exports
+- template-actions.ts: added (was missing from previous version)
+- Meeting model: added conditionHealth?, conditionMood?, conditionWorkload?,
+  checkinNote, startedAt?, endedAt? fields
+- ActionItem indexes: added @@index([meetingId]), @@index([meetingId, sortOrder])
+- MeetingTemplate model: added (new 8th model)
+- Utilities table: expanded from 4 to 19 entries covering all lib/*.ts files
+
+===== frontend.md =====
+Changes:
+- Freshness updated: 2026-02-23 → 2026-02-25
+- Meeting components: 11 → 39 components (+28)
+  - Added: Recording Mode section (10 components)
+  - Added: Coaching Assist section (3 components)
+  - Added: meeting-navigation, previous-meeting-review, meeting-summary,
+    carryover-action-list, print-button, closing-dialog,
+    meeting-header-actions, focus-mode-indicator, meeting-detail-header,
+    topic-list-section, action-list-section, prepare-topic-item,
+    template-form-dialog
+- Member components: 8 → 17 components (+9)
+  - Added: member-actions-dropdown, member-detail-tab-nav, member-timeline,
+    checkin-summary-section, checkin-summary, calendar-export-button,
+    member-list-page, *-skeleton components
+- Action components: 3 → 6 (+3)
+  - Added: action-pagination, due-date-badge, action-list-skeleton
+- Analytics components: 7 → 11 (+4)
+  - Added: analytics-filter-bar, checkin-trend-section,
+    topic-analytics-section, action-analytics-section
+- Dashboard components: 8 → 10 (+2)
+  - Added: flash-toast, dashboard-skeleton
+- Settings: new section (template-management, template-form-dialog)
+- UI components: added sheet, dropdown-menu, calendar, popover, skeleton
+- Custom Hooks: 4 → 10 (+6)
+  - Added: use-bulk-selection, use-meeting-form, use-meeting-detail-page,
+    use-meeting-prepare, use-recording-session, use-reduced-motion
+- Added: Meeting Form Tree diagram, Recording Mode Tree diagram
+
+===== data.md =====
+Changes:
+- Freshness updated: 2026-02-23 → 2026-02-25
+- Meeting model: added conditionHealth?, conditionMood?, conditionWorkload?,
+  checkinNote, startedAt?, endedAt? fields
+- ActionItem model: added @@index([meetingId]), @@index([meetingId, sortOrder])
+- MeetingTemplate model: added (new)
+- Indexes section: updated to reflect all current indexes
+
+===== OBSOLETE DOCUMENTATION =====
+All docs in docs/plans/ are dated 2026-02-20 to 2026-02-25.
+No files exceed 90-day threshold (threshold date: 2025-11-27).
+No obsolete documentation found.

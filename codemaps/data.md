@@ -1,6 +1,6 @@
 # Data Models & Schemas
 
-<!-- freshness: 2026-02-23 -->
+<!-- freshness: 2026-02-25 -->
 
 ## Prisma Models
 
@@ -24,12 +24,18 @@ model Member {
 
 ```prisma
 model Meeting {
-  id        String    @id @default(uuid())
-  memberId  String
-  date      DateTime
-  mood      Int?      // 1–5
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id                 String    @id @default(uuid())
+  memberId           String
+  date               DateTime
+  mood               Int?      // 1–5
+  conditionHealth    Int?      // 1–5: physical condition
+  conditionMood      Int?      // 1–5: mood condition
+  conditionWorkload  Int?      // 1–5: workload condition
+  checkinNote        String    @default("")
+  startedAt          DateTime?
+  endedAt            DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
   member      Member       @relation(...)
   topics      Topic[]
   actionItems ActionItem[]
@@ -71,9 +77,11 @@ model ActionItem {
   completedAt DateTime?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-  meeting ActionItem[]    @relation(fields: [meetingId], ...)
+  meeting Meeting         @relation(fields: [meetingId], ...)
   member  Member          @relation(fields: [memberId], ...)
   tags    ActionItemTag[]
+  @@index([meetingId])
+  @@index([meetingId, sortOrder])
   @@index([memberId])
   @@index([memberId, status])
   @@index([status])
@@ -105,6 +113,20 @@ model ActionItemTag {
   tagId        String
   @@id([actionItemId, tagId])
   @@index([tagId])
+}
+```
+
+### MeetingTemplate
+
+```prisma
+model MeetingTemplate {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String   @default("")
+  topics      Json     // Array of { category, title } objects
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 ```
 

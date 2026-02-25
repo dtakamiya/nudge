@@ -2,7 +2,7 @@
 
 > Source of truth: `package.json`, `.env.example`, `vitest.config.ts`, `playwright.config.ts`
 >
-> 最終更新: 2026-02-24
+> 最終更新: 2026-02-25
 
 ## 環境セットアップ
 
@@ -56,6 +56,8 @@ DATABASE_URL="file:./test.db" npx prisma migrate deploy
 ```
 
 ## npm スクリプト一覧
+
+> **注意:** `npm run dev` 実行前に `predev` フックが自動実行される。`node_modules` が存在しない場合はエラーで停止するので、先に `npm install` を実行すること。
 
 | コマンド                  | 実行内容                   | 説明                                           |
 | ------------------------- | -------------------------- | ---------------------------------------------- |

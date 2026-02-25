@@ -1,6 +1,6 @@
 # Architecture Overview
 
-<!-- freshness: 2026-02-23 -->
+<!-- freshness: 2026-02-25 -->
 
 ## Tech Stack
 
@@ -11,6 +11,8 @@
 - **Testing**: Vitest + Testing Library + Playwright E2E
 - **DnD**: @dnd-kit/core + @dnd-kit/sortable
 - **Charts**: recharts
+- **Toast**: sonner
+- **Themes**: next-themes (dark mode)
 
 ## Layered Architecture
 
@@ -34,16 +36,20 @@ src/
 │   ├── page.tsx          # Dashboard (/)
 │   ├── members/          # Member CRUD + meetings
 │   ├── actions/          # Action items list
-│   └── analytics/        # Analytics dashboard
+│   ├── tasks/            # Tasks page
+│   ├── analytics/        # Analytics dashboard
+│   └── settings/
+│       └── templates/    # Custom meeting template management
 ├── components/
-│   ├── layout/           # Sidebar, breadcrumb, search
-│   ├── dashboard/        # KPI cards, activity feed
-│   ├── member/           # Member cards, forms
-│   ├── meeting/          # Meeting form (DnD), detail
-│   ├── action/           # Action item list
-│   ├── analytics/        # Charts, heatmap
+│   ├── layout/           # Sidebar, breadcrumb, search, theme toggle
+│   ├── dashboard/        # KPI cards, activity feed, health score
+│   ├── member/           # Member cards, forms, timeline, checkin summary
+│   ├── meeting/          # Meeting form (DnD), recording mode, coaching
+│   ├── action/           # Action item list, pagination, due-date badge
+│   ├── analytics/        # Charts, heatmap, checkin trend
 │   ├── tag/              # Tag input, badge, filter
-│   └── ui/               # shadcn/ui + custom (avatar, empty-state)
+│   └── ui/               # shadcn/ui + custom (avatar, empty-state, skeleton)
+├── hooks/                # Custom React hooks (6+)
 ├── lib/
 │   ├── actions/          # Server Actions (all writes)
 │   ├── validations/      # Zod schemas
@@ -51,11 +57,25 @@ src/
 │   ├── format.ts         # Date formatting
 │   ├── avatar.ts         # Initials & gradient
 │   ├── schedule.ts       # Overdue / next-date calc
-│   └── constants.ts      # App-wide constants
+│   ├── constants.ts      # App-wide constants
+│   ├── coaching-tips.ts  # Coaching assist hint definitions
+│   ├── icebreakers.ts    # Icebreaker question list
+│   ├── checkin-messages.ts # Check-in response messages
+│   ├── condition-diff.ts # Check-in condition diff logic
+│   ├── due-date.ts       # Due date calculation utilities
+│   ├── group-actions.ts  # Action item grouping logic
+│   ├── group-tasks.ts    # Task grouping logic
+│   ├── meeting-summary.ts # Meeting summary generation
+│   ├── meeting-templates.ts # Built-in templates
+│   ├── mood.ts           # Mood score conversion
+│   ├── export.ts         # Meeting data export
+│   ├── ical.ts           # iCal export
+│   ├── toast-messages.ts # Toast notification messages
+│   └── dnd-accessibility.ts # DnD accessibility config
 └── generated/prisma/     # Auto-generated (gitignored)
 
 prisma/
-├── schema.prisma         # DB schema (6 models)
+├── schema.prisma         # DB schema (8 models)
 ├── seed.ts               # Seed data
 └── migrations/           # Schema history
 ```
@@ -71,13 +91,16 @@ prisma/
 
 ## Route Map
 
-| Route                                | Page                                             | Purpose          |
-| ------------------------------------ | ------------------------------------------------ | ---------------- |
-| `/`                                  | `app/page.tsx`                                   | Dashboard        |
-| `/members/new`                       | `app/members/new/page.tsx`                       | Create member    |
-| `/members/[id]`                      | `app/members/[id]/page.tsx`                      | Member detail    |
-| `/members/[id]/meetings/new`         | `app/members/[id]/meetings/new/page.tsx`         | Create meeting   |
-| `/members/[id]/meetings/prepare`     | `app/members/[id]/meetings/prepare/page.tsx`     | Meeting prep     |
-| `/members/[id]/meetings/[meetingId]` | `app/members/[id]/meetings/[meetingId]/page.tsx` | Meeting detail   |
-| `/actions`                           | `app/actions/page.tsx`                           | All action items |
-| `/analytics`                         | `app/analytics/page.tsx`                         | Analytics        |
+| Route                                | Page                                             | Purpose                    |
+| ------------------------------------ | ------------------------------------------------ | -------------------------- |
+| `/`                                  | `app/page.tsx`                                   | Dashboard                  |
+| `/members`                           | `app/members/page.tsx`                           | Member list                |
+| `/members/new`                       | `app/members/new/page.tsx`                       | Create member              |
+| `/members/[id]`                      | `app/members/[id]/page.tsx`                      | Member detail              |
+| `/members/[id]/meetings/new`         | `app/members/[id]/meetings/new/page.tsx`         | Create meeting             |
+| `/members/[id]/meetings/prepare`     | `app/members/[id]/meetings/prepare/page.tsx`     | Meeting prep               |
+| `/members/[id]/meetings/[meetingId]` | `app/members/[id]/meetings/[meetingId]/page.tsx` | Meeting detail / recording |
+| `/actions`                           | `app/actions/page.tsx`                           | All action items           |
+| `/tasks`                             | `app/tasks/page.tsx`                             | Tasks page                 |
+| `/analytics`                         | `app/analytics/page.tsx`                         | Analytics                  |
+| `/settings/templates`                | `app/settings/templates/page.tsx`                | Template management        |
