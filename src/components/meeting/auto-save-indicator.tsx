@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -15,22 +15,15 @@ type Props = {
 };
 
 export function AutoSaveIndicator({ status, onRetry, onIdle }: Props) {
-  const onIdleRef = useRef(onIdle);
-  onIdleRef.current = onIdle;
-
-  const handleIdle = useCallback(() => {
-    onIdleRef.current?.();
-  }, []);
-
   useEffect(() => {
     if (status !== "saved") return;
 
     const timer = setTimeout(() => {
-      handleIdle();
+      onIdle?.();
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [status, handleIdle]);
+  }, [status, onIdle]);
 
   if (status === "idle") return null;
 

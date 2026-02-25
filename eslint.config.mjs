@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Ignore git worktrees (local dev only, not present in CI)
+    ".worktrees/**",
   ]),
   {
     plugins: {
