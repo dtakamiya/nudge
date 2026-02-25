@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -129,5 +129,54 @@ describe("MemberListPage", () => {
     const deptSelect = screen.getByRole("combobox", { name: "部署で絞り込む" });
     await user.selectOptions(deptSelect, "エンジニアリング");
     expect(screen.getByText("2人")).toBeDefined();
+  });
+
+  describe("aria-live region", () => {
+    it("aria-live='polite' の通知エリアが存在する", () => {
+      const { container } = render(<MemberListPage members={members} />);
+      const liveRegion = container.querySelector("[aria-live='polite']");
+      expect(liveRegion).not.toBeNull();
+    });
+
+    it("部署フィルタ適用後に件数メッセージが更新される", async () => {
+      const user = userEvent.setup();
+      render(<MemberListPage members={members} />);
+      const deptSelect = screen.getByRole("combobox", { name: "部署で絞り込む" });
+      await user.selectOptions(deptSelect, "エンジニアリング");
+      expect(screen.getByText("2 件のメンバーが見つかりました")).toBeDefined();
+    });
+
+    it("検索入力中は '検索中...' を表示する", () => {
+      vi.useFakeTimers();
+      render(<MemberListPage members={members} />);
+      const searchInput = screen.getByPlaceholderText("名前で検索...");
+      fireEvent.change(searchInput, { target: { value: "田" } });
+      expect(screen.getByText("検索中...")).toBeDefined();
+      vi.useRealTimers();
+    });
+
+    it("デバウンス後に件数メッセージが表示される", () => {
+      vi.useFakeTimers();
+      render(<MemberListPage members={members} />);
+      const searchInput = screen.getByPlaceholderText("名前で検索...");
+      fireEvent.change(searchInput, { target: { value: "田中" } });
+      act(() => {
+        vi.advanceTimersByTime(300);
+      });
+      expect(screen.getByText("1 件のメンバーが見つかりました")).toBeDefined();
+      vi.useRealTimers();
+    });
+
+    it("0件のとき '該当するメンバーが見つかりませんでした' を表示する", () => {
+      vi.useFakeTimers();
+      render(<MemberListPage members={members} />);
+      const searchInput = screen.getByPlaceholderText("名前で検索...");
+      fireEvent.change(searchInput, { target: { value: "存在しない名前" } });
+      act(() => {
+        vi.advanceTimersByTime(300);
+      });
+      expect(screen.getByText("該当するメンバーが見つかりませんでした")).toBeDefined();
+      vi.useRealTimers();
+    });
   });
 });
