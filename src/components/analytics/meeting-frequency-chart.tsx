@@ -13,7 +13,18 @@ export function MeetingFrequencyChart({ data }: { data: MeetingFrequencyMonth[] 
   const mounted = useChartMounted();
   const prefersReducedMotion = useReducedMotion();
 
-  if (!mounted) return null;
+  if (!mounted) {
+    return (
+      <Card className="h-full">
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">月次1on1実施回数</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[250px] w-full pt-4">
+          <div className="h-full w-full animate-pulse rounded bg-muted" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="h-full">

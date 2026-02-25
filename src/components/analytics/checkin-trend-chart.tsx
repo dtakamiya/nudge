@@ -22,7 +22,18 @@ export function CheckinTrendChart({ data }: { data: CheckinTrendEntry[] }) {
   const mounted = useChartMounted();
   const prefersReducedMotion = useReducedMotion();
 
-  if (!mounted) return null;
+  if (!mounted) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">チェックイン状態の推移</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[260px] w-full pt-4">
+          <div className="h-full w-full animate-pulse rounded bg-muted" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
