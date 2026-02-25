@@ -40,7 +40,19 @@ export function TopicTrendChart({ data }: Props) {
 
   const categories = Object.keys(CATEGORY_LABELS) as TopicCategory[];
 
-  if (!mounted) return null;
+  if (!mounted) {
+    return (
+      <Card className="h-full flex flex-col">
+        <CardHeader>
+          <CardTitle>話題の時系列推移</CardTitle>
+          <CardDescription>月別の各カテゴリの話題数</CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 h-[250px]">
+          <div className="h-full w-full animate-pulse rounded bg-muted" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (data.length === 0) {
     return (
@@ -62,7 +74,7 @@ export function TopicTrendChart({ data }: Props) {
         <CardTitle>話題の時系列推移</CardTitle>
         <CardDescription>月別の各カテゴリの話題数</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 min-h-[250px]">
+      <CardContent className="flex-1 h-[250px]">
         {/* スクリーンリーダー向け代替テキスト */}
         <div className="sr-only">
           <p>話題の時系列推移（{data.length} ヶ月分）</p>

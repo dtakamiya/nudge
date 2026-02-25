@@ -1,40 +1,39 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 
-// ブラウザの初回ペイント後にチャートをマウントするための外部ストア。
-// requestAnimationFrame を使い、DOM レイアウト完了後に mounted を true にすることで
-// recharts の "width(-1) and height(-1)" 警告を回避する。
-// テスト環境では同期的に true を返し、既存テストの動作を維持する。
-let chartMounted = process.env.NODE_ENV === "test";
-const chartListeners = new Set<() => void>();
-
-function subscribeToChartMount(listener: () => void) {
-  chartListeners.add(listener);
-  return () => {
-    chartListeners.delete(listener);
-  };
-}
-
-function getChartMountSnapshot() {
-  return chartMounted;
-}
-
-function getChartMountServerSnapshot() {
-  return false;
-}
-
-if (typeof window !== "undefined") {
-  requestAnimationFrame(() => {
-    chartMounted = true;
-    chartListeners.forEach((listener) => listener());
-  });
-}
-
+/**
+ * コンポーネントレベルでチャートのマウント状態を管理するフック。
+ * useEffect 内で requestAnimationFrame を2フレーム待ちし、
+ * DOM レイアウト完了後に mounted を true にすることで
+ * recharts の "width(-1) and height(-1)" 警告を回避する。
+ * テスト環境では同期的に true を返し、既存テストの動作を維持する。
+ */
 export function useChartMounted(): boolean {
-  return useSyncExternalStore(
-    subscribeToChartMount,
-    getChartMountSnapshot,
-    getChartMountServerSnapshot,
-  );
+  // ビルド時に静的置換されるため実行時に変化しない。
+  // テストでの vi.stubEnv 対応のため関数内で評価する。
+  const isTest = process.env.NODE_ENV === "test";
+  const [mounted, setMounted] = useState(isTest);
+
+  useEffect(() => {
+    if (isTest) return;
+
+    let secondFrameId: number | undefined;
+
+    // 2フレーム待ちで DOM レイアウト完了を保証
+    const firstFrameId = requestAnimationFrame(() => {
+      secondFrameId = requestAnimationFrame(() => {
+        setMounted(true);
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(firstFrameId);
+      if (secondFrameId !== undefined) {
+        cancelAnimationFrame(secondFrameId);
+      }
+    };
+  }, [isTest]);
+
+  return mounted;
 }

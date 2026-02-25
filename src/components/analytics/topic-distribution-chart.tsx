@@ -40,7 +40,19 @@ export function TopicDistributionChart({ data }: Props) {
     }));
   }, [data]);
 
-  if (!mounted) return null;
+  if (!mounted) {
+    return (
+      <Card className="h-full flex flex-col">
+        <CardHeader>
+          <CardTitle>話題カテゴリの分布</CardTitle>
+          <CardDescription>これまでの1on1で話された話題の割合</CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 h-[250px]">
+          <div className="h-full w-full animate-pulse rounded bg-muted" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (data.length === 0) {
     return (
@@ -62,7 +74,7 @@ export function TopicDistributionChart({ data }: Props) {
         <CardTitle>話題カテゴリの分布</CardTitle>
         <CardDescription>これまでの1on1で話された話題の割合</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 min-h-[250px] relative">
+      <CardContent className="flex-1 h-[250px] relative">
         {/* スクリーンリーダー向け代替テキスト */}
         <div className="sr-only">
           <p>話題カテゴリの分布（合計 {data.reduce((sum, d) => sum + d.count, 0)} 件）</p>
