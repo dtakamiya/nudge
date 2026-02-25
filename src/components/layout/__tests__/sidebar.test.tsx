@@ -87,6 +87,19 @@ describe("Sidebar - ナビゲーション", () => {
     const memberLink = screen.getAllByText("メンバー追加")[0].closest("a");
     expect(memberLink?.className).not.toContain("bg-primary/10");
   });
+
+  it("ナビリンクに py-3 クラスが付与されている（タップターゲット44px確保）", () => {
+    render(<Sidebar />);
+    const dashboardLinks = screen.getAllByText("ダッシュボード");
+    const link = dashboardLinks[0].closest("a");
+    expect(link?.className).toContain("py-3");
+  });
+
+  it("メンバークイックリストのリンクに py-3 クラスが付与されている", () => {
+    render(<Sidebar members={[{ id: "m1", name: "田中太郎" }]} />);
+    const memberLink = screen.getAllByText("田中太郎")[0].closest("a");
+    expect(memberLink?.className).toContain("py-3");
+  });
 });
 
 describe("Sidebar - アクションバッジ", () => {
