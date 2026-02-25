@@ -36,9 +36,9 @@ function ActionRow({
         <p className="text-sm text-foreground truncate group-hover:text-primary transition-colors">
           {item.title}
         </p>
-        <p className="text-xs text-muted-foreground">{item.memberName}</p>
+        <p className="text-sm text-muted-foreground">{item.memberName}</p>
       </div>
-      <span className="text-xs text-muted-foreground flex-shrink-0">
+      <span className="text-sm text-muted-foreground flex-shrink-0">
         {formatDate(item.dueDate)}
       </span>
     </Link>
