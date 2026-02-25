@@ -31,14 +31,14 @@ test.describe("ミーティング管理", () => {
     await page.getByPlaceholder("話題のタイトル").first().fill("プロジェクト進捗");
 
     // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
-    await page.getByRole("button", { name: "1on1を保存" }).click();
+    await page.getByRole("button", { name: "1on1を保存" }).first().click();
     await confirmSaveMeeting(page);
 
     // メンバー詳細ページに遷移
     await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
 
-    // 1on1履歴が表示される
-    await expect(page.getByRole("heading", { name: "1on1履歴" })).toBeVisible();
+    // 1on1履歴タブが表示される
+    await expect(page.getByRole("tab", { name: "1on1履歴" })).toBeVisible();
   });
 
   test("ミーティングにトピックを追加できる", async ({ page }) => {
@@ -62,7 +62,7 @@ test.describe("ミーティング管理", () => {
     await topicInputs.nth(1).fill("2つ目の話題");
 
     // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
-    await page.getByRole("button", { name: "1on1を保存" }).click();
+    await page.getByRole("button", { name: "1on1を保存" }).first().click();
     await confirmSaveMeeting(page);
 
     // メンバー詳細ページに遷移
@@ -90,7 +90,7 @@ test.describe("ミーティング管理", () => {
     await actionTitleInput.first().fill("テストレポートを作成する");
 
     // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
-    await page.getByRole("button", { name: "1on1を保存" }).click();
+    await page.getByRole("button", { name: "1on1を保存" }).first().click();
     await confirmSaveMeeting(page);
 
     // メンバー詳細ページに遷移
@@ -108,9 +108,13 @@ test.describe("ミーティング管理", () => {
     await page.getByRole("link", { name: "新規1on1" }).click();
     await page.getByPlaceholder("話題のタイトル").first().fill("詳細表示テスト用トピック");
     // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
-    await page.getByRole("button", { name: "1on1を保存" }).click();
+    await page.getByRole("button", { name: "1on1を保存" }).first().click();
     await confirmSaveMeeting(page);
     await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
+
+    // デフォルトタブが「タイムライン」なので「1on1履歴」タブに切り替える
+    await page.getByRole("tab", { name: "1on1履歴" }).click();
+    await page.waitForURL(/tab=history/, { timeout: 10000 });
 
     // 1on1履歴セクションの最初のリンクをクリック
     // "new" や "prepare" を除く実際のミーティングリンクを対象にする

@@ -4,6 +4,7 @@ import {
   createMeetingFromDetail,
   createMemberAndNavigateToDetail,
   navigateToFirstMeetingDetail,
+  openMeetingDeleteDialog,
 } from "./helpers";
 
 test.describe("ミーティング削除", () => {
@@ -13,8 +14,8 @@ test.describe("ミーティング削除", () => {
     await createMeetingFromDetail(page, memberName, { topicTitle: "削除テスト用話題" });
     await navigateToFirstMeetingDetail(page, memberName);
 
-    // 削除ボタンをクリック
-    await page.getByRole("button", { name: "削除" }).click();
+    // 「...」ドロップダウンメニューを開いて「削除」を選択
+    await openMeetingDeleteDialog(page);
 
     // 削除確認ダイアログが表示される
     await expect(page.getByText("ミーティングを削除しますか？")).toBeVisible();
@@ -27,8 +28,8 @@ test.describe("ミーティング削除", () => {
     await createMeetingFromDetail(page, memberName, { topicTitle: "キャンセルテスト話題" });
     await navigateToFirstMeetingDetail(page, memberName);
 
-    // 削除ダイアログを開く
-    await page.getByRole("button", { name: "削除" }).click();
+    // 「...」ドロップダウンメニューを開いて「削除」を選択
+    await openMeetingDeleteDialog(page);
     await expect(page.getByText("ミーティングを削除しますか？")).toBeVisible();
 
     // キャンセル
@@ -47,8 +48,8 @@ test.describe("ミーティング削除", () => {
     await createMeetingFromDetail(page, memberName, { topicTitle: "削除される話題" });
     await navigateToFirstMeetingDetail(page, memberName);
 
-    // 削除ダイアログを開く
-    await page.getByRole("button", { name: "削除" }).click();
+    // 「...」ドロップダウンメニューを開いて「削除」を選択
+    await openMeetingDeleteDialog(page);
     await expect(page.getByText("ミーティングを削除しますか？")).toBeVisible();
 
     // 削除を実行

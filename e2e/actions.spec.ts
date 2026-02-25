@@ -23,7 +23,7 @@ test.describe("アクションアイテム", () => {
     await page.getByPlaceholder("アクションのタイトル").first().fill(actionTitle);
 
     // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
-    await page.getByRole("button", { name: "1on1を保存" }).click();
+    await page.getByRole("button", { name: "1on1を保存" }).first().click();
     await confirmSaveMeeting(page);
     await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
   }
@@ -83,16 +83,16 @@ test.describe("アクションアイテム", () => {
     await expect(page.getByText(actionTitle)).toBeVisible({ timeout: 10000 });
 
     // アクションアイテムのカード内のステータスセレクトを見つける
-    // ActionListFull のカード構造: Card > CardContent > div(flex) > Select + div(info)
-    const actionCard = page
-      .locator("main")
-      .locator("div")
+    // ActionListFull のカード構造: Card > CardContent > div(flex) > Select(w-28) + div(info)
+    // アクション名を含む Card 要素内の combobox を探す
+    const actionCardElement = page
+      .locator("main [class*='card']")
       .filter({ hasText: actionTitle })
-      .locator("button[role='combobox']")
       .first();
+    const statusCombobox = actionCardElement.locator("button[role='combobox']");
 
-    if (await actionCard.isVisible()) {
-      await actionCard.click();
+    if (await statusCombobox.isVisible()) {
+      await statusCombobox.click();
 
       // 「進行中」を選択
       await page.getByRole("option", { name: "進行中" }).click();

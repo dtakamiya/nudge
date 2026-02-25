@@ -29,10 +29,11 @@ test.describe("アクションフィルタリング", () => {
 
   /**
    * メンバーフィルターのコンボボックスを取得する
-   * ActionFilters の SelectTrigger は w-44 クラスを持つ
+   * ActionFilters には w-44 の SelectTrigger が2つ（グループ化・メンバー）あるため
+   * 2番目（nth(1)）を取得する
    */
   function getMemberFilter(page: import("@playwright/test").Page) {
-    return page.locator("main button[role='combobox'].w-44");
+    return page.locator("main button[role='combobox'].w-44").nth(1);
   }
 
   test("フィルターUIが表示される", async ({ page }) => {

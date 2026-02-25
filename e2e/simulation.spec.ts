@@ -51,7 +51,7 @@ test.describe("一連の業務フローシミュレーション", () => {
     await actionTitleInput.first().fill(newActionTitle);
 
     // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
-    await page.getByRole("button", { name: "1on1を保存" }).click();
+    await page.getByRole("button", { name: "1on1を保存" }).first().click();
     await confirmSaveMeeting(page);
     await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
 
@@ -65,15 +65,14 @@ test.describe("一連の業務フローシミュレーション", () => {
     await expect(page.getByText(newActionTitle)).toBeVisible({ timeout: 10000 });
 
     // 5. アクションのステータスを「完了」に変更する
-    const actionCard = page
-      .locator("main")
-      .locator("div")
+    const actionCardElement = page
+      .locator("main [class*='card']")
       .filter({ hasText: newActionTitle })
-      .locator("button[role='combobox']")
       .first();
+    const statusCombobox = actionCardElement.locator("button[role='combobox']");
 
-    if (await actionCard.isVisible()) {
-      await actionCard.click();
+    if (await statusCombobox.isVisible()) {
+      await statusCombobox.click();
       await page.getByRole("option", { name: "完了" }).click();
 
       // リロードして反映を確認

@@ -21,17 +21,14 @@ test.describe("ミーティング準備", () => {
     await page.getByRole("link", { name: "1on1 を準備" }).click();
     await expect(page.getByRole("heading", { name: `${memberName}との1on1 準備` })).toBeVisible();
 
-    // アジェンダセクションが表示される（exact: true でメンバー名とのマッチを防ぐ）
+    // アジェンダセクションが表示される（CardTitle として表示）
     await expect(page.getByText("アジェンダ", { exact: true })).toBeVisible();
 
-    // テンプレートセクションが表示される
-    await expect(page.getByRole("heading", { name: "テンプレート" })).toBeVisible();
+    // テンプレートセクションが表示される（CardTitle: "テンプレートを適用"）
+    await expect(page.getByText("テンプレートを適用")).toBeVisible();
 
-    // 未完了アクションセクションが表示される
-    await expect(page.getByText("未完了アクション", { exact: true })).toBeVisible();
-
-    // 過去のミーティングセクションが表示される
-    await expect(page.getByText("過去のミーティング", { exact: true })).toBeVisible();
+    // 前回の振り返りセクションが表示される
+    await expect(page.getByText("前回の振り返り")).toBeVisible();
   });
 
   test("アジェンダに話題を追加・削除できる", async ({ page }) => {
@@ -55,7 +52,8 @@ test.describe("ミーティング準備", () => {
     await topicInputs.nth(1).fill("2つ目の話題");
 
     // 削除ボタンが表示される（2つ以上の場合のみ）
-    const deleteButtons = page.getByRole("button", { name: "削除" });
+    // PrepareTopicItem の aria-label は「{title}を削除」の形式
+    const deleteButtons = page.getByRole("button", { name: /を削除$/ });
     await expect(deleteButtons.first()).toBeVisible();
 
     // 1つ目の話題を削除
@@ -75,8 +73,8 @@ test.describe("ミーティング準備", () => {
     // 話題を入力
     await page.getByPlaceholder("話題のタイトル").first().fill("準備した話題");
 
-    // ミーティングを開始ボタンをクリック
-    await page.getByRole("link", { name: /ミーティングを開始/ }).click();
+    // 記録を開始ボタンをクリック
+    await page.getByRole("link", { name: /記録を開始/ }).click();
 
     // ミーティング作成ページの URL に遷移するのを待つ（/meetings/new を含む）
     await page.waitForURL(/\/meetings\/new/, { timeout: 15000 });
@@ -116,7 +114,7 @@ test.describe("ミーティング準備", () => {
     await page.getByRole("link", { name: "1on1 を準備" }).click();
     await expect(page.getByRole("heading", { name: `${memberName}との1on1 準備` })).toBeVisible();
 
-    // 過去のミーティングセクションにデータが表示される
-    await expect(page.getByText("過去のミーティング")).toBeVisible();
+    // 前回の振り返りセクションにデータが表示される
+    await expect(page.getByText("前回の振り返り")).toBeVisible();
   });
 });
