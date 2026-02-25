@@ -75,10 +75,11 @@ function MemberRow({ member }: MemberRowProps) {
   return (
     <div className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
       <div className="flex items-center gap-2 min-w-0">
-        {config.icon}
+        <span aria-hidden="true">{config.icon}</span>
         <span className="text-sm text-foreground truncate">{member.name}</span>
       </div>
       <span
+        aria-label={`ステータス: ${config.label}`}
         className={`text-xs font-medium px-2 py-0.5 rounded-full border shrink-0 ${config.badgeClass}`}
       >
         {config.label}
@@ -92,11 +93,13 @@ type CountBadgeProps = {
   readonly label: string;
   readonly colorClass: string;
   readonly bgClass: string;
+  readonly icon: React.ReactNode;
 };
 
-function CountBadge({ count, label, colorClass, bgClass }: CountBadgeProps) {
+function CountBadge({ count, label, colorClass, bgClass, icon }: CountBadgeProps) {
   return (
     <div className={`flex flex-col items-center px-3 py-2 rounded-lg ${bgClass}`}>
+      <span aria-hidden="true">{icon}</span>
       <span className={`text-lg font-bold ${colorClass}`}>{count}</span>
       <span className={`text-xs ${colorClass} opacity-80`}>{label}</span>
     </div>
@@ -135,18 +138,21 @@ export function HealthScoreWidget({ data }: Props) {
             label="健全"
             colorClass="text-success"
             bgClass="bg-success/10"
+            icon={<CheckCircle2 className="w-4 h-4 text-success" />}
           />
           <CountBadge
             count={warningCount}
             label="注意"
             colorClass="text-warning"
             bgClass="bg-warning/10"
+            icon={<AlertTriangle className="w-4 h-4 text-warning" />}
           />
           <CountBadge
             count={dangerCount}
             label="危険"
             colorClass="text-destructive"
             bgClass="bg-destructive/10"
+            icon={<XCircle className="w-4 h-4 text-destructive" />}
           />
         </div>
       </div>

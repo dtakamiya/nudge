@@ -1,4 +1,12 @@
-import { Calendar, CircleAlert, Clock, TrendingUp } from "lucide-react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  Calendar,
+  CheckCircle2,
+  CircleAlert,
+  Clock,
+  TrendingUp,
+} from "lucide-react";
 
 import type { DashboardSummary as DashboardSummaryType } from "@/lib/types";
 
@@ -17,6 +25,19 @@ type KPICardProps = {
   readonly testId: string;
   readonly staggerClass: string;
 };
+
+function getStatusIcon(variant: Variant): React.ReactNode {
+  switch (variant) {
+    case "success":
+      return <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0" aria-hidden="true" />;
+    case "warning":
+      return <AlertTriangle className="w-3.5 h-3.5 text-warning shrink-0" aria-hidden="true" />;
+    case "danger":
+      return <AlertCircle className="w-3.5 h-3.5 text-destructive shrink-0" aria-hidden="true" />;
+    case "info":
+      return null;
+  }
+}
 
 function getBorderClass(variant: Variant): string {
   switch (variant) {
@@ -45,15 +66,19 @@ function getValueClass(variant: Variant): string {
 }
 
 function KPICard({ title, value, unit, variant, icon, testId, staggerClass }: KPICardProps) {
+  const statusIcon = getStatusIcon(variant);
   return (
     <div
       data-testid={testId}
       className={`animate-fade-in-up ${staggerClass} rounded-xl border border-l-4 ${getBorderClass(variant)} bg-card p-5`}
     >
       <div className="flex items-center justify-between mb-3">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-          {title}
-        </p>
+        <div className="flex items-center gap-1.5">
+          {statusIcon}
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            {title}
+          </p>
+        </div>
         <span className={`${getValueClass(variant)} opacity-70`}>{icon}</span>
       </div>
       <p className={`text-4xl font-bold tracking-tight ${getValueClass(variant)}`}>
