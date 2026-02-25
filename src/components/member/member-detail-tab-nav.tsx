@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
-export type MemberDetailTab = "timeline" | "history" | "actions";
+export type MemberDetailTab = "timeline" | "history" | "actions" | "goals";
 
 type Props = {
   memberId: string;
@@ -15,6 +15,7 @@ const TABS: { value: MemberDetailTab; label: string }[] = [
   { value: "timeline", label: "タイムライン" },
   { value: "history", label: "1on1履歴" },
   { value: "actions", label: "アクションアイテム" },
+  { value: "goals", label: "目標" },
 ];
 
 export function MemberDetailTabNav({ memberId, currentTab }: Props) {

@@ -6,13 +6,14 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 import { PrepareActionChecklist } from "@/components/meeting/prepare-action-checklist";
+import { PrepareGoalsSection } from "@/components/meeting/prepare-goals-section";
 import { PrepareTopicItem } from "@/components/meeting/prepare-topic-item";
 import { PreviousMeetingReview } from "@/components/meeting/previous-meeting-review";
 import { TemplateSelector } from "@/components/meeting/template-selector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import type { MeetingTemplate as DbMeetingTemplate } from "@/generated/prisma/client";
+import type { Goal, MeetingTemplate as DbMeetingTemplate } from "@/generated/prisma/client";
 import { useMeetingPrepare } from "@/hooks/use-meeting-prepare";
 import { screenReaderInstructions } from "@/lib/dnd-accessibility";
 import { cn } from "@/lib/utils";
@@ -37,6 +38,7 @@ type Props = {
   pendingActions: PendingAction[];
   lastMeetingData: LastMeetingData;
   customTemplates?: DbMeetingTemplate[];
+  activeGoals?: Goal[];
 };
 
 export function MeetingPrepare({
@@ -44,6 +46,7 @@ export function MeetingPrepare({
   pendingActions,
   lastMeetingData,
   customTemplates = [],
+  activeGoals = [],
 }: Props) {
   const {
     topics,
@@ -82,6 +85,22 @@ export function MeetingPrepare({
             />
           </CardContent>
         </Card>
+
+        {activeGoals.length > 0 && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">
+                進行中の目標
+                <span className="ml-2 text-xs font-normal text-muted-foreground">
+                  ({activeGoals.length}件)
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PrepareGoalsSection goals={activeGoals} />
+            </CardContent>
+          </Card>
+        )}
 
         {pendingActions.length > 0 && (
           <Collapsible open={isPendingActionsOpen} onOpenChange={setIsPendingActionsOpen}>

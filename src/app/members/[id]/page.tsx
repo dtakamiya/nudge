@@ -5,6 +5,7 @@ import { ActionListCompact } from "@/components/action/action-list-compact";
 import { ActionAnalyticsSection } from "@/components/analytics/action-analytics-section";
 import { CheckinTrendSection } from "@/components/analytics/checkin-trend-section";
 import { TopicAnalyticsSection } from "@/components/analytics/topic-analytics-section";
+import { GoalList } from "@/components/goal/goal-list";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { MeetingHistory } from "@/components/meeting/meeting-history";
 import { CalendarExportButton } from "@/components/member/calendar-export-button";
@@ -21,6 +22,7 @@ import { MoodTrendChart } from "@/components/member/mood-trend-chart";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { getGoals } from "@/lib/actions/goal-actions";
 import { getMoodTrend } from "@/lib/actions/meeting-actions";
 import { getMember, getMemberMeetings, getMemberTimeline } from "@/lib/actions/member-actions";
 import { calcNextRecommendedDate } from "@/lib/schedule";
@@ -31,7 +33,7 @@ type Props = {
 };
 
 function resolveTab(tab: string | undefined): MemberDetailTab {
-  if (tab === "history" || tab === "actions") return tab;
+  if (tab === "history" || tab === "actions" || tab === "goals") return tab;
   return "timeline";
 }
 
@@ -52,9 +54,10 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
     member.meetingIntervalDays,
   );
 
-  const [meetingsPage, timeline] = await Promise.all([
+  const [meetingsPage, timeline, goals] = await Promise.all([
     currentTab === "history" ? getMemberMeetings(id, page) : Promise.resolve(null),
     currentTab === "timeline" ? getMemberTimeline(id) : Promise.resolve(null),
+    currentTab === "goals" ? getGoals(id) : Promise.resolve(null),
   ]);
 
   return (
@@ -144,6 +147,13 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
           <>
             <Separator className="mb-6" />
             <ActionListCompact actionItems={member.actionItems} />
+          </>
+        )}
+
+        {currentTab === "goals" && goals !== null && (
+          <>
+            <Separator className="mb-6" />
+            <GoalList goals={goals} memberId={id} />
           </>
         )}
       </div>
