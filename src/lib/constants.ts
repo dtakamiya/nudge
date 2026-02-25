@@ -34,3 +34,12 @@ export const TAG_COLOR_PALETTE = [
 export const TAG_NAME_MAX_LENGTH = 30;
 export const TAG_NAME_MIN_LENGTH = 1;
 export const TAG_SUGGESTIONS_LIMIT = 10;
+
+/** コンディションアラート: チェックに必要な最低ミーティング数 */
+export const CONDITION_ALERT_MIN_MEETINGS = 2;
+/** コンディションアラート: チェック対象の直近ミーティング数 */
+export const CONDITION_ALERT_CHECK_COUNT = 3;
+/** コンディションアラート: 気分スコアの低値閾値（5段階中） */
+export const MOOD_LOW_THRESHOLD = 2;
+/** コンディションアラート: コンディションスコアの低値閾値（5段階中） */
+export const CONDITION_LOW_THRESHOLD = 2;
