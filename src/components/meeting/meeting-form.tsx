@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,7 +68,7 @@ export function MeetingForm(props: MeetingFormProps) {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <form onSubmit={handleSubmit} aria-busy={isSubmitting} className="flex flex-col gap-6">
         <div className="flex items-end justify-between gap-4">
           <div className="flex flex-col gap-2 flex-1">
             <Label htmlFor="date">日付 *</Label>
@@ -81,6 +81,7 @@ export function MeetingForm(props: MeetingFormProps) {
             />
           </div>
           <Button type="submit" variant="outline" disabled={isSubmitting}>
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {submitLabel}
           </Button>
         </div>
@@ -146,6 +147,7 @@ export function MeetingForm(props: MeetingFormProps) {
 
         <div className="sticky bottom-0 z-10 bg-background border-t pt-3 pb-3">
           <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {submitLabel}
           </Button>
         </div>

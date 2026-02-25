@@ -1,6 +1,6 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -70,7 +70,7 @@ export function MemberDeleteDialog({ memberId, memberName, open: openProp, onOpe
           削除
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent aria-busy={loading}>
         <AlertDialogHeader>
           <AlertDialogTitle>メンバーを削除しますか？</AlertDialogTitle>
           <AlertDialogDescription>
@@ -88,6 +88,7 @@ export function MemberDeleteDialog({ memberId, memberName, open: openProp, onOpe
         <AlertDialogFooter>
           <AlertDialogCancel disabled={loading}>キャンセル</AlertDialogCancel>
           <Button variant="destructive" onClick={handleDelete} disabled={loading}>
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {loading ? "削除中..." : "削除する"}
           </Button>
         </AlertDialogFooter>
