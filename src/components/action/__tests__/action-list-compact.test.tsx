@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
@@ -301,6 +301,49 @@ describe("ActionListCompact", () => {
     it("アイテムが空のとき meetingId があれば追加ボタンが表示される", () => {
       render(<ActionListCompact actionItems={[]} meetingId="meeting-1" memberId="member-1" />);
       expect(screen.getByRole("button", { name: /アクション追加/ })).toBeDefined();
+    });
+  });
+
+  describe("スナップショット", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2026-02-26T00:00:00.000Z"));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("空リストのスナップショット", () => {
+      const { asFragment } = render(<ActionListCompact actionItems={[]} />);
+      expect(asFragment()).toMatchSnapshot();
+    });
+
+    it("アクションアイテムあり（TODO・IN_PROGRESS）のスナップショット", () => {
+      const { asFragment } = render(<ActionListCompact actionItems={baseItems} />);
+      expect(asFragment()).toMatchSnapshot();
+    });
+
+    it("meetingId あり（追加ボタン表示）のスナップショット", () => {
+      const { asFragment } = render(
+        <ActionListCompact actionItems={baseItems} meetingId="meeting-1" memberId="member-1" />,
+      );
+      expect(asFragment()).toMatchSnapshot();
+    });
+
+    it("期限超過アイテムのスナップショット", () => {
+      const overdueItems = [
+        {
+          id: "overdue-1",
+          title: "期限切れタスク",
+          description: "期限を過ぎたタスクの説明",
+          status: "TODO",
+          dueDate: new Date("2020-01-01"),
+          meeting: { date: new Date("2020-01-01") },
+        },
+      ];
+      const { asFragment } = render(<ActionListCompact actionItems={overdueItems} />);
+      expect(asFragment()).toMatchSnapshot();
     });
   });
 

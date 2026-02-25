@@ -1,0 +1,444 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ActionListCompact > スナップショット > meetingId あり（追加ボタン表示）のスナップショット 1`] = `
+<DocumentFragment>
+  <div
+    class="flex flex-col gap-2 "
+  >
+    <div
+      class="flex items-center justify-between p-2 border rounded transition-colors "
+    >
+      <div
+        class="flex items-center gap-2 flex-1 min-w-0"
+      >
+        <button
+          aria-label="テストタスク1のステータスを進行中に変更"
+        >
+          <span
+            class="inline-flex items-center justify-center rounded-full border border-transparent px-2.5 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] transition-all duration-200 overflow-hidden bg-[oklch(0.96_0.005_260)] text-[oklch(0.45_0.01_260)]"
+            data-slot="badge"
+            data-variant="status-todo"
+          >
+            未着手
+          </span>
+        </button>
+        <div
+          class="flex flex-col min-w-0"
+        >
+          <span
+            class="text-sm"
+          >
+            テストタスク1
+          </span>
+        </div>
+      </div>
+      <div
+        class="flex items-center gap-2 shrink-0"
+      >
+        <span
+          class="text-xs text-muted-foreground"
+        >
+          期限: 2099/12/31
+        </span>
+        <button
+          aria-label="編集"
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground size-8 rounded-md [&_svg:not([class*='size-'])]:size-3 print:hidden"
+          data-size="icon-xs"
+          data-slot="button"
+          data-variant="ghost"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-pencil"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
+            />
+            <path
+              d="m15 5 4 4"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div
+      class="flex items-center justify-between p-2 border rounded transition-colors "
+    >
+      <div
+        class="flex items-center gap-2 flex-1 min-w-0"
+      >
+        <button
+          aria-label="テストタスク2のステータスを完了に変更"
+        >
+          <span
+            class="inline-flex items-center justify-center rounded-full border border-transparent px-2.5 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] transition-all duration-200 overflow-hidden bg-[oklch(0.95_0.05_80)] text-[oklch(0.4_0.1_80)]"
+            data-slot="badge"
+            data-variant="status-progress"
+          >
+            進行中
+          </span>
+        </button>
+        <div
+          class="flex flex-col min-w-0"
+        >
+          <span
+            class="text-sm"
+          >
+            テストタスク2
+          </span>
+        </div>
+      </div>
+      <div
+        class="flex items-center gap-2 shrink-0"
+      >
+        <button
+          aria-label="編集"
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground size-8 rounded-md [&_svg:not([class*='size-'])]:size-3 print:hidden"
+          data-size="icon-xs"
+          data-slot="button"
+          data-variant="ghost"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-pencil"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
+            />
+            <path
+              d="m15 5 4 4"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div
+      class="flex justify-end mt-1 print:hidden"
+    >
+      <button
+        aria-label="アクション追加"
+        class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5"
+        data-size="sm"
+        data-slot="button"
+        data-variant="ghost"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-plus w-4 h-4 mr-1"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M5 12h14"
+          />
+          <path
+            d="M12 5v14"
+          />
+        </svg>
+        アクション追加
+      </button>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`ActionListCompact > スナップショット > アクションアイテムあり（TODO・IN_PROGRESS）のスナップショット 1`] = `
+<DocumentFragment>
+  <div
+    class="flex flex-col gap-2 "
+  >
+    <div
+      class="flex items-center justify-between p-2 border rounded transition-colors "
+    >
+      <div
+        class="flex items-center gap-2 flex-1 min-w-0"
+      >
+        <button
+          aria-label="テストタスク1のステータスを進行中に変更"
+        >
+          <span
+            class="inline-flex items-center justify-center rounded-full border border-transparent px-2.5 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] transition-all duration-200 overflow-hidden bg-[oklch(0.96_0.005_260)] text-[oklch(0.45_0.01_260)]"
+            data-slot="badge"
+            data-variant="status-todo"
+          >
+            未着手
+          </span>
+        </button>
+        <div
+          class="flex flex-col min-w-0"
+        >
+          <span
+            class="text-sm"
+          >
+            テストタスク1
+          </span>
+        </div>
+      </div>
+      <div
+        class="flex items-center gap-2 shrink-0"
+      >
+        <span
+          class="text-xs text-muted-foreground"
+        >
+          期限: 2099/12/31
+        </span>
+        <button
+          aria-label="編集"
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground size-8 rounded-md [&_svg:not([class*='size-'])]:size-3 print:hidden"
+          data-size="icon-xs"
+          data-slot="button"
+          data-variant="ghost"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-pencil"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
+            />
+            <path
+              d="m15 5 4 4"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div
+      class="flex items-center justify-between p-2 border rounded transition-colors "
+    >
+      <div
+        class="flex items-center gap-2 flex-1 min-w-0"
+      >
+        <button
+          aria-label="テストタスク2のステータスを完了に変更"
+        >
+          <span
+            class="inline-flex items-center justify-center rounded-full border border-transparent px-2.5 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] transition-all duration-200 overflow-hidden bg-[oklch(0.95_0.05_80)] text-[oklch(0.4_0.1_80)]"
+            data-slot="badge"
+            data-variant="status-progress"
+          >
+            進行中
+          </span>
+        </button>
+        <div
+          class="flex flex-col min-w-0"
+        >
+          <span
+            class="text-sm"
+          >
+            テストタスク2
+          </span>
+        </div>
+      </div>
+      <div
+        class="flex items-center gap-2 shrink-0"
+      >
+        <button
+          aria-label="編集"
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground size-8 rounded-md [&_svg:not([class*='size-'])]:size-3 print:hidden"
+          data-size="icon-xs"
+          data-slot="button"
+          data-variant="ghost"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-pencil"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
+            />
+            <path
+              d="m15 5 4 4"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`ActionListCompact > スナップショット > 期限超過アイテムのスナップショット 1`] = `
+<DocumentFragment>
+  <div
+    class="flex flex-col gap-2 "
+  >
+    <div
+      class="flex items-center justify-between p-2 border rounded transition-colors "
+    >
+      <div
+        class="flex items-center gap-2 flex-1 min-w-0"
+      >
+        <button
+          aria-label="期限切れタスクのステータスを進行中に変更"
+        >
+          <span
+            class="inline-flex items-center justify-center rounded-full border border-transparent px-2.5 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] transition-all duration-200 overflow-hidden bg-[oklch(0.96_0.005_260)] text-[oklch(0.45_0.01_260)]"
+            data-slot="badge"
+            data-variant="status-todo"
+          >
+            未着手
+          </span>
+        </button>
+        <div
+          class="flex flex-col min-w-0"
+        >
+          <span
+            class="text-sm"
+          >
+            期限切れタスク
+          </span>
+        </div>
+      </div>
+      <div
+        class="flex items-center gap-2 shrink-0"
+      >
+        <span
+          class="justify-center rounded-full border border-transparent px-2.5 py-0.5 font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] transition-all duration-200 overflow-hidden bg-destructive text-white [a&]:hover:bg-destructive/90 flex items-center gap-1 text-xs"
+          data-slot="badge"
+          data-variant="destructive"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-triangle-alert h-3 w-3"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+            />
+            <path
+              d="M12 9v4"
+            />
+            <path
+              d="M12 17h.01"
+            />
+          </svg>
+          期限超過
+        </span>
+        <button
+          aria-label="編集"
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground size-8 rounded-md [&_svg:not([class*='size-'])]:size-3 print:hidden"
+          data-size="icon-xs"
+          data-slot="button"
+          data-variant="ghost"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-pencil"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
+            />
+            <path
+              d="m15 5 4 4"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`ActionListCompact > スナップショット > 空リストのスナップショット 1`] = `
+<DocumentFragment>
+  <div
+    class="flex flex-col items-center justify-center text-center py-6"
+    data-variant="default"
+  >
+    <div
+      class="rounded-full p-3 mb-3 bg-muted"
+    >
+      <svg
+        aria-hidden="true"
+        class="lucide lucide-square-check w-8 h-8 text-muted-foreground"
+        fill="none"
+        height="24"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="1.5"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect
+          height="18"
+          rx="2"
+          width="18"
+          x="3"
+          y="3"
+        />
+        <path
+          d="m9 12 2 2 4-4"
+        />
+      </svg>
+    </div>
+    <p
+      class="text-sm font-medium text-foreground/80"
+    >
+      アクションアイテムはありません
+    </p>
+  </div>
+</DocumentFragment>
+`;
