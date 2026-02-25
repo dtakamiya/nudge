@@ -128,13 +128,14 @@ export function ConditionSelector({
                 </span>
                 <span className="text-xs text-slate-400">{axis.minLabel}</span>
               </div>
-              <div className="flex items-center gap-1">
+              <div role="radiogroup" aria-label={axis.label} className="flex items-center gap-1">
                 {axis.options.map((option) => (
                   <button
                     key={option.value}
                     type="button"
+                    role="radio"
                     aria-label={`${axis.label}: ${option.label}`}
-                    aria-pressed={currentValue === option.value}
+                    aria-checked={currentValue === option.value}
                     onClick={() => handleSelect(axis.field, option.value)}
                     className={`flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary ${
                       currentValue === option.value

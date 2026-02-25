@@ -98,8 +98,10 @@ export function MeetingForm(props: MeetingFormProps) {
         />
 
         <div className="flex flex-col gap-2">
-          <Label>ミーティングの雰囲気</Label>
-          <MoodSelector value={mood} onChange={setMood} />
+          <Label id="mood-label">ミーティングの雰囲気</Label>
+          <div aria-labelledby="mood-label">
+            <MoodSelector value={mood} onChange={setMood} />
+          </div>
           {mood && (
             <p className="text-xs text-muted-foreground">
               選択をもう一度クリックすると解除できます

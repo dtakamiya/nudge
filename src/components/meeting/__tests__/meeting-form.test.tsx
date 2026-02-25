@@ -79,7 +79,7 @@ describe("MeetingForm", () => {
   it("renders condition selector buttons in CheckinSection", () => {
     render(<MeetingForm memberId="m1" />);
     // Condition selector has buttons with aria-label for each axis
-    const healthButtons = screen.getAllByRole("button", { name: /体調:/ });
+    const healthButtons = screen.getAllByRole("radio", { name: /体調:/ });
     expect(healthButtons.length).toBeGreaterThan(0);
   });
 

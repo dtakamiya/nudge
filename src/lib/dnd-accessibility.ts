@@ -1,4 +1,7 @@
 import type { Announcements, ScreenReaderInstructions } from "@dnd-kit/core";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+
+export { sortableKeyboardCoordinates };
 
 export const screenReaderInstructions: ScreenReaderInstructions = {
   draggable:

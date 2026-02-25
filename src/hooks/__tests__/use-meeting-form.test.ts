@@ -15,6 +15,7 @@ vi.mock("@/lib/actions/meeting-actions", () => ({
 }));
 
 vi.mock("@/lib/dnd-accessibility", () => ({
+  sortableKeyboardCoordinates: vi.fn(),
   createAnnouncements: vi.fn(() => ({
     onDragStart: vi.fn(() => ""),
     onDragOver: vi.fn(() => ""),

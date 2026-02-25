@@ -23,19 +23,32 @@ describe("ConditionSelector", () => {
     expect(screen.getByText(/業務量/)).toBeInTheDocument();
   });
 
-  it("各軸に5つのボタンが表示されること（合計15ボタン）", () => {
+  it("各軸に5つのラジオボタンが表示されること（合計15ボタン）", () => {
     render(<ConditionSelector {...defaultProps} />);
-    const buttons = screen.getAllByRole("button");
-    expect(buttons).toHaveLength(15);
+    const radios = screen.getAllByRole("radio");
+    expect(radios).toHaveLength(15);
+  });
+
+  it("各軸のボタン群が role=radiogroup を持つこと", () => {
+    render(<ConditionSelector {...defaultProps} />);
+    const groups = screen.getAllByRole("radiogroup");
+    expect(groups).toHaveLength(3);
+  });
+
+  it("radiogroup に対応するコンディション軸の aria-label が付くこと", () => {
+    render(<ConditionSelector {...defaultProps} />);
+    expect(screen.getByRole("radiogroup", { name: "体調" })).toBeInTheDocument();
+    expect(screen.getByRole("radiogroup", { name: "気分" })).toBeInTheDocument();
+    expect(screen.getByRole("radiogroup", { name: "業務量" })).toBeInTheDocument();
   });
 
   it("体調のボタンをクリックすると conditionHealth で onConditionChange が呼ばれること", async () => {
     const user = userEvent.setup();
     const handleChange = vi.fn();
     render(<ConditionSelector {...defaultProps} onConditionChange={handleChange} />);
-    const buttons = screen.getAllByRole("button");
+    const radios = screen.getAllByRole("radio");
     // 最初の5つが体調ボタン
-    await user.click(buttons[2]); // value=3
+    await user.click(radios[2]); // value=3
     expect(handleChange).toHaveBeenCalledWith("conditionHealth", 3);
   });
 
@@ -43,9 +56,9 @@ describe("ConditionSelector", () => {
     const user = userEvent.setup();
     const handleChange = vi.fn();
     render(<ConditionSelector {...defaultProps} onConditionChange={handleChange} />);
-    const buttons = screen.getAllByRole("button");
+    const radios = screen.getAllByRole("radio");
     // 6〜10番目が気分ボタン
-    await user.click(buttons[5]); // value=1
+    await user.click(radios[5]); // value=1
     expect(handleChange).toHaveBeenCalledWith("conditionMood", 1);
   });
 
@@ -53,18 +66,18 @@ describe("ConditionSelector", () => {
     const user = userEvent.setup();
     const handleChange = vi.fn();
     render(<ConditionSelector {...defaultProps} onConditionChange={handleChange} />);
-    const buttons = screen.getAllByRole("button");
+    const radios = screen.getAllByRole("radio");
     // 11〜15番目が業務量ボタン
-    await user.click(buttons[10]); // value=1
+    await user.click(radios[10]); // value=1
     expect(handleChange).toHaveBeenCalledWith("conditionWorkload", 1);
   });
 
-  it("選択済みのボタンに aria-pressed=true が付くこと", () => {
+  it("選択済みのボタンに aria-checked=true が付くこと", () => {
     render(<ConditionSelector {...defaultProps} conditionHealth={3} />);
-    const buttons = screen.getAllByRole("button");
+    const radios = screen.getAllByRole("radio");
     // 体調の3番目（index=2）が選択済み
-    expect(buttons[2]).toHaveAttribute("aria-pressed", "true");
-    expect(buttons[0]).toHaveAttribute("aria-pressed", "false");
+    expect(radios[2]).toHaveAttribute("aria-checked", "true");
+    expect(radios[0]).toHaveAttribute("aria-checked", "false");
   });
 
   it("選択済みと同じボタンを再クリックすると null で onConditionChange が呼ばれること", async () => {
@@ -73,9 +86,9 @@ describe("ConditionSelector", () => {
     render(
       <ConditionSelector {...defaultProps} conditionHealth={2} onConditionChange={handleChange} />,
     );
-    const buttons = screen.getAllByRole("button");
+    const radios = screen.getAllByRole("radio");
     // 体調の2番目（index=1）をクリック → null
-    await user.click(buttons[1]);
+    await user.click(radios[1]);
     expect(handleChange).toHaveBeenCalledWith("conditionHealth", null);
   });
 

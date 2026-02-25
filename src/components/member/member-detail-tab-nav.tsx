@@ -23,6 +23,7 @@ export function MemberDetailTabNav({ memberId, currentTab }: Props) {
       {TABS.map((tab) => (
         <Link
           key={tab.value}
+          id={`tab-${tab.value}`}
           href={`/members/${memberId}?tab=${tab.value}`}
           role="tab"
           aria-selected={currentTab === tab.value}

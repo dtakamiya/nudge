@@ -29,6 +29,7 @@ export function AutoSaveIndicator({ status, onRetry, onIdle }: Props) {
 
   return (
     <div
+      role="status"
       className={cn(
         "flex items-center gap-1.5 text-xs transition-opacity duration-300",
         status === "saving" && "text-muted-foreground",

@@ -4,6 +4,7 @@ import {
   closestCenter,
   DndContext,
   type DragEndEvent,
+  KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
@@ -11,7 +12,7 @@ import {
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { PrepareActionChecklist } from "@/components/meeting/prepare-action-checklist";
@@ -22,6 +23,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { MeetingTemplate as DbMeetingTemplate } from "@/generated/prisma/client";
+import {
+  createAnnouncements,
+  screenReaderInstructions,
+  sortableKeyboardCoordinates,
+} from "@/lib/dnd-accessibility";
 import type { MeetingTemplate, TopicCategory } from "@/lib/meeting-templates";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 import { cn } from "@/lib/utils";
@@ -88,7 +94,11 @@ export function MeetingPrepare({
   const [isTemplateOpen, setIsTemplateOpen] = useState(false);
   const agendaRef = useRef<HTMLDivElement>(null);
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+  const agendaAnnouncements = useMemo(() => createAnnouncements("話題"), []);
 
   function handleTemplateReplace(template: MeetingTemplate) {
     setSelectedTemplateId(template.id);
@@ -257,6 +267,10 @@ export function MeetingPrepare({
                 sensors={sensors}
                 collisionDetection={closestCenter}
                 onDragEnd={handleTopicDragEnd}
+                accessibility={{
+                  announcements: agendaAnnouncements,
+                  screenReaderInstructions,
+                }}
               >
                 <SortableContext
                   items={topics.map((t) => t.id)}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getRandomCheckinMessage } from "@/lib/checkin-messages";
 
@@ -51,21 +52,28 @@ export function CheckinSection({
         <IcebreakerCard />
 
         <div className="space-y-2">
-          <p className="text-sm font-medium text-slate-700">コンディション</p>
-          <ConditionSelector
-            conditionHealth={conditionHealth}
-            conditionMood={conditionMood}
-            conditionWorkload={conditionWorkload}
-            previousConditionHealth={previousConditionHealth}
-            previousConditionMood={previousConditionMood}
-            previousConditionWorkload={previousConditionWorkload}
-            onConditionChange={onConditionChange}
-          />
+          <p id="checkin-condition-label" className="text-sm font-medium text-slate-700">
+            コンディション
+          </p>
+          <div aria-labelledby="checkin-condition-label">
+            <ConditionSelector
+              conditionHealth={conditionHealth}
+              conditionMood={conditionMood}
+              conditionWorkload={conditionWorkload}
+              previousConditionHealth={previousConditionHealth}
+              previousConditionMood={previousConditionMood}
+              previousConditionWorkload={previousConditionWorkload}
+              onConditionChange={onConditionChange}
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
-          <p className="text-sm font-medium text-slate-700">メモ</p>
+          <Label htmlFor="checkin-note" className="text-sm font-medium text-slate-700">
+            メモ
+          </Label>
           <Textarea
+            id="checkin-note"
             value={checkinNote}
             onChange={(e) => onCheckinNoteChange(e.target.value)}
             placeholder="気になることや共有したいことを入力..."

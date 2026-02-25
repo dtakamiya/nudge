@@ -13,7 +13,7 @@ export function MoodSelector({ value, onChange }: Props) {
   };
 
   return (
-    <div className="flex items-center gap-1">
+    <div role="group" aria-label="ミーティングの雰囲気" className="flex items-center gap-1">
       {MOOD_OPTIONS.map((option) => (
         <button
           key={option.value}
