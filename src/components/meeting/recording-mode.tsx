@@ -4,7 +4,7 @@ import { Maximize2, Minimize2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useFocusMode } from "@/hooks/use-focus-mode";
-import { type Topic,useRecordingSession } from "@/hooks/use-recording-session";
+import { type Topic, useRecordingSession } from "@/hooks/use-recording-session";
 
 import { AutoSaveIndicator } from "./auto-save-indicator";
 import { ElapsedTimer } from "./elapsed-timer";
