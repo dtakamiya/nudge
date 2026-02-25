@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -65,6 +65,11 @@ vi.mock("@/lib/meeting-summary", () => ({
   generateMeetingSummaryText: vi.fn().mockReturnValue("テストサマリーテキスト"),
 }));
 
+// Mock SummaryDialog
+vi.mock("../summary-dialog", () => ({
+  SummaryDialog: () => <div data-testid="summary-dialog" />,
+}));
+
 const defaultProps = {
   meetingId: "meeting-1",
   memberId: "member-1",
@@ -109,24 +114,9 @@ describe("MeetingDetailPageClient", () => {
     expect(screen.getByRole("button", { name: /編集/ })).toBeTruthy();
   });
 
-  it("shows copy summary button in view mode", () => {
+  it("shows summary generate button in view mode", () => {
     render(<MeetingDetailPageClient {...defaultProps} />);
-    expect(screen.getByRole("button", { name: /サマリーをコピー/ })).toBeTruthy();
-  });
-
-  it("calls generateMeetingSummaryText with memberName when copy button is clicked", async () => {
-    const { generateMeetingSummaryText } = await import("@/lib/meeting-summary");
-    const mockGenerate = vi.mocked(generateMeetingSummaryText);
-
-    const user = userEvent.setup();
-    render(<MeetingDetailPageClient {...defaultProps} />);
-    await user.click(screen.getByRole("button", { name: /サマリーをコピー/ }));
-
-    await waitFor(() => {
-      expect(mockGenerate).toHaveBeenCalledWith(
-        expect.objectContaining({ memberName: "田中太郎" }),
-      );
-    });
+    expect(screen.getByRole("button", { name: /サマリー生成/ })).toBeTruthy();
   });
 
   it("switches to edit mode when edit button is clicked", async () => {
