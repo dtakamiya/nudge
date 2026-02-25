@@ -129,6 +129,7 @@ npm run format           # Prettier で全ファイルフォーマット
 npm run format:check     # Prettier チェック（CI用）
 npm test                 # テスト実行（vitest run）
 npm run test:watch       # テスト ウォッチモード
+npm test -- --update-snapshots  # スナップショット更新（UI変更後に実行）
 npm run test:e2e         # E2E テスト実行（Playwright）
 npm run test:e2e:ui      # E2E テスト（Playwright UI モード）
 npm run test:e2e:headed  # E2E テスト（ブラウザ表示あり）

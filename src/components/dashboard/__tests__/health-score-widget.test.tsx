@@ -114,4 +114,42 @@ describe("HealthScoreWidget", () => {
     const scoreEl = container.querySelector("[data-testid='health-score-value']");
     expect(scoreEl?.className).toContain("success");
   });
+
+  describe("スナップショット", () => {
+    it("スコア100・メンバーなしのデフォルト状態", () => {
+      const { asFragment } = render(<HealthScoreWidget data={baseData} />);
+      expect(asFragment()).toMatchSnapshot();
+    });
+
+    it("スコア50・複数メンバー（健全・注意・危険混在）の状態", () => {
+      const data: HealthScoreData = {
+        score: 50,
+        healthyCount: 2,
+        warningCount: 1,
+        dangerCount: 1,
+        memberStatuses: [
+          { id: "1", name: "田中 一郎", status: "healthy", overdueDays: 0 },
+          { id: "2", name: "佐藤 花子", status: "warning", overdueDays: 3 },
+          { id: "3", name: "鈴木 次郎", status: "danger", overdueDays: 10 },
+        ],
+      };
+      const { asFragment } = render(<HealthScoreWidget data={data} />);
+      expect(asFragment()).toMatchSnapshot();
+    });
+
+    it("スコア30・全員危険ステータスの状態", () => {
+      const data: HealthScoreData = {
+        score: 30,
+        healthyCount: 0,
+        warningCount: 0,
+        dangerCount: 2,
+        memberStatuses: [
+          { id: "1", name: "山田 太郎", status: "danger", overdueDays: 15 },
+          { id: "2", name: "伊藤 三郎", status: "danger", overdueDays: 20 },
+        ],
+      };
+      const { asFragment } = render(<HealthScoreWidget data={data} />);
+      expect(asFragment()).toMatchSnapshot();
+    });
+  });
 });

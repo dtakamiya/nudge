@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { MemberList } from "../member-list";
 
@@ -194,6 +194,53 @@ describe("MemberList", () => {
     it("renders sr-only text for screen readers on active sort column", () => {
       render(<MemberList members={[baseMember]} />);
       expect(screen.getByText("昇順ソート中")).toBeDefined();
+    });
+  });
+
+  describe("スナップショット", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2026-02-26T00:00:00.000Z"));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("空リストのスナップショット", () => {
+      const { asFragment } = render(<MemberList members={[]} />);
+      expect(asFragment()).toMatchSnapshot();
+    });
+
+    it("メンバーあり（良好ステータス）のスナップショット", () => {
+      const member = {
+        ...baseMember,
+        meetings: [{ date: new Date("2026-02-20") }],
+        overdueActionCount: 0,
+      };
+      const { asFragment } = render(<MemberList members={[member]} />);
+      expect(asFragment()).toMatchSnapshot();
+    });
+
+    it("複数メンバー（良好・要フォロー混在）のスナップショット", () => {
+      const recentMember = {
+        ...baseMember,
+        id: "member-1",
+        name: "田中 太郎",
+        meetings: [{ date: new Date("2026-02-20") }],
+        overdueActionCount: 0,
+      };
+      const oldMember = {
+        ...baseMember,
+        id: "member-2",
+        name: "佐藤 花子",
+        department: "デザイン",
+        position: "デザイナー",
+        meetings: [{ date: new Date("2026-01-01") }],
+        overdueActionCount: 2,
+      };
+      const { asFragment } = render(<MemberList members={[recentMember, oldMember]} />);
+      expect(asFragment()).toMatchSnapshot();
     });
   });
 });
