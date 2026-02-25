@@ -6,6 +6,7 @@ import { Noto_Sans_JP } from "next/font/google";
 
 import { KeyboardShortcutProvider } from "@/components/layout/keyboard-shortcut-provider";
 import { Sidebar } from "@/components/layout/sidebar";
+import { NotificationInitializer } from "@/components/notification/notification-initializer";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import { prisma } from "@/lib/prisma";
@@ -62,6 +63,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </main>
           <Toaster />
           <KeyboardShortcutProvider members={members} />
+          <NotificationInitializer />
         </Providers>
       </body>
     </html>
