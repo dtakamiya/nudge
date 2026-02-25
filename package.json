@@ -17,6 +17,7 @@
     "test:e2e:headed": "playwright test --headed",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed-test": "tsx prisma/seed-test.ts",
+    "lhci": "lhci autorun",
     "prepare": "husky"
   },
   "dependencies": {
@@ -42,6 +43,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^10.3.0",
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
