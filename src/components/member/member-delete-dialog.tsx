@@ -78,7 +78,11 @@ export function MemberDeleteDialog({ memberId, memberName, open: openProp, onOpe
             のデータを削除します。関連するミーティング記録やアクションアイテムもすべて削除されます。この操作は取り消せません。
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <p className="text-sm text-destructive" style={error ? undefined : { display: "none" }}>
+        <p
+          role="alert"
+          className="text-sm text-destructive"
+          style={error ? undefined : { display: "none" }}
+        >
           {error}
         </p>
         <AlertDialogFooter>

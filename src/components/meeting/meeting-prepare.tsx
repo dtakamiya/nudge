@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { MeetingTemplate as DbMeetingTemplate } from "@/generated/prisma/client";
 import { useMeetingPrepare } from "@/hooks/use-meeting-prepare";
+import { screenReaderInstructions } from "@/lib/dnd-accessibility";
 import { cn } from "@/lib/utils";
 
 type PendingAction = {
@@ -52,6 +53,7 @@ export function MeetingPrepare({
     isTemplateOpen,
     agendaRef,
     sensors,
+    agendaAnnouncements,
     setIsPendingActionsOpen,
     setIsTemplateOpen,
     handleTemplateReplace,
@@ -161,6 +163,10 @@ export function MeetingPrepare({
                 sensors={sensors}
                 collisionDetection={closestCenter}
                 onDragEnd={handleTopicDragEnd}
+                accessibility={{
+                  announcements: agendaAnnouncements,
+                  screenReaderInstructions,
+                }}
               >
                 <SortableContext
                   items={topics.map((t) => t.id)}

@@ -53,6 +53,11 @@ export function SortableActionItem({
     transition,
   };
 
+  const itemId = id || String(index);
+  const titleId = `action-${itemId}-title`;
+  const dueDateId = `action-${itemId}-dueDate`;
+  const descriptionId = `action-${itemId}-description`;
+
   function handleTagsChange(newTags: TagData[]) {
     onTagsChange?.(index, newTags);
   }
@@ -76,24 +81,30 @@ export function SortableActionItem({
           <GripVertical className="w-4 h-4" />
         </button>
         <div className="flex-[2]">
-          <Label>タイトル</Label>
+          <Label htmlFor={titleId}>タイトル</Label>
           <Input
+            id={titleId}
             value={title}
             onChange={(e) => onUpdate(index, "title", e.target.value)}
             placeholder="アクションのタイトル"
           />
         </div>
         <div className="flex-1">
-          <Label>期限</Label>
-          <DatePicker value={dueDate} onChange={(value) => onUpdate(index, "dueDate", value)} />
+          <Label htmlFor={dueDateId}>期限</Label>
+          <DatePicker
+            id={dueDateId}
+            value={dueDate}
+            onChange={(value) => onUpdate(index, "dueDate", value)}
+          />
         </div>
         <Button type="button" variant="ghost" size="sm" onClick={() => onRemove(index)}>
           削除
         </Button>
       </div>
       <div>
-        <Label>説明</Label>
+        <Label htmlFor={descriptionId}>説明</Label>
         <Input
+          id={descriptionId}
           value={description}
           onChange={(e) => onUpdate(index, "description", e.target.value)}
           placeholder="詳細（任意）"

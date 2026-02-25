@@ -23,7 +23,7 @@ import {
 } from "@/components/meeting/meeting-form.types";
 import type { TagData } from "@/components/meeting/sortable-action-item";
 import { createMeeting, updateMeeting } from "@/lib/actions/meeting-actions";
-import { createAnnouncements } from "@/lib/dnd-accessibility";
+import { createAnnouncements, sortableKeyboardCoordinates } from "@/lib/dnd-accessibility";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 export function useMeetingForm({
@@ -89,7 +89,10 @@ export function useMeetingForm({
   const [showClosingDialog, setShowClosingDialog] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
 
-  const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor));
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
   const topicAnnouncements = useMemo(() => createAnnouncements("話題"), []);
   const actionAnnouncements = useMemo(() => createAnnouncements("アクション"), []);
 

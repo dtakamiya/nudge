@@ -20,7 +20,7 @@ afterEach(() => {
 describe("TagInput", () => {
   it("入力フィールドが表示される", () => {
     render(<TagInput selectedTags={[]} onTagsChange={vi.fn()} />);
-    expect(screen.getByRole("textbox")).toBeDefined();
+    expect(screen.getByRole("combobox")).toBeDefined();
   });
 
   it("placeholder が表示される", () => {

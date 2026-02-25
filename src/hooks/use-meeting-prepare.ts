@@ -1,10 +1,17 @@
 "use client";
 
-import { type DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import {
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { createAnnouncements, sortableKeyboardCoordinates } from "@/lib/dnd-accessibility";
 import type { MeetingTemplate, TopicCategory } from "@/lib/meeting-templates";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
@@ -43,7 +50,11 @@ export function useMeetingPrepare({ memberId }: { memberId: string }) {
   const [isTemplateOpen, setIsTemplateOpen] = useState(false);
   const agendaRef = useRef<HTMLDivElement>(null);
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+  const agendaAnnouncements = useMemo(() => createAnnouncements("話題"), []);
 
   function handleTemplateReplace(template: MeetingTemplate) {
     setSelectedTemplateId(template.id);
@@ -123,6 +134,7 @@ export function useMeetingPrepare({ memberId }: { memberId: string }) {
     isTemplateOpen,
     agendaRef,
     sensors,
+    agendaAnnouncements,
     setIsPendingActionsOpen,
     setIsTemplateOpen,
     handleTemplateReplace,

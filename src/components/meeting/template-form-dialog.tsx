@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -103,6 +104,7 @@ export function TemplateFormDialog({ template, trigger }: Props) {
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEdit ? "テンプレートを編集" : "テンプレートを作成"}</DialogTitle>
+          <DialogDescription>テンプレートの名前、説明、トピックを設定します。</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
           <div>
@@ -147,7 +149,10 @@ export function TemplateFormDialog({ template, trigger }: Props) {
                       value={topic.category}
                       onValueChange={(val) => updateTopicField(index, "category", val)}
                     >
-                      <SelectTrigger className="h-8 text-xs">
+                      <SelectTrigger
+                        className="h-8 text-xs"
+                        aria-label={`トピック${index + 1}のカテゴリ`}
+                      >
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -164,6 +169,7 @@ export function TemplateFormDialog({ template, trigger }: Props) {
                     onChange={(e) => updateTopicField(index, "title", e.target.value)}
                     placeholder="トピックのタイトル"
                     className="h-8 text-sm flex-1"
+                    aria-label={`トピック${index + 1}のタイトル`}
                   />
                   <Button
                     type="button"

@@ -186,11 +186,13 @@ export function ActionListFull({
                     value={editForm.title}
                     onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
                     placeholder="タイトル"
+                    aria-label="タイトル"
                   />
                   <Input
                     value={editForm.description}
                     onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                     placeholder="説明"
+                    aria-label="説明"
                   />
                   <DatePicker
                     value={editForm.dueDate}

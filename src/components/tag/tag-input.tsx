@@ -115,6 +115,7 @@ export function TagInput({
     suggestions.some((s) => s.name.toLowerCase() === inputValue.trim().toLowerCase());
 
   const showNewTagOption = inputValue.trim().length > 0 && !hasExactMatch;
+  const showSuggestions = isOpen && (suggestions.length > 0 || showNewTagOption);
 
   return (
     <div ref={containerRef} className="relative">
@@ -141,6 +142,11 @@ export function TagInput({
         onChange={(e) => handleInputChange(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
+        role="combobox"
+        aria-expanded={showSuggestions}
+        aria-controls="tag-suggestions"
+        aria-autocomplete="list"
+        aria-haspopup="listbox"
         className={cn(
           "w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm",
           "text-foreground placeholder:text-muted-foreground",
@@ -150,8 +156,9 @@ export function TagInput({
       />
 
       {/* サジェストドロップダウン */}
-      {isOpen && (suggestions.length > 0 || showNewTagOption) && (
+      {showSuggestions && (
         <div
+          id="tag-suggestions"
           role="listbox"
           aria-label="タグの候補"
           className={cn(
