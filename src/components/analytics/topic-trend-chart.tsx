@@ -80,7 +80,7 @@ export function TopicTrendChart({ data }: Props) {
                 <tr key={d.month}>
                   <td>{d.month}</td>
                   {categories.map((category) => (
-                    <td key={category}>{(d as Record<string, unknown>)[category] ?? 0}</td>
+                    <td key={category}>{Number((d as Record<string, unknown>)[category] ?? 0)}</td>
                   ))}
                 </tr>
               ))}
