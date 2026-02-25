@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
@@ -117,5 +118,73 @@ describe("runAction", () => {
     });
     expect(consoleSpy).toHaveBeenCalledWith("[Server Action Error]", expect.any(Error));
     consoleSpy.mockRestore();
+  });
+
+  describe("PrismaClientKnownRequestError", () => {
+    it("P2002 (ユニーク制約違反) で「すでに同じ名前のデータが存在します」を返す", async () => {
+      const result = await runAction(async () => {
+        throw new PrismaClientKnownRequestError(
+          "Unique constraint failed on the fields: (`name`)",
+          {
+            code: "P2002",
+            clientVersion: "6.0.0",
+          },
+        );
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("すでに同じ名前のデータが存在します");
+        expect(result.fieldErrors).toBeUndefined();
+      }
+    });
+
+    it("P2025 (レコードが見つからない) で「対象のデータが見つかりません」を返す", async () => {
+      const result = await runAction(async () => {
+        throw new PrismaClientKnownRequestError(
+          "An operation failed because it depends on one or more records that were required but not found.",
+          {
+            code: "P2025",
+            clientVersion: "6.0.0",
+          },
+        );
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("対象のデータが見つかりません");
+        expect(result.fieldErrors).toBeUndefined();
+      }
+    });
+
+    it("その他の Prisma エラーコードでは「データベースエラーが発生しました」を返す", async () => {
+      const result = await runAction(async () => {
+        throw new PrismaClientKnownRequestError(
+          "Foreign key constraint failed on the field: `memberId`",
+          {
+            code: "P2003",
+            clientVersion: "6.0.0",
+          },
+        );
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("データベースエラーが発生しました");
+        expect(result.fieldErrors).toBeUndefined();
+      }
+    });
+
+    it("Prisma エラー発生時に console.error でサーバーサイドログを出力する", async () => {
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      await runAction(async () => {
+        throw new PrismaClientKnownRequestError("Record not found", {
+          code: "P2025",
+          clientVersion: "6.0.0",
+        });
+      });
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "[Server Action Error]",
+        expect.any(PrismaClientKnownRequestError),
+      );
+      consoleSpy.mockRestore();
+    });
   });
 });
