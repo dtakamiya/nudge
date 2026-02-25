@@ -143,6 +143,30 @@ describe("useMeetingPrepare", () => {
     expect(result.current.selectedTemplateId).toBe("regular-checkin");
   });
 
+  it("appendTopicsFromTemplate で既存トピックにテンプレートの話題が追加される", () => {
+    const { result } = renderHook(() => useMeetingPrepare({ memberId: "m1" }));
+    act(() => {
+      result.current.updateTopic(0, "title", "既存のトピック");
+    });
+    const template = {
+      id: "regular-checkin",
+      name: "定期チェックイン",
+      description: "テスト",
+      topics: [
+        { category: "WORK_PROGRESS" as const, title: "今週の進捗" },
+        { category: "ISSUES" as const, title: "困っていること" },
+      ],
+    };
+    act(() => {
+      result.current.appendTopicsFromTemplate(template);
+    });
+    expect(result.current.topics).toHaveLength(3);
+    expect(result.current.topics[0].title).toBe("既存のトピック");
+    expect(result.current.topics[1].title).toBe("今週の進捗");
+    expect(result.current.topics[2].title).toBe("困っていること");
+    expect(result.current.topics.map((t) => t.sortOrder)).toEqual([0, 1, 2]);
+  });
+
   it("isPendingActionsOpen, isTemplateOpen の初期値はfalse", () => {
     const { result } = renderHook(() => useMeetingPrepare({ memberId: "m1" }));
     expect(result.current.isPendingActionsOpen).toBe(false);
