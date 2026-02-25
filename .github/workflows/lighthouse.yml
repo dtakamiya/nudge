@@ -12,6 +12,8 @@ jobs:
   lighthouse:
     name: Lighthouse CI (Core Web Vitals)
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     env:
       DATABASE_URL: file:./lighthouse.db
 
@@ -38,12 +40,122 @@ jobs:
       - name: Build Next.js app
         run: npm run build
 
-      - name: Run Lighthouse CI
-        run: npx lhci autorun
-        env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+      - name: Collect Lighthouse results
+        run: npx lhci collect
 
-      - name: Upload Lighthouse report
+      - name: Post Lighthouse results to PR
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const dir = '.lighthouseci';
+            if (!fs.existsSync(dir)) {
+              console.log('No Lighthouse results found');
+              return;
+            }
+
+            const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+            if (files.length === 0) {
+              console.log('No Lighthouse JSON files found');
+              return;
+            }
+
+            // URL ごとに LHR をグループ化
+            const byUrl = {};
+            for (const file of files) {
+              const lhr = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8'));
+              const url = lhr.requestedUrl || lhr.finalUrl;
+              if (!url) continue;
+              if (!byUrl[url]) byUrl[url] = [];
+              byUrl[url].push(lhr);
+            }
+
+            if (Object.keys(byUrl).length === 0) {
+              console.log('No valid LHR data found');
+              return;
+            }
+
+            // 絵文字ヘルパー
+            const scoreEmoji = (s) => s >= 90 ? '🟢' : s >= 80 ? '🟡' : '🔴';
+            const lcpEmoji   = (ms) => ms <= 2500 ? '🟢' : ms <= 4000 ? '🟡' : '🔴';
+            const clsEmoji   = (v)  => v  <= 0.1  ? '🟢' : v  <= 0.25  ? '🟡' : '🔴';
+            const tbtEmoji   = (ms) => ms <= 300  ? '🟢' : ms <= 600   ? '🟡' : '🔴';
+            const fcpEmoji   = (ms) => ms <= 1800 ? '🟢' : ms <= 3000  ? '🟡' : '🔴';
+
+            const avg = (lhrs, fn) => {
+              const vals = lhrs.map(fn).filter(v => v != null);
+              return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+            };
+
+            const PAGE_LABELS = {
+              '/':          'ダッシュボード',
+              '/members':   'メンバー一覧',
+              '/analytics': 'アナリティクス',
+            };
+
+            let body = '## 🔦 Lighthouse CI 計測結果\n\n';
+            body += `> 計測日時: ${new Date().toISOString().replace('T', ' ').slice(0, 16)} UTC\n\n`;
+
+            for (const [url, lhrs] of Object.entries(byUrl)) {
+              const pagePath  = url.replace(/^https?:\/\/localhost:\d+/, '') || '/';
+              const pageLabel = PAGE_LABELS[pagePath] || pagePath;
+
+              const perf = Math.round((avg(lhrs, l => l.categories?.performance?.score)    ?? 0) * 100);
+              const a11y = Math.round((avg(lhrs, l => l.categories?.accessibility?.score)  ?? 0) * 100);
+              const lcp  = Math.round( avg(lhrs, l => l.audits?.['largest-contentful-paint']?.numericValue) ?? 0);
+              const cls  =            (avg(lhrs, l => l.audits?.['cumulative-layout-shift']?.numericValue)  ?? 0).toFixed(3);
+              const tbt  = Math.round( avg(lhrs, l => l.audits?.['total-blocking-time']?.numericValue)     ?? 0);
+              const fcp  = Math.round( avg(lhrs, l => l.audits?.['first-contentful-paint']?.numericValue)  ?? 0);
+
+              body += `### \`${pagePath}\` ${pageLabel}\n\n`;
+              body += `| 指標 | 値 | 評価 |\n`;
+              body += `|------|-----|------|\n`;
+              body += `| パフォーマンス | ${perf} | ${scoreEmoji(perf)} |\n`;
+              body += `| アクセシビリティ | ${a11y} | ${scoreEmoji(a11y)} |\n`;
+              body += `| LCP (Largest Contentful Paint) | ${lcp} ms | ${lcpEmoji(lcp)} |\n`;
+              body += `| CLS (Cumulative Layout Shift) | ${cls} | ${clsEmoji(parseFloat(cls))} |\n`;
+              body += `| TBT (Total Blocking Time) | ${tbt} ms | ${tbtEmoji(tbt)} |\n`;
+              body += `| FCP (First Contentful Paint) | ${fcp} ms | ${fcpEmoji(fcp)} |\n\n`;
+            }
+
+            body += '---\n';
+            body += '🟢 Good &nbsp;&nbsp; 🟡 Needs Improvement &nbsp;&nbsp; 🔴 Poor\n';
+
+            // 既存の Lighthouse コメントを更新、なければ新規作成
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existing = comments.find(c =>
+              c.user.login === 'github-actions[bot]' &&
+              c.body.startsWith('## 🔦 Lighthouse CI 計測結果')
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - name: Assert Lighthouse thresholds
+        run: npx lhci assert
+
+      - name: Upload Lighthouse reports
         uses: actions/upload-artifact@v4
         if: always()
         with:

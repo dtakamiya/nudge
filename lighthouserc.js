@@ -43,9 +43,10 @@ module.exports = {
       },
     },
     upload: {
-      // Google の一時公開ストレージにアップロード（7日間有効）
-      // PR コメントに結果リンクが表示される
-      target: "temporary-public-storage",
+      // ローカルファイルシステムに保存（外部送信なし）
+      // GitHub Actions artifact として保存し、PR コメントにテキストで掲載する
+      target: "filesystem",
+      outputDir: ".lighthouseci",
     },
   },
 };
