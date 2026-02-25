@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -121,5 +121,74 @@ describe("RecordingMode", () => {
       expect(mockEndMeeting).toHaveBeenCalled();
     });
     expect(onEnd).not.toHaveBeenCalled();
+  });
+
+  it("blur 時に updateTopicNotes が成功すると「保存済み」が表示される", async () => {
+    const user = userEvent.setup();
+    mockUpdateTopicNotes.mockResolvedValue({ success: true, data: {} as never });
+    render(<RecordingMode {...defaultProps} />);
+    const textareas = screen.getAllByRole("textbox");
+    await user.click(textareas[0]);
+    await user.type(textareas[0], "テスト入力");
+    await user.tab();
+    await waitFor(() => {
+      expect(screen.getByText("保存済み")).toBeTruthy();
+    });
+  });
+
+  it("blur 時に updateTopicNotes が失敗すると「保存に失敗しました」が表示される", async () => {
+    const user = userEvent.setup();
+    mockUpdateTopicNotes.mockResolvedValue({ success: false, error: "エラー" });
+    render(<RecordingMode {...defaultProps} />);
+    const textareas = screen.getAllByRole("textbox");
+    await user.click(textareas[0]);
+    await user.type(textareas[0], "テスト入力");
+    await user.tab();
+    await waitFor(() => {
+      expect(screen.getByText("保存に失敗しました")).toBeTruthy();
+    });
+  });
+
+  it("保存エラー時に「再試行」ボタンが表示される", async () => {
+    const user = userEvent.setup();
+    mockUpdateTopicNotes.mockResolvedValue({ success: false, error: "エラー" });
+    render(<RecordingMode {...defaultProps} />);
+    const textareas = screen.getAllByRole("textbox");
+    await user.click(textareas[0]);
+    await user.type(textareas[0], "テスト入力");
+    await user.tab();
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "再試行" })).toBeTruthy();
+    });
+  });
+
+  it("初期状態では保存状態インジケーターが表示されない", () => {
+    mockUpdateTopicNotes.mockResolvedValue({ success: true, data: {} as never });
+    render(<RecordingMode {...defaultProps} />);
+    expect(screen.queryByText("保存中...")).toBeNull();
+    expect(screen.queryByText("保存済み")).toBeNull();
+    expect(screen.queryByText("保存に失敗しました")).toBeNull();
+  });
+
+  it("blur 時に updateTopicNotes 呼び出し中は「保存中...」が表示される", async () => {
+    let resolveUpdate!: (value: { success: true; data: never }) => void;
+    mockUpdateTopicNotes.mockImplementation(
+      () =>
+        new Promise<{ success: true; data: never }>((resolve) => {
+          resolveUpdate = resolve;
+        }),
+    );
+    const user = userEvent.setup();
+    render(<RecordingMode {...defaultProps} />);
+    const textareas = screen.getAllByRole("textbox");
+    await user.click(textareas[0]);
+    await user.type(textareas[0], "テスト入力");
+    await user.tab();
+    await waitFor(() => {
+      expect(screen.getByText("保存中...")).toBeTruthy();
+    });
+    await act(async () => {
+      resolveUpdate({ success: true, data: {} as never });
+    });
   });
 });

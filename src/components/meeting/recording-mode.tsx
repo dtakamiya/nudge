@@ -1,7 +1,7 @@
 "use client";
 
 import { Maximize2, Minimize2 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { useFocusMode } from "@/hooks/use-focus-mode";
 import { endMeeting, updateTopicNotes } from "@/lib/actions/meeting-actions";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
+import { AutoSaveIndicator, type SaveStatus } from "./auto-save-indicator";
 import { ElapsedTimer } from "./elapsed-timer";
 import { RecordingTopicItem } from "./recording-topic-item";
 
@@ -34,6 +35,7 @@ export function RecordingMode({ meetingId, startedAt, topics, onEnd }: Props) {
   );
   const [dirtyTopicIds, setDirtyTopicIds] = useState<Set<string>>(new Set());
   const [isEnding, setIsEnding] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const debouncedNotes = useDebounce(localNotes, 500);
   const isFirstRender = useRef(true);
   const { isFocusMode, toggleFocusMode } = useFocusMode();
@@ -51,14 +53,23 @@ export function RecordingMode({ meetingId, startedAt, topics, onEnd }: Props) {
     if (dirtyTopicIds.size === 0) return;
 
     async function saveAll() {
-      for (const topicId of dirtyTopicIds) {
-        const notes = debouncedNotes.get(topicId) ?? "";
-        const result = await updateTopicNotes({ topicId, notes });
-        if (!result.success) {
-          toast.error(TOAST_MESSAGES.meeting.autoSaveError);
+      setSaveStatus("saving");
+      try {
+        for (const topicId of dirtyTopicIds) {
+          const notes = debouncedNotes.get(topicId) ?? "";
+          const result = await updateTopicNotes({ topicId, notes });
+          if (!result.success) {
+            setSaveStatus("error");
+            toast.error(TOAST_MESSAGES.meeting.autoSaveError);
+            return;
+          }
         }
+        setSaveStatus("saved");
+        setDirtyTopicIds(new Set());
+      } catch {
+        setSaveStatus("error");
+        toast.error(TOAST_MESSAGES.meeting.autoSaveError);
       }
-      setDirtyTopicIds(new Set());
     }
 
     void saveAll();
@@ -75,12 +86,17 @@ export function RecordingMode({ meetingId, startedAt, topics, onEnd }: Props) {
 
   async function handleBlur(topicId: string) {
     const notes = localNotes.get(topicId) ?? "";
+    setSaveStatus("saving");
     try {
       const result = await updateTopicNotes({ topicId, notes });
       if (!result.success) {
+        setSaveStatus("error");
         toast.error(TOAST_MESSAGES.meeting.autoSaveError);
+      } else {
+        setSaveStatus("saved");
       }
     } catch {
+      setSaveStatus("error");
       toast.error(TOAST_MESSAGES.meeting.autoSaveError);
     } finally {
       setDirtyTopicIds((prev) => {
@@ -90,6 +106,14 @@ export function RecordingMode({ meetingId, startedAt, topics, onEnd }: Props) {
       });
     }
   }
+
+  const handleRetry = useCallback(() => {
+    setSaveStatus("idle");
+  }, []);
+
+  const handleSaveIdle = useCallback(() => {
+    setSaveStatus("idle");
+  }, []);
 
   async function handleEnd() {
     setIsEnding(true);
@@ -112,6 +136,7 @@ export function RecordingMode({ meetingId, startedAt, topics, onEnd }: Props) {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between border-b pb-4">
         <ElapsedTimer startedAt={startedAt} />
+        <AutoSaveIndicator status={saveStatus} onRetry={handleRetry} onIdle={handleSaveIdle} />
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
