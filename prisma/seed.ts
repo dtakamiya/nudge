@@ -11,9 +11,9 @@ function getPhase(date: Date): 1 | 2 | 3 | 4 {
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
   if (year === 2025) {
-    if (month <= 5) return 1;
-    if (month <= 8) return 2;
-    if (month <= 11) return 3;
+    if (month >= 3 && month <= 5) return 1;
+    if (month >= 6 && month <= 8) return 2;
+    if (month >= 9 && month <= 11) return 3;
   }
   return 4;
 }
