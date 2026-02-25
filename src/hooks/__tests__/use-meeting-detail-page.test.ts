@@ -39,7 +39,6 @@ const mockGenerateMeetingSummaryText = vi.mocked(
 
 const baseOptions = {
   meetingId: "meeting-1",
-  memberId: "member-1",
   memberName: "田中太郎",
   date: new Date("2024-01-15"),
   topics: [

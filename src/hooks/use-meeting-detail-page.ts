@@ -37,14 +37,8 @@ type ActionItem = {
 
 export type UseMeetingDetailPageOptions = {
   meetingId: string;
-  memberId: string;
   memberName: string;
   date: Date;
-  mood?: number | null;
-  conditionHealth?: number | null;
-  conditionMood?: number | null;
-  conditionWorkload?: number | null;
-  checkinNote?: string | null;
   topics: ReadonlyArray<Topic>;
   actionItems: ReadonlyArray<ActionItem>;
   startedAt?: Date | null;
