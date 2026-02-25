@@ -1,6 +1,14 @@
 "use client";
 
-import { ArrowDown, ArrowUp, ArrowUpDown, Users } from "lucide-react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  CheckCircle2,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -40,13 +48,33 @@ function getLastMeetingDays(date: Date | null): number {
 function getStatusBadge(days: number): React.ReactNode {
   if (days >= 14)
     return (
-      <Badge className="animate-pulse-attention bg-[oklch(0.95_0.05_25)] text-[oklch(0.45_0.15_25)]">
+      <Badge
+        className="animate-pulse-attention bg-[oklch(0.95_0.05_25)] text-[oklch(0.45_0.15_25)] flex items-center gap-1"
+        aria-label="ステータス: 要フォロー"
+      >
+        <AlertCircle className="w-3 h-3" aria-hidden="true" />
         要フォロー
       </Badge>
     );
   if (days >= 7)
-    return <Badge className="bg-[oklch(0.95_0.05_80)] text-[oklch(0.4_0.1_80)]">注意</Badge>;
-  return <Badge className="bg-[oklch(0.95_0.05_155)] text-[oklch(0.35_0.1_155)]">良好</Badge>;
+    return (
+      <Badge
+        className="bg-[oklch(0.95_0.05_80)] text-[oklch(0.4_0.1_80)] flex items-center gap-1"
+        aria-label="ステータス: 注意"
+      >
+        <AlertTriangle className="w-3 h-3" aria-hidden="true" />
+        注意
+      </Badge>
+    );
+  return (
+    <Badge
+      className="bg-[oklch(0.95_0.05_155)] text-[oklch(0.35_0.1_155)] flex items-center gap-1"
+      aria-label="ステータス: 良好"
+    >
+      <CheckCircle2 className="w-3 h-3" aria-hidden="true" />
+      良好
+    </Badge>
+  );
 }
 
 type Props = {
