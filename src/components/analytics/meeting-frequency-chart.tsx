@@ -6,10 +6,12 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useChartMounted } from "@/hooks/use-chart-mounted";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import type { MeetingFrequencyMonth } from "@/lib/types";
 
 export function MeetingFrequencyChart({ data }: { data: MeetingFrequencyMonth[] }) {
   const mounted = useChartMounted();
+  const prefersReducedMotion = useReducedMotion();
 
   if (!mounted) return null;
 
@@ -27,40 +29,72 @@ export function MeetingFrequencyChart({ data }: { data: MeetingFrequencyMonth[] 
             size="compact"
           />
         ) : (
-          <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={250}>
-            <BarChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-              <XAxis
-                dataKey="month"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                stroke="var(--muted-foreground)"
-                tickFormatter={(val: string) => {
-                  const parts = val.split("-");
-                  return parts.length === 2 ? `${parseInt(parts[1], 10)}月` : val;
-                }}
-              />
-              <YAxis
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                stroke="var(--muted-foreground)"
-                allowDecimals={false}
-              />
-              <Tooltip
-                cursor={{ fill: "var(--muted)" }}
-                contentStyle={{
-                  backgroundColor: "var(--background)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "var(--radius)",
-                  fontSize: "12px",
-                }}
-                formatter={(value: number | undefined) => [value ?? 0, "実施回数"]}
-              />
-              <Bar dataKey="count" name="実施回数" fill="var(--primary)" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <>
+            {/* スクリーンリーダー向け代替テキスト */}
+            <div className="sr-only">
+              <p>月次1on1実施回数（{data.length} ヶ月分）</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>月</th>
+                    <th>実施回数</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.map((d) => (
+                    <tr key={d.month}>
+                      <td>{d.month}</td>
+                      <td>{d.count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* チャート本体（視覚ユーザー向け） */}
+            <div aria-hidden="true" className="h-full">
+              <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={250}>
+                <BarChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                  <XAxis
+                    dataKey="month"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    stroke="var(--muted-foreground)"
+                    tickFormatter={(val: string) => {
+                      const parts = val.split("-");
+                      return parts.length === 2 ? `${parseInt(parts[1], 10)}月` : val;
+                    }}
+                  />
+                  <YAxis
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    stroke="var(--muted-foreground)"
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "var(--muted)" }}
+                    contentStyle={{
+                      backgroundColor: "var(--background)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "var(--radius)",
+                      fontSize: "12px",
+                    }}
+                    formatter={(value: number | undefined) => [value ?? 0, "実施回数"]}
+                  />
+                  <Bar
+                    dataKey="count"
+                    name="実施回数"
+                    fill="var(--primary)"
+                    radius={[4, 4, 0, 0]}
+                    isAnimationActive={!prefersReducedMotion}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </>
         )}
       </CardContent>
     </Card>
