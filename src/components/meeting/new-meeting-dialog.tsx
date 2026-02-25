@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -28,16 +29,18 @@ type Props = {
 export function NewMeetingDialog({ open, onClose, members }: Props) {
   const router = useRouter();
   const [selectedMemberId, setSelectedMemberId] = useState<string>(members[0]?.id ?? "");
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const handleCreate = () => {
     if (!selectedMemberId) return;
+    setIsNavigating(true);
     onClose();
     router.push(`/members/${selectedMemberId}/meetings/new`);
   };
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="sm:max-w-sm">
+      <DialogContent className="sm:max-w-sm" aria-busy={isNavigating}>
         <DialogHeader>
           <DialogTitle className="font-semibold tracking-tight">新規ミーティングを作成</DialogTitle>
           <DialogDescription>ミーティングを作成するメンバーを選択してください。</DialogDescription>
@@ -78,7 +81,8 @@ export function NewMeetingDialog({ open, onClose, members }: Props) {
             キャンセル
           </Button>
           {members.length > 0 && (
-            <Button onClick={handleCreate} disabled={!selectedMemberId}>
+            <Button onClick={handleCreate} disabled={!selectedMemberId || isNavigating}>
+              {isNavigating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               作成
             </Button>
           )}

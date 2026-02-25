@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -86,7 +87,7 @@ export function MemberForm({ initialData, onSuccess }: Props) {
   }
 
   const content = (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} aria-busy={isSubmitting} className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         <Label htmlFor="name">名前 *</Label>
         <Input
@@ -140,6 +141,7 @@ export function MemberForm({ initialData, onSuccess }: Props) {
           キャンセル
         </Button>
         <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {isSubmitting
             ? isEditing
               ? "更新中..."
