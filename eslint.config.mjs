@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Ignore git worktrees (local dev only, not present in CI)
     ".worktrees/**",
+    // Ignore third-party plugin directories
+    "everything-claude-code/**",
   ]),
   {
     plugins: {
