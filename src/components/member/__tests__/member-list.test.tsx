@@ -88,6 +88,74 @@ describe("MemberList", () => {
     expect(rows.length).toBeGreaterThanOrEqual(1);
   });
 
+  describe("truncate 対応", () => {
+    it("メンバー名の span に truncate クラスが付与されている", () => {
+      const longNameMember = {
+        ...baseMember,
+        name: "とても長いメンバー名前フルネームテスト用データ",
+      };
+      render(<MemberList members={[longNameMember]} />);
+
+      const nameSpan = screen.getByText(longNameMember.name);
+      expect(nameSpan.className).toContain("truncate");
+    });
+
+    it("メンバー名の span に title 属性が設定されている", () => {
+      const longNameMember = {
+        ...baseMember,
+        name: "とても長いメンバー名前フルネームテスト用データ",
+      };
+      render(<MemberList members={[longNameMember]} />);
+
+      const nameSpan = screen.getByText(longNameMember.name);
+      expect(nameSpan.getAttribute("title")).toBe(longNameMember.name);
+    });
+
+    it("役職に truncate クラスが付与されている", () => {
+      const longPositionMember = {
+        ...baseMember,
+        position: "非常に長い役職名テスト用データシニアプリンシパルエンジニア",
+      };
+      render(<MemberList members={[longPositionMember]} />);
+
+      const positionEl = screen.getByText(longPositionMember.position);
+      expect(positionEl.className).toContain("truncate");
+    });
+
+    it("役職に title 属性が設定されている", () => {
+      const longPositionMember = {
+        ...baseMember,
+        position: "非常に長い役職名テスト用データシニアプリンシパルエンジニア",
+      };
+      render(<MemberList members={[longPositionMember]} />);
+
+      const positionEl = screen.getByText(longPositionMember.position);
+      expect(positionEl.getAttribute("title")).toBe(longPositionMember.position);
+    });
+
+    it("部署に truncate クラスが付与されている", () => {
+      const longDeptMember = {
+        ...baseMember,
+        department: "とても長い部署名テスト用データプロダクトエンジニアリング部門",
+      };
+      render(<MemberList members={[longDeptMember]} />);
+
+      const deptEl = screen.getByText(longDeptMember.department);
+      expect(deptEl.className).toContain("truncate");
+    });
+
+    it("部署に title 属性が設定されている", () => {
+      const longDeptMember = {
+        ...baseMember,
+        department: "とても長い部署名テスト用データプロダクトエンジニアリング部門",
+      };
+      render(<MemberList members={[longDeptMember]} />);
+
+      const deptEl = screen.getByText(longDeptMember.department);
+      expect(deptEl.getAttribute("title")).toBe(longDeptMember.department);
+    });
+  });
+
   describe("aria-sort", () => {
     it("shows aria-sort=ascending on 最終1on1 column by default", () => {
       const { container } = render(<MemberList members={[baseMember]} />);

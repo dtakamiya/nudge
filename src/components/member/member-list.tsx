@@ -214,18 +214,33 @@ export function MemberList({ members }: Props) {
                 className="hover:bg-muted/50 hover:shadow-sm cursor-pointer transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <TableCell className="px-4 py-3">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <AvatarInitial name={member.name} size="sm" />
-                    <div>
-                      <span className="font-medium text-sm">{member.name}</span>
+                    <div className="min-w-0">
+                      <span
+                        className="font-medium text-sm block truncate max-w-[180px]"
+                        title={member.name}
+                      >
+                        {member.name}
+                      </span>
                       {member.position && (
-                        <p className="text-xs text-muted-foreground">{member.position}</p>
+                        <p
+                          className="text-xs text-muted-foreground truncate max-w-[180px]"
+                          title={member.position}
+                        >
+                          {member.position}
+                        </p>
                       )}
                     </div>
                   </div>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-sm text-muted-foreground hidden sm:table-cell">
-                  {member.department ?? "—"}
+                  <span
+                    className="block truncate max-w-[120px]"
+                    title={member.department ?? undefined}
+                  >
+                    {member.department ?? "—"}
+                  </span>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-sm text-muted-foreground">
                   {formatRelativeDate(lastDate)}
