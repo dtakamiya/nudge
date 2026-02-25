@@ -889,9 +889,9 @@ async function main() {
       const actionTemplates = actionsByMemberPhase[memberKey][phase];
       const actionCount = i % 3 === 0 ? 3 : 2;
       const startIdx = (i * 2) % actionTemplates.length;
-      const selectedActions = [...actionTemplates.slice(startIdx, startIdx + actionCount)];
-      while (selectedActions.length < actionCount) {
-        selectedActions.push(actionTemplates[selectedActions.length % actionTemplates.length]);
+      const selectedActions: ActionTemplate[] = [];
+      for (let j = 0; j < actionCount; j++) {
+        selectedActions.push(actionTemplates[(startIdx + j) % actionTemplates.length]);
       }
 
       const isRecent = i >= meetingDates.length - 3;
