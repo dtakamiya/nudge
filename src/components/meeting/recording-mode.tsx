@@ -4,19 +4,11 @@ import { Maximize2, Minimize2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useFocusMode } from "@/hooks/use-focus-mode";
-import { useRecordingSession } from "@/hooks/use-recording-session";
+import { type Topic,useRecordingSession } from "@/hooks/use-recording-session";
 
 import { AutoSaveIndicator } from "./auto-save-indicator";
 import { ElapsedTimer } from "./elapsed-timer";
 import { RecordingTopicItem } from "./recording-topic-item";
-
-type Topic = {
-  id: string;
-  category: string;
-  title: string;
-  notes: string | null;
-  sortOrder: number;
-};
 
 type Props = {
   meetingId: string;

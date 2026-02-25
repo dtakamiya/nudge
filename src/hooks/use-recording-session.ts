@@ -3,12 +3,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { type SaveStatus } from "@/components/meeting/auto-save-indicator";
 import { endMeeting, updateTopicNotes } from "@/lib/actions/meeting-actions";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 import { useDebounce } from "./use-debounce";
 
-export type SaveStatus = "idle" | "saving" | "saved" | "error";
+export type { SaveStatus };
 
 export type Topic = {
   id: string;
