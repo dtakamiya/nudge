@@ -84,7 +84,7 @@ describe("generateMeetingSummaryMarkdown", () => {
 
   it("アクションアイテムの期日が表示される", () => {
     const md = generateMeetingSummaryMarkdown(baseData);
-    expect(md).toMatch(/バグ修正.*期日:/s);
+    expect(md).toMatch(/バグ修正[\s\S]*期日:/);
   });
 
   it("アクションアイテムの説明が表示される", () => {
