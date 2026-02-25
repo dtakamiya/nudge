@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit2, Plus, Trash2 } from "lucide-react";
+import { Download, Edit2, Plus, Trash2, Upload } from "lucide-react";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
@@ -19,9 +19,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { MeetingTemplate } from "@/generated/prisma/client";
-import { deleteTemplate } from "@/lib/actions/template-actions";
+import { deleteTemplate, exportTemplates } from "@/lib/actions/template-actions";
+import { downloadTemplatesAsJson } from "@/lib/template-io";
 
 import { TemplateFormDialog } from "./template-form-dialog";
+import { TemplateImportDialog } from "./template-import-dialog";
 
 const categoryLabels: Record<string, string> = {
   WORK_PROGRESS: "業務進捗",
@@ -129,23 +131,57 @@ type Props = {
 };
 
 export function TemplateManagement({ templates }: Props) {
+  const [isExporting, startExportTransition] = useTransition();
+
+  function handleExport() {
+    startExportTransition(async () => {
+      const result = await exportTemplates();
+      if (result.success) {
+        downloadTemplatesAsJson(result.data);
+        toast.success("テンプレートをエクスポートしました");
+      } else {
+        toast.error(result.error);
+      }
+    });
+  }
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <div>
           <h2 className="text-lg font-semibold tracking-tight">カスタムテンプレート</h2>
           <p className="text-sm text-muted-foreground mt-0.5">
             1on1 準備画面で使えるオリジナルテンプレートを作成できます
           </p>
         </div>
-        <TemplateFormDialog
-          trigger={
-            <Button size="sm">
-              <Plus className="w-4 h-4 mr-1" />
-              新規作成
-            </Button>
-          }
-        />
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExport}
+            disabled={isExporting || templates.length === 0}
+            aria-label="テンプレートをエクスポート"
+          >
+            <Download className="w-4 h-4 mr-1" />
+            エクスポート
+          </Button>
+          <TemplateImportDialog
+            trigger={
+              <Button variant="outline" size="sm" aria-label="テンプレートをインポート">
+                <Upload className="w-4 h-4 mr-1" />
+                インポート
+              </Button>
+            }
+          />
+          <TemplateFormDialog
+            trigger={
+              <Button size="sm">
+                <Plus className="w-4 h-4 mr-1" />
+                新規作成
+              </Button>
+            }
+          />
+        </div>
       </div>
 
       {templates.length === 0 ? (

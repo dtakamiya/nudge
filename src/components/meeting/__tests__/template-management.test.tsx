@@ -8,6 +8,20 @@ vi.mock("@/lib/actions/template-actions", () => ({
   deleteTemplate: vi.fn().mockResolvedValue({ success: true }),
   createTemplate: vi.fn().mockResolvedValue({ success: true, data: {} }),
   updateTemplate: vi.fn().mockResolvedValue({ success: true, data: {} }),
+  exportTemplates: vi.fn().mockResolvedValue({
+    success: true,
+    data: { version: 1, exportedAt: "2026-01-01T00:00:00.000Z", templates: [] },
+  }),
+  previewImport: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { templates: [], duplicateNames: [] } }),
+  importTemplates: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { created: 1, updated: 0, skipped: 0 } }),
+}));
+
+vi.mock("@/lib/template-io", () => ({
+  downloadTemplatesAsJson: vi.fn(),
 }));
 
 vi.mock("sonner", () => ({
@@ -131,5 +145,21 @@ describe("TemplateManagement", () => {
     expect(
       screen.getByText("1on1 準備画面で使えるオリジナルテンプレートを作成できます"),
     ).toBeDefined();
+  });
+
+  it("「エクスポート」ボタンを表示する", () => {
+    render(<TemplateManagement templates={mockTemplates} />);
+    expect(screen.getByRole("button", { name: /テンプレートをエクスポート/ })).toBeDefined();
+  });
+
+  it("テンプレートがない場合、エクスポートボタンは無効化される", () => {
+    render(<TemplateManagement templates={[]} />);
+    const exportBtn = screen.getByRole("button", { name: /テンプレートをエクスポート/ });
+    expect((exportBtn as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("「インポート」ボタンを表示する", () => {
+    render(<TemplateManagement templates={[]} />);
+    expect(screen.getByRole("button", { name: /テンプレートをインポート/ })).toBeDefined();
   });
 });
