@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import type { OverdueReminder } from "@/lib/types";
+import type { ActionItemDueSoon, OverdueReminder } from "@/lib/types";
 
 export async function getOverdueReminders(): Promise<OverdueReminder[]> {
   const now = new Date();
@@ -55,4 +55,46 @@ export async function getOverdueReminders(): Promise<OverdueReminder[]> {
     if (b.daysSinceLastMeeting === null) return -1;
     return b.daysSinceLastMeeting - a.daysSinceLastMeeting;
   });
+}
+
+/**
+ * 期限が今日・明日・期限切れの未完了アクションアイテムを取得する（ブラウザ通知用）
+ */
+export async function getActionItemsDueSoon(): Promise<ActionItemDueSoon[]> {
+  const now = new Date();
+
+  // 今日の開始（00:00:00）
+  const todayStart = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+
+  // 明日の終了（翌日 23:59:59.999）
+  const tomorrowEnd = new Date(todayStart);
+  tomorrowEnd.setDate(tomorrowEnd.getDate() + 2);
+  tomorrowEnd.setMilliseconds(tomorrowEnd.getMilliseconds() - 1);
+
+  const items = await prisma.actionItem.findMany({
+    where: {
+      status: { not: "DONE" },
+      dueDate: { lte: tomorrowEnd },
+    },
+    select: {
+      id: true,
+      title: true,
+      dueDate: true,
+      memberId: true,
+      member: { select: { name: true } },
+    },
+    orderBy: { dueDate: "asc" },
+  });
+
+  return items
+    .filter((item): item is typeof item & { dueDate: Date } => item.dueDate !== null)
+    .map((item) => ({
+      id: item.id,
+      title: item.title,
+      dueDate: item.dueDate,
+      memberId: item.memberId,
+      memberName: item.member.name,
+      isOverdue: item.dueDate < todayStart,
+    }));
 }

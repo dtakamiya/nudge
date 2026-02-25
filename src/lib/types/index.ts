@@ -37,7 +37,7 @@ export type {
   MemberTimelineEntry,
   MemberWithStats,
 } from "./member";
-export type { OverdueReminder } from "./reminder";
+export type { ActionItemDueSoon, OverdueReminder } from "./reminder";
 export type {
   ActionItemSearchResult,
   MemberSearchResult,

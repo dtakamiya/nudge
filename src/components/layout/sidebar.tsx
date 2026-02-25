@@ -39,7 +39,7 @@ const navItems = [
   { href: "/tasks", label: "マイタスク", icon: ClipboardCheck },
   { href: "/actions", label: "アクション一覧", icon: ListChecks },
   { href: "/analytics", label: "ミーティング分析", icon: BarChart2 },
-  { href: "/settings/templates", label: "テンプレート管理", icon: Settings },
+  { href: "/settings", label: "設定", icon: Settings },
 ];
 
 function NavLinks({
