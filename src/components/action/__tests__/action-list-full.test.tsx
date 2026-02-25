@@ -42,7 +42,7 @@ const baseItems = [
     title: "レビュー依頼",
     description: "PRのレビューをする",
     status: "TODO",
-    dueDate: new Date("2026-03-01"),
+    dueDate: new Date("2099-12-31"),
     member: { id: "member-1", name: "田中太郎" },
     meeting: { id: "meeting-1", date: new Date("2026-02-15") },
   },

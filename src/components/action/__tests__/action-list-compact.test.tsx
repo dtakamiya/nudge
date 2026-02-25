@@ -44,7 +44,7 @@ const baseItems = [
     title: "テストタスク1",
     description: "説明1",
     status: "TODO",
-    dueDate: new Date("2026-03-01"),
+    dueDate: new Date("2099-12-31"),
     meeting: { date: new Date("2026-02-15") },
   },
   {
