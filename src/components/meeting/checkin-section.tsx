@@ -35,6 +35,7 @@ export function CheckinSection({
   const [safetyMessage, setSafetyMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Math.random() を使うため SSR Hydration エラーを避けてマウント後に初期化する
     setSafetyMessage(getRandomCheckinMessage());
   }, []);
 
