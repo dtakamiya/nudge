@@ -1,15 +1,17 @@
 "use client";
 
-import { Copy, Pencil, Play } from "lucide-react";
+import { FileText, Pencil, Play } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useMeetingDetailPage } from "@/hooks/use-meeting-detail-page";
+import type { MeetingSummaryMarkdownData } from "@/lib/meeting-summary-markdown";
 
 import { CoachingSheet } from "./coaching-sheet";
 import { FocusModeIndicator } from "./focus-mode-indicator";
 import { MeetingDetail } from "./meeting-detail";
 import { MeetingForm } from "./meeting-form";
 import { RecordingMode } from "./recording-mode";
+import { SummaryDialog } from "./summary-dialog";
 
 type TagData = {
   readonly id?: string;
@@ -80,11 +82,12 @@ export function MeetingDetailPageClient({
     isEditing,
     isRecording,
     isStarting,
+    isSummaryDialogOpen,
     setIsEditing,
+    setIsSummaryDialogOpen,
     handleEditSuccess,
     handleRecordingEnd,
     handleStartMeeting,
-    handleCopySummary,
   } = useMeetingDetailPage({
     meetingId,
     memberName,
@@ -94,6 +97,28 @@ export function MeetingDetailPageClient({
     startedAt,
     endedAt,
   });
+
+  const summaryData: MeetingSummaryMarkdownData = {
+    memberName,
+    date,
+    conditionHealth: conditionHealth ?? null,
+    conditionMood: conditionMood ?? null,
+    conditionWorkload: conditionWorkload ?? null,
+    checkinNote: checkinNote ?? null,
+    topics: topics.map((t) => ({
+      category: t.category,
+      title: t.title,
+      notes: t.notes,
+    })),
+    actionItems: actionItems.map((a) => ({
+      title: a.title,
+      description: a.description,
+      status: a.status,
+      dueDate: a.dueDate,
+    })),
+    startedAt: startedAt ?? null,
+    endedAt: endedAt ?? null,
+  };
 
   if (isRecording) {
     return (
@@ -169,9 +194,9 @@ export function MeetingDetailPageClient({
             {isStarting ? "記録開始中..." : "記録を開始"}
           </Button>
         )}
-        <Button variant="outline" size="sm" onClick={handleCopySummary}>
-          <Copy className="w-4 h-4 mr-1.5" />
-          サマリーをコピー
+        <Button variant="outline" size="sm" onClick={() => setIsSummaryDialogOpen(true)}>
+          <FileText className="w-4 h-4 mr-1.5" />
+          サマリー生成
         </Button>
         <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
           <Pencil className="w-4 h-4 mr-1.5" />
@@ -191,6 +216,11 @@ export function MeetingDetailPageClient({
         actionItems={[...actionItems]}
         startedAt={startedAt}
         endedAt={endedAt}
+      />
+      <SummaryDialog
+        open={isSummaryDialogOpen}
+        onOpenChange={setIsSummaryDialogOpen}
+        data={summaryData}
       />
       <CoachingSheet />
     </div>

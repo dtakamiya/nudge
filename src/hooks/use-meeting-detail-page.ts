@@ -51,6 +51,7 @@ export function useMeetingDetailPage(options: UseMeetingDetailPageOptions) {
   const [isEditing, setIsEditing] = useState(false);
   const [isRecording, setIsRecording] = useState(startedAt != null && endedAt == null);
   const [isStarting, setIsStarting] = useState(false);
+  const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
   const router = useRouter();
   const { setFocusMode } = useFocusMode();
 
@@ -103,7 +104,9 @@ export function useMeetingDetailPage(options: UseMeetingDetailPageOptions) {
     isEditing,
     isRecording,
     isStarting,
+    isSummaryDialogOpen,
     setIsEditing,
+    setIsSummaryDialogOpen,
     handleEditSuccess,
     handleRecordingEnd,
     handleStartMeeting,
