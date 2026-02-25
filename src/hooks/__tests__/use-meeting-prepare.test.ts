@@ -9,6 +9,7 @@ vi.mock("sonner", () => ({
 
 vi.mock("@dnd-kit/core", () => ({
   PointerSensor: vi.fn(),
+  KeyboardSensor: vi.fn(),
   useSensor: vi.fn(),
   useSensors: vi.fn(() => []),
 }));
