@@ -66,6 +66,14 @@ describe("buildFilterUrl", () => {
     expect(buildFilterUrl("", "sort", "createdAt")).toBe("/actions?sort=createdAt");
   });
 
+  it("dateFilter が 'no-date' のとき URLパラメータに反映される", () => {
+    expect(buildFilterUrl("", "dateFilter", "no-date")).toBe("/actions?dateFilter=no-date");
+  });
+
+  it("sort が 'updatedAt' のとき URLパラメータに反映される", () => {
+    expect(buildFilterUrl("", "sort", "updatedAt")).toBe("/actions?sort=updatedAt");
+  });
+
   it("フィルター変更時に page パラメータを削除する", () => {
     expect(buildFilterUrl("status=TODO&page=3", "status", "IN_PROGRESS")).toBe(
       "/actions?status=IN_PROGRESS",
@@ -125,6 +133,17 @@ describe("ActionFilters", () => {
     mockSearchParamsGet.mockReturnValue(null);
     render(<ActionFilters members={mockMembers} />);
     expect(screen.getByText("期限日順")).toBeDefined();
+  });
+
+  // Radix UI SelectContent はポータル経由でレンダリングされるため
+  // ドロップダウン内の選択肢は buildFilterUrl のテストで検証する。
+  // 以下は no-date / updatedAt が URL パラメータとして正しく渡されることを確認。
+  it("dateFilter が 'no-date' のとき buildFilterUrl が正しい URL を返す", () => {
+    expect(buildFilterUrl("", "dateFilter", "no-date")).toBe("/actions?dateFilter=no-date");
+  });
+
+  it("sort が 'updatedAt' のとき buildFilterUrl が正しい URL を返す", () => {
+    expect(buildFilterUrl("", "sort", "updatedAt")).toBe("/actions?sort=updatedAt");
   });
 
   // Note: Radix UI Select の onValueChange テストは jsdom 環境では

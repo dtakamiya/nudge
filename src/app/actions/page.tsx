@@ -14,8 +14,8 @@ import type { ActionItemStatusType } from "@/lib/validations/action-item";
 
 export const dynamic = "force-dynamic";
 
-const DATE_FILTERS: DateFilterType[] = ["all", "overdue", "this-week", "this-month"];
-const SORT_OPTIONS: SortByType[] = ["dueDate", "createdAt", "memberName"];
+const DATE_FILTERS: DateFilterType[] = ["all", "overdue", "this-week", "this-month", "no-date"];
+const SORT_OPTIONS: SortByType[] = ["dueDate", "createdAt", "updatedAt", "memberName"];
 const GROUP_BY_OPTIONS: GroupByType[] = ["none", "member", "dueDate", "tag"];
 const PER_PAGE = 20;
 const PER_PAGE_GROUPED = 1000;

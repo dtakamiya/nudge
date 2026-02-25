@@ -20,9 +20,9 @@ export type LastMeetingPendingActionsResult = {
 /**
  * 日付フィルタ種別
  */
-export type DateFilterType = "all" | "overdue" | "this-week" | "this-month";
+export type DateFilterType = "all" | "overdue" | "this-week" | "this-month" | "no-date";
 
 /**
  * ソート種別
  */
-export type SortByType = "dueDate" | "createdAt" | "memberName";
+export type SortByType = "dueDate" | "createdAt" | "updatedAt" | "memberName";
