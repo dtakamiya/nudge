@@ -62,9 +62,9 @@ export function MemberList({ members }: Props) {
     return (
       <EmptyState
         icon={Users}
-        title="メンバーがまだ登録されていません"
-        description="まずメンバーを追加して、1on1を始めましょう"
-        action={{ label: "メンバーを追加", href: "/members/new" }}
+        title="最初のメンバーを追加しましょう"
+        description="チームメンバーを追加すると、1on1の記録・フォローアップを管理できます"
+        action={{ label: "メンバーを追加する", href: "/members/new" }}
         size="large"
       />
     );

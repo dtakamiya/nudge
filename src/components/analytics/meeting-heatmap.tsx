@@ -47,7 +47,7 @@ export function MeetingHeatmap({ data }: Props) {
           <EmptyState
             icon={Calendar}
             title="まだデータがありません"
-            description="1on1を実施すると、メンバー別の頻度マップが表示されます"
+            description="メンバーと1on1を実施すると、頻度マップが表示されます。まずはメンバーを追加して1on1を始めましょう"
             size="compact"
           />
         ) : (

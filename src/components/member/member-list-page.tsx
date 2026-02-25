@@ -4,6 +4,7 @@ import { Search, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { MemberList } from "@/components/member/member-list";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 
 type MemberWithStats = {
@@ -93,9 +94,11 @@ export function MemberListPage({ members }: Props) {
       </div>
 
       {filtered.length === 0 && members.length > 0 ? (
-        <div className="rounded-xl border bg-card p-12 text-center">
-          <p className="text-muted-foreground">条件に一致するメンバーが見つかりません</p>
-        </div>
+        <EmptyState
+          icon={Users}
+          title="条件に一致するメンバーが見つかりません"
+          description="検索条件やフィルターを変更してお試しください"
+        />
       ) : (
         <MemberList members={filtered} />
       )}

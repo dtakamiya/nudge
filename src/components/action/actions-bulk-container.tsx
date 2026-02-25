@@ -43,6 +43,8 @@ type Props = {
   currentPage: number;
   totalPages: number;
   searchParams: SearchParams;
+  hasMembers: boolean;
+  hasFilter: boolean;
 };
 
 export function ActionsBulkContainer({
@@ -53,6 +55,8 @@ export function ActionsBulkContainer({
   currentPage,
   totalPages,
   searchParams,
+  hasMembers,
+  hasFilter,
 }: Props) {
   const { selectedIds, toggleItem, clearAll } = useBulkSelection();
 
@@ -73,6 +77,8 @@ export function ActionsBulkContainer({
             statusFilter={statusFilter}
             selectedIds={selectedIds}
             onToggleSelect={toggleItem}
+            hasMembers={hasMembers}
+            hasFilter={hasFilter}
           />
           <ActionPagination
             currentPage={currentPage}

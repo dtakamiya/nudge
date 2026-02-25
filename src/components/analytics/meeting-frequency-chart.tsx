@@ -23,7 +23,7 @@ export function MeetingFrequencyChart({ data }: { data: MeetingFrequencyMonth[] 
           <EmptyState
             icon={BarChart2}
             title="まだデータがありません"
-            description="1on1を実施すると、月次実施回数グラフが表示されます"
+            description="1on1を実施すると月次グラフが表示されます。まずはメンバーとの1on1を記録しましょう"
             size="compact"
           />
         ) : (

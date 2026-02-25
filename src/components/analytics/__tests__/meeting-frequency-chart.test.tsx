@@ -15,7 +15,11 @@ describe("MeetingFrequencyChart", () => {
 
   it("renders guidance message in empty state", () => {
     render(<MeetingFrequencyChart data={[]} />);
-    expect(screen.getByText("1on1を実施すると、月次実施回数グラフが表示されます")).toBeDefined();
+    expect(
+      screen.getByText(
+        "1on1を実施すると月次グラフが表示されます。まずはメンバーとの1on1を記録しましょう",
+      ),
+    ).toBeDefined();
   });
 
   it("renders bar chart when data exists", () => {
