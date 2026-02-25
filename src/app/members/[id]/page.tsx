@@ -8,6 +8,7 @@ import { TopicAnalyticsSection } from "@/components/analytics/topic-analytics-se
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { MeetingHistory } from "@/components/meeting/meeting-history";
 import { CalendarExportButton } from "@/components/member/calendar-export-button";
+import { CheckinSummarySection } from "@/components/member/checkin-summary-section";
 import { MemberActionsDropdown } from "@/components/member/member-actions-dropdown";
 import {
   type MemberDetailTab,
@@ -100,6 +101,8 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
         pendingActionCount={member.pendingActionItems.length}
         meetingIntervalDays={member.meetingIntervalDays}
       />
+
+      <CheckinSummarySection memberId={id} />
 
       <TopicAnalyticsSection memberId={id} />
       <ActionAnalyticsSection memberId={id} />

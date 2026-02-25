@@ -48,6 +48,32 @@ export async function getCheckinTrend(memberId: string, limit = 12): Promise<Che
   }));
 }
 
+export async function getRecentCheckinSummary(
+  memberId: string,
+  limit = 5,
+): Promise<CheckinTrendEntry[]> {
+  const meetings = await prisma.meeting.findMany({
+    where: {
+      memberId,
+      OR: [
+        { conditionHealth: { not: null } },
+        { conditionMood: { not: null } },
+        { conditionWorkload: { not: null } },
+      ],
+    },
+    orderBy: { date: "desc" },
+    take: limit,
+    select: { date: true, conditionHealth: true, conditionMood: true, conditionWorkload: true },
+  });
+
+  return meetings.reverse().map((m) => ({
+    date: formatDate(m.date),
+    health: m.conditionHealth,
+    mood: m.conditionMood,
+    workload: m.conditionWorkload,
+  }));
+}
+
 export async function getMemberTopicTrends(memberId: string) {
   const topics = await prisma.topic.findMany({
     where: { meeting: { memberId } },
