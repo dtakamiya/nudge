@@ -69,6 +69,11 @@ export function SortableTopicItem({
     transition,
   };
 
+  const itemId = id || String(index);
+  const categoryId = `topic-${itemId}-category`;
+  const titleId = `topic-${itemId}-title`;
+  const notesId = `topic-${itemId}-notes`;
+
   function handleTagsChange(newTags: TagData[]) {
     onTagsChange?.(index, newTags);
   }
@@ -92,9 +97,9 @@ export function SortableTopicItem({
           <GripVertical className="w-4 h-4" />
         </button>
         <div className="flex-1">
-          <Label>カテゴリ</Label>
+          <Label htmlFor={categoryId}>カテゴリ</Label>
           <Select value={category} onValueChange={(val) => onUpdate(index, "category", val)}>
-            <SelectTrigger>
+            <SelectTrigger id={categoryId}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -107,8 +112,9 @@ export function SortableTopicItem({
           </Select>
         </div>
         <div className="flex-[2]">
-          <Label>タイトル</Label>
+          <Label htmlFor={titleId}>タイトル</Label>
           <Input
+            id={titleId}
             value={title}
             onChange={(e) => onUpdate(index, "title", e.target.value)}
             placeholder="話題のタイトル"
@@ -142,8 +148,9 @@ export function SortableTopicItem({
       {isExpanded && (
         <>
           <div>
-            <Label>メモ</Label>
+            <Label htmlFor={notesId}>メモ</Label>
             <Textarea
+              id={notesId}
               value={notes}
               onChange={(e) => onUpdate(index, "notes", e.target.value)}
               placeholder="詳細メモ"

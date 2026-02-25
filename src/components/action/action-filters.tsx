@@ -56,6 +56,7 @@ export function ActionFilters({ members, tags = [] }: Props) {
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           className="pl-9"
+          aria-label="アクション検索"
         />
       </div>
       <div className="flex gap-3 flex-wrap">

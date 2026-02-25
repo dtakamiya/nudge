@@ -11,13 +11,20 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 
 interface DatePickerProps {
+  id?: string;
   value?: string;
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
 }
 
-function DatePicker({ value, onChange, placeholder = "日付を選択", className }: DatePickerProps) {
+function DatePicker({
+  id,
+  value,
+  onChange,
+  placeholder = "日付を選択",
+  className,
+}: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
 
   const selectedDate = value ? parseISO(value) : undefined;
@@ -35,6 +42,7 @@ function DatePicker({ value, onChange, placeholder = "日付を選択", classNam
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          id={id}
           variant="outline"
           className={cn(
             "w-full justify-start text-left font-normal",

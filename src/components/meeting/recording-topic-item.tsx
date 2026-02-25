@@ -33,6 +33,7 @@ export function RecordingTopicItem({ topic, onNotesChange, onBlur }: Props) {
         placeholder="メモを入力..."
         rows={3}
         className="resize-none"
+        aria-label={`${topic.title}のメモ`}
       />
     </div>
   );

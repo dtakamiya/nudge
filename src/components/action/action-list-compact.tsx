@@ -174,16 +174,19 @@ export function ActionListCompact({ actionItems, meetingId, memberId, enableBulk
                 value={editForm.title}
                 onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
                 placeholder="タイトル"
+                aria-label="タイトル"
               />
               <Input
                 value={editForm.description}
                 onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                 placeholder="説明"
+                aria-label="説明"
               />
               <Input
                 type="date"
                 value={editForm.dueDate}
                 onChange={(e) => setEditForm({ ...editForm, dueDate: e.target.value })}
+                aria-label="期限"
               />
             </div>
             <div className="flex gap-2 justify-end">
@@ -252,11 +255,13 @@ export function ActionListCompact({ actionItems, meetingId, memberId, enableBulk
               onChange={(e) => setAddForm({ ...addForm, title: e.target.value })}
               placeholder="アクションのタイトル"
               autoFocus
+              aria-label="タイトル"
             />
             <Input
               type="date"
               value={addForm.dueDate}
               onChange={(e) => setAddForm({ ...addForm, dueDate: e.target.value })}
+              aria-label="期限"
             />
           </div>
           <div className="flex gap-2 justify-end">
