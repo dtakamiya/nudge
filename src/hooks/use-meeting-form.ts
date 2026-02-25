@@ -9,7 +9,7 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { useRouter } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import type { ConditionField } from "@/components/meeting/condition-selector";
@@ -37,10 +37,15 @@ export function useMeetingForm({
   const isEditing = !!initialData;
 
   const [date, setDate] = useState(
-    initialData
-      ? new Date(initialData.date).toISOString().split("T")[0]
-      : new Date().toISOString().split("T")[0],
+    initialData ? new Date(initialData.date).toISOString().split("T")[0] : "",
   );
+
+  useEffect(() => {
+    if (!initialData) {
+      setDate(new Date().toISOString().split("T")[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [topics, setTopics] = useState<TopicFormData[]>(
     initialData
