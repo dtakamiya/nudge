@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { MemberList } from "../member-list";
@@ -86,5 +86,46 @@ describe("MemberList", () => {
     render(<MemberList members={[baseMember]} />);
     const rows = screen.getAllByRole("link");
     expect(rows.length).toBeGreaterThanOrEqual(1);
+  });
+
+  describe("aria-sort", () => {
+    it("shows aria-sort=ascending on 最終1on1 column by default", () => {
+      const { container } = render(<MemberList members={[baseMember]} />);
+      const ths = container.querySelectorAll("th");
+      const lastMeetingTh = Array.from(ths).find((th) => th.textContent?.includes("最終1on1"));
+      expect(lastMeetingTh?.getAttribute("aria-sort")).toBe("ascending");
+    });
+
+    it("shows aria-sort=none on 未完了 column by default (not active sort)", () => {
+      const { container } = render(<MemberList members={[baseMember]} />);
+      const ths = container.querySelectorAll("th");
+      const actionsTh = Array.from(ths).find((th) => th.textContent?.includes("未完了"));
+      expect(actionsTh?.getAttribute("aria-sort")).toBe("none");
+    });
+
+    it("toggles aria-sort to descending when 最終1on1 is clicked", () => {
+      const { container } = render(<MemberList members={[baseMember]} />);
+      const sortButton = screen.getByRole("button", { name: /最終1on1/ });
+      fireEvent.click(sortButton);
+      const ths = container.querySelectorAll("th");
+      const lastMeetingTh = Array.from(ths).find((th) => th.textContent?.includes("最終1on1"));
+      expect(lastMeetingTh?.getAttribute("aria-sort")).toBe("descending");
+    });
+
+    it("switches active sort to 未完了 column when its button is clicked", () => {
+      const { container } = render(<MemberList members={[baseMember]} />);
+      const actionsButton = screen.getByRole("button", { name: /未完了/ });
+      fireEvent.click(actionsButton);
+      const ths = container.querySelectorAll("th");
+      const actionsTh = Array.from(ths).find((th) => th.textContent?.includes("未完了"));
+      const lastMeetingTh = Array.from(ths).find((th) => th.textContent?.includes("最終1on1"));
+      expect(actionsTh?.getAttribute("aria-sort")).toBe("ascending");
+      expect(lastMeetingTh?.getAttribute("aria-sort")).toBe("none");
+    });
+
+    it("renders sr-only text for screen readers on active sort column", () => {
+      render(<MemberList members={[baseMember]} />);
+      expect(screen.getByText("昇順ソート中")).toBeDefined();
+    });
   });
 });
