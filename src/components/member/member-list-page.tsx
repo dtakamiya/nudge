@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { MemberList } from "@/components/member/member-list";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/hooks/use-debounce";
 
 type MemberWithStats = {
   readonly id: string;
@@ -25,6 +26,8 @@ export function MemberListPage({ members }: Props) {
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("");
   const [position, setPosition] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
+  const isSearching = search !== debouncedSearch;
 
   const departments = useMemo(() => {
     const set = new Set(members.map((m) => m.department).filter(Boolean) as string[]);
@@ -45,8 +48,17 @@ export function MemberListPage({ members }: Props) {
     });
   }, [members, search, department, position]);
 
+  const liveMessage = isSearching
+    ? "検索中..."
+    : filtered.length === 0
+      ? "該当するメンバーが見つかりませんでした"
+      : `${filtered.length} 件のメンバーが見つかりました`;
+
   return (
     <div>
+      <div aria-live="polite" className="sr-only">
+        {liveMessage}
+      </div>
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />

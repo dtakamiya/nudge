@@ -5,6 +5,7 @@ import { ActionListSkeleton } from "@/components/action/action-list-skeleton";
 import { ActionsBulkContainer } from "@/components/action/actions-bulk-container";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { Badge } from "@/components/ui/badge";
+import { FilterResultAnnouncer } from "@/components/ui/filter-result-announcer";
 import { getActionItems } from "@/lib/actions/action-item-actions";
 import { getMembers } from "@/lib/actions/member-actions";
 import { getTags } from "@/lib/actions/tag-actions";
@@ -99,6 +100,11 @@ export default async function ActionsPage({ searchParams }: Props) {
   return (
     <div className="animate-fade-in-up">
       <Breadcrumb items={[{ label: "ダッシュボード", href: "/" }, { label: "アクション一覧" }]} />
+      <FilterResultAnnouncer
+        count={total}
+        itemLabel="アクション"
+        emptyMessage="該当するアクションが見つかりませんでした"
+      />
       <div className="flex items-center gap-3 mb-6">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">アクション一覧</h1>
         {hasFilter ? (
