@@ -51,11 +51,15 @@ function buildDateFilter(dateFilter: DateFilterType): Prisma.ActionItemWhereInpu
     const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 1);
     return { dueDate: { gte: monthStart, lt: monthEnd } };
   }
+  if (dateFilter === "no-date") {
+    return { dueDate: null };
+  }
   return {};
 }
 
 function buildOrderBy(sortBy: SortByType): Prisma.ActionItemOrderByWithRelationInput[] {
   if (sortBy === "createdAt") return [{ createdAt: "desc" }];
+  if (sortBy === "updatedAt") return [{ updatedAt: "desc" }];
   if (sortBy === "memberName") return [{ member: { name: "asc" } }, { dueDate: "asc" }];
   return [{ dueDate: "asc" }, { createdAt: "desc" }];
 }

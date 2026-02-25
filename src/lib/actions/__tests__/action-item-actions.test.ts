@@ -430,6 +430,71 @@ describe("getLastMeetingAllActions", () => {
   });
 });
 
+describe("getActionItems - dateFilter: no-date", () => {
+  it("dateFilter が 'no-date' のとき dueDate がないアイテムのみ返す", async () => {
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [
+        { title: "期限なしタスク", description: "" },
+        { title: "期限ありタスク", description: "", dueDate: "2026-04-01" },
+      ],
+    });
+    const result = await getActionItems({ dateFilter: "no-date" });
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].title).toBe("期限なしタスク");
+    expect(result.items[0].dueDate).toBeNull();
+  });
+
+  it("no-date + メンバーフィルタの組み合わせが機能する", async () => {
+    const member2Result = await createMember({ name: "Member 2 no-date" });
+    if (!member2Result.success) throw new Error(member2Result.error);
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "Member1 期限なし", description: "" }],
+    });
+    await createMeeting({
+      memberId: member2Result.data.id,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "Member2 期限なし", description: "" }],
+    });
+    const result = await getActionItems({ dateFilter: "no-date", memberId });
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].title).toBe("Member1 期限なし");
+  });
+});
+
+describe("getActionItems - sortBy: updatedAt", () => {
+  it("sortBy が 'updatedAt' のとき更新日降順で返す", async () => {
+    await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [
+        { title: "古いタスク", description: "" },
+        { title: "新しいタスク", description: "" },
+      ],
+    });
+    const all = await getActionItems();
+    const older = all.items.find((i) => i.title === "古いタスク")!;
+    // 古いほうを先に更新して updatedAt を古くする（新しいほうは後で更新）
+    await new Promise((r) => setTimeout(r, 50));
+    await updateActionItem(older.id, { title: "古いタスク", description: "updated first" });
+    await new Promise((r) => setTimeout(r, 50));
+    const newer = all.items.find(
+      (i) => i.title === "新しいほうのタスク" || i.title === "新しいタスク",
+    )!;
+    await updateActionItem(newer.id, { title: "新しいタスク", description: "updated second" });
+
+    const result = await getActionItems({ sortBy: "updatedAt" });
+    expect(result.items[0].title).toBe("新しいタスク");
+  });
+});
+
 describe("getLastMeetingPendingActions", () => {
   it("前回ミーティングの未完了アクションを返す", async () => {
     // beforeEach のミーティングより確実に新しい日付を使用（タイミング競合を防ぐ）

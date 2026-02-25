@@ -115,6 +115,7 @@ export function ActionFilters({ members, tags = [] }: Props) {
             <SelectItem value="overdue">期限切れ</SelectItem>
             <SelectItem value="this-week">今週期限</SelectItem>
             <SelectItem value="this-month">今月期限</SelectItem>
+            <SelectItem value="no-date">期限なし</SelectItem>
           </SelectContent>
         </Select>
         <Select
@@ -127,6 +128,7 @@ export function ActionFilters({ members, tags = [] }: Props) {
           <SelectContent>
             <SelectItem value="dueDate">期限日順</SelectItem>
             <SelectItem value="createdAt">作成日順</SelectItem>
+            <SelectItem value="updatedAt">更新日順</SelectItem>
             <SelectItem value="memberName">メンバー名順</SelectItem>
           </SelectContent>
         </Select>
