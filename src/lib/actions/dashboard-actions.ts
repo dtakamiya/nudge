@@ -1,11 +1,21 @@
 "use server";
 
+import { detectConditionDecline } from "@/lib/condition-alert";
+import {
+  CONDITION_ALERT_CHECK_COUNT,
+  CONDITION_ALERT_MIN_MEETINGS,
+  CONDITION_LOW_THRESHOLD,
+  MOOD_LOW_THRESHOLD,
+} from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { getMemberHealthStatus, isOverdue, type MemberHealthStatus } from "@/lib/schedule";
 import type {
   ActionActivityItem,
   ActionItemWithMember,
   ActivityItem,
+  ConditionAlert,
+  ConditionAlertMember,
+  ConditionAlertType,
   DashboardSummary,
   MeetingActivityItem,
   UpcomingActionsData,
@@ -236,4 +246,84 @@ export async function getUpcomingActions(): Promise<UpcomingActionsData> {
     today: todayItems.map(toActionWithMember),
     thisWeek: thisWeekItems.map(toActionWithMember),
   };
+}
+
+type ConditionMetric = {
+  type: ConditionAlertType;
+  label: string;
+  field: "mood" | "conditionMood" | "conditionHealth" | "conditionWorkload";
+  threshold: number;
+};
+
+const CONDITION_METRICS: readonly ConditionMetric[] = [
+  { type: "mood", label: "気分", field: "mood", threshold: MOOD_LOW_THRESHOLD },
+  {
+    type: "conditionMood",
+    label: "気分コンディション",
+    field: "conditionMood",
+    threshold: CONDITION_LOW_THRESHOLD,
+  },
+  {
+    type: "conditionHealth",
+    label: "健康状態",
+    field: "conditionHealth",
+    threshold: CONDITION_LOW_THRESHOLD,
+  },
+  {
+    type: "conditionWorkload",
+    label: "業務負荷",
+    field: "conditionWorkload",
+    threshold: CONDITION_LOW_THRESHOLD,
+  },
+] as const;
+
+export async function getConditionAlertMembers(): Promise<ConditionAlertMember[]> {
+  const members = await prisma.member.findMany({
+    select: {
+      id: true,
+      name: true,
+      meetings: {
+        orderBy: { date: "desc" },
+        take: CONDITION_ALERT_CHECK_COUNT,
+        select: {
+          mood: true,
+          conditionMood: true,
+          conditionHealth: true,
+          conditionWorkload: true,
+        },
+      },
+    },
+    orderBy: { name: "asc" },
+  });
+
+  const alertMembers: ConditionAlertMember[] = [];
+
+  for (const member of members) {
+    if (member.meetings.length < CONDITION_ALERT_MIN_MEETINGS) continue;
+
+    const alerts: ConditionAlert[] = [];
+
+    for (const metric of CONDITION_METRICS) {
+      const values = member.meetings.map((m) => m[metric.field]);
+      const trend = detectConditionDecline(values, metric.threshold);
+      if (trend !== null) {
+        alerts.push({
+          type: metric.type,
+          label: metric.label,
+          values: values.filter((v): v is number => v !== null),
+          trend,
+        });
+      }
+    }
+
+    if (alerts.length > 0) {
+      alertMembers.push({
+        memberId: member.id,
+        memberName: member.name,
+        alerts,
+      });
+    }
+  }
+
+  return alertMembers;
 }

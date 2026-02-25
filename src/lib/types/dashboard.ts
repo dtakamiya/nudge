@@ -57,3 +57,27 @@ export type UpcomingActionsData = {
   today: ActionItemWithMember[];
   thisWeek: ActionItemWithMember[];
 };
+
+/**
+ * コンディションアラートの種別
+ */
+export type ConditionAlertType = "mood" | "conditionMood" | "conditionHealth" | "conditionWorkload";
+
+/**
+ * 個別のアラート情報
+ */
+export type ConditionAlert = {
+  type: ConditionAlertType;
+  label: string;
+  values: number[];
+  trend: "declining" | "low";
+};
+
+/**
+ * コンディション低下アラート対象メンバー
+ */
+export type ConditionAlertMember = {
+  memberId: string;
+  memberName: string;
+  alerts: ConditionAlert[];
+};

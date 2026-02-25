@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { BrowserNotification } from "@/components/dashboard/browser-notification";
+import { ConditionAlertSection } from "@/components/dashboard/condition-alert-section";
 import { DashboardSummary } from "@/components/dashboard/dashboard-summary";
 import { FlashToast } from "@/components/dashboard/flash-toast";
 import { HealthScoreWidget } from "@/components/dashboard/health-score-widget";
@@ -13,6 +14,7 @@ import { UpcomingActionsSection } from "@/components/dashboard/upcoming-actions-
 import { MemberList } from "@/components/member/member-list";
 import { getRecommendedAndScheduledMeetings } from "@/lib/actions/analytics-actions";
 import {
+  getConditionAlertMembers,
   getDashboardSummary,
   getHealthScore,
   getRecentActivity,
@@ -32,6 +34,7 @@ export default async function DashboardPage() {
     upcomingActions,
     { recommended: recommendedMeetings, scheduled: scheduledMeetings },
     overdueReminders,
+    conditionAlertMembers,
   ] = await Promise.all([
     getMembers(),
     getDashboardSummary(),
@@ -40,6 +43,7 @@ export default async function DashboardPage() {
     getUpcomingActions(),
     getRecommendedAndScheduledMeetings(),
     getOverdueReminders(),
+    getConditionAlertMembers(),
   ]);
 
   const isFirstTime = members.length === 0;
@@ -52,6 +56,7 @@ export default async function DashboardPage() {
       <h1 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">ダッシュボード</h1>
 
       {!isFirstTime && <ReminderAlertBanner reminders={overdueReminders} />}
+      {!isFirstTime && <ConditionAlertSection members={conditionAlertMembers} />}
       {!isFirstTime && <BrowserNotification reminders={overdueReminders} />}
 
       {isFirstTime ? <OnboardingCard /> : <DashboardSummary summary={summary} />}
