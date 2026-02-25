@@ -1,15 +1,9 @@
 "use client";
 
 import { Copy, Pencil, Play } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { useFocusMode } from "@/hooks/use-focus-mode";
-import { startMeeting } from "@/lib/actions/meeting-actions";
-import { generateMeetingSummaryText } from "@/lib/meeting-summary";
-import { TOAST_MESSAGES } from "@/lib/toast-messages";
+import { useMeetingDetailPage } from "@/hooks/use-meeting-detail-page";
 
 import { CoachingSheet } from "./coaching-sheet";
 import { FocusModeIndicator } from "./focus-mode-indicator";
@@ -82,56 +76,30 @@ export function MeetingDetailPageClient({
   endedAt,
   previousConditions,
 }: Props) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [isRecording, setIsRecording] = useState(startedAt != null && endedAt == null);
-  const [isStarting, setIsStarting] = useState(false);
-  const router = useRouter();
-  const { setFocusMode } = useFocusMode();
-
-  function handleEditSuccess() {
-    setIsEditing(false);
-    router.refresh();
-  }
-
-  function handleRecordingEnd() {
-    setFocusMode(false);
-    setIsRecording(false);
-    router.refresh();
-  }
-
-  async function handleStartMeeting() {
-    setIsStarting(true);
-    try {
-      const result = await startMeeting({ meetingId });
-      if (result.success) {
-        toast.success(TOAST_MESSAGES.meeting.recordingStart);
-        setIsRecording(true);
-      } else {
-        toast.error(TOAST_MESSAGES.meeting.recordingStartError);
-      }
-    } catch {
-      toast.error(TOAST_MESSAGES.meeting.recordingStartError);
-    } finally {
-      setIsStarting(false);
-    }
-  }
-
-  async function handleCopySummary() {
-    const summaryText = generateMeetingSummaryText({
-      memberName,
-      date,
-      topics: topics.map((t) => ({ category: t.category, title: t.title, notes: t.notes })),
-      actionItems: actionItems.map((a) => ({ title: a.title, dueDate: a.dueDate })),
-      startedAt: startedAt ?? null,
-      endedAt: endedAt ?? null,
-    });
-    try {
-      await navigator.clipboard.writeText(summaryText);
-      toast.success(TOAST_MESSAGES.meeting.summaryCopied);
-    } catch {
-      toast.error(TOAST_MESSAGES.meeting.summaryCopyError);
-    }
-  }
+  const {
+    isEditing,
+    isRecording,
+    isStarting,
+    setIsEditing,
+    handleEditSuccess,
+    handleRecordingEnd,
+    handleStartMeeting,
+    handleCopySummary,
+  } = useMeetingDetailPage({
+    meetingId,
+    memberId,
+    memberName,
+    date,
+    mood,
+    conditionHealth,
+    conditionMood,
+    conditionWorkload,
+    checkinNote,
+    topics,
+    actionItems,
+    startedAt,
+    endedAt,
+  });
 
   if (isRecording) {
     return (
