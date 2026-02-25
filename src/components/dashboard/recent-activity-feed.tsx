@@ -47,7 +47,7 @@ function ActivityRow({ activity }: { readonly activity: ActivityItem }) {
             </>
           )}
         </p>
-        <p className="text-xs text-muted-foreground mt-0.5">{formatRelativeDate(date)}</p>
+        <p className="text-sm text-muted-foreground mt-0.5">{formatRelativeDate(date)}</p>
       </div>
     </Link>
   );

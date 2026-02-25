@@ -33,7 +33,7 @@ function MeetingEntryContent({
         </span>
         {mood && <span className="text-lg">{mood.emoji}</span>}
       </div>
-      <div className="mt-1 flex gap-3 text-xs text-muted-foreground">
+      <div className="mt-1 flex gap-3 text-sm text-muted-foreground">
         <span>話題 {entry.topicCount}件</span>
         <span>アクション {entry.actionCount}件</span>
       </div>
@@ -54,7 +54,7 @@ function ActionCompletedContent({
       className="block group rounded-lg border border-border bg-card px-4 py-3 hover:bg-muted/50 transition-colors"
     >
       <p className="text-sm font-medium text-foreground group-hover:text-primary">{entry.title}</p>
-      <p className="mt-1 text-xs text-muted-foreground">完了日: {formatDate(entry.completedAt)}</p>
+      <p className="mt-1 text-sm text-muted-foreground">完了日: {formatDate(entry.completedAt)}</p>
     </Link>
   );
 }
@@ -74,7 +74,7 @@ function ActionOverdueContent({
       <p className="text-sm font-medium text-foreground group-hover:text-destructive">
         {entry.title}
       </p>
-      <p className="mt-1 text-xs text-destructive/80">期日: {formatDate(entry.dueDate)}</p>
+      <p className="mt-1 text-sm text-destructive/80">期日: {formatDate(entry.dueDate)}</p>
     </Link>
   );
 }
