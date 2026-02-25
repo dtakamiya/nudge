@@ -103,7 +103,7 @@ export async function createMeetingFromDetail(
   }
 
   // 保存ボタンをクリック → ClosingDialog が表示されるので確認する
-  await page.getByRole("button", { name: "1on1を保存" }).click();
+  await page.getByRole("button", { name: "1on1を保存" }).first().click();
   await confirmSaveMeeting(page);
   await expect(page.getByRole("heading", { name: memberName })).toBeVisible({ timeout: 15000 });
 }
@@ -113,6 +113,10 @@ export async function createMeetingFromDetail(
  * 事前にメンバー詳細ページにいて、ミーティングが存在することが前提
  */
 export async function navigateToFirstMeetingDetail(page: Page, memberName: string) {
+  // デフォルトタブが「タイムライン」なので「1on1履歴」タブに切り替える
+  await page.getByRole("tab", { name: "1on1履歴" }).click();
+  await page.waitForURL(/tab=history/, { timeout: 10000 });
+
   const meetingCards = page.locator(
     "main a[href*='/meetings/']:not([href$='/new']):not([href$='/prepare'])",
   );
@@ -122,6 +126,17 @@ export async function navigateToFirstMeetingDetail(page: Page, memberName: strin
   await expect(page.getByRole("heading", { name: `${memberName}との1on1` })).toBeVisible({
     timeout: 10000,
   });
+}
+
+/**
+ * ミーティング詳細ページの「...」メニューから削除ダイアログを開く
+ * MeetingHeaderActions の DropdownMenu を操作する
+ */
+export async function openMeetingDeleteDialog(page: Page) {
+  // Radix UI DropdownMenuTrigger: data-slot="dropdown-menu-trigger" 属性を持つボタン
+  const menuTrigger = page.locator("button[data-slot='dropdown-menu-trigger']");
+  await menuTrigger.click();
+  await page.getByRole("menuitem", { name: "削除" }).click();
 }
 
 /**

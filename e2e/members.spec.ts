@@ -59,11 +59,11 @@ test.describe("メンバー管理", () => {
     await expect(page.getByRole("heading", { name: memberName })).toBeVisible();
     await expect(page.getByText("プロダクト部 / PM")).toBeVisible();
 
-    // 1on1履歴セクションが表示される
-    await expect(page.getByRole("heading", { name: "1on1履歴" })).toBeVisible();
+    // 1on1履歴タブが表示される
+    await expect(page.getByRole("tab", { name: "1on1履歴" })).toBeVisible();
 
-    // アクションアイテムセクションが表示される
-    await expect(page.getByRole("heading", { name: "アクションアイテム" })).toBeVisible();
+    // アクションアイテムタブが表示される
+    await expect(page.getByRole("tab", { name: "アクションアイテム" })).toBeVisible();
 
     // 新規1on1ボタンが表示される
     await expect(page.getByRole("link", { name: "新規1on1" })).toBeVisible();
