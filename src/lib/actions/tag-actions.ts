@@ -97,44 +97,44 @@ export async function deleteTag(id: string): Promise<ActionResult<void>> {
 }
 
 // 名前配列からタグを取得、存在しなければ作成（getOrCreate）
+// findMany で一括取得し、存在しないものだけ create することで N+1 を解消
 export async function getOrCreateTags(names: string[]): Promise<Tag[]> {
   if (names.length === 0) return [];
 
-  // 重複を除去
   const uniqueNames = [...new Set(names)];
 
-  const results = await Promise.all(
-    uniqueNames.map(async (name) => {
-      const existing = await prisma.tag.findUnique({ where: { name } });
-      if (existing) return existing;
-      return prisma.tag.create({
-        data: { name, color: "#6366f1" },
-      });
-    }),
+  const existingTags = await prisma.tag.findMany({
+    where: { name: { in: uniqueNames } },
+  });
+  const existingNames = new Set(existingTags.map((t) => t.name));
+  const newNames = uniqueNames.filter((n) => !existingNames.has(n));
+
+  const newTags = await Promise.all(
+    newNames.map((name) => prisma.tag.create({ data: { name, color: "#6366f1" } })),
   );
 
-  return results;
+  return [...existingTags, ...newTags];
 }
 
 // トランザクション内で使用するバージョン（ロールバック時のタグ孤立を防ぐ）
+// findMany で一括取得し、存在しないものだけ create することで N+1 を解消
 export async function getOrCreateTagsInTx(
   tx: Prisma.TransactionClient,
   names: string[],
 ): Promise<{ id: string; name: string; color: string }[]> {
   if (names.length === 0) return [];
 
-  // 重複を除去
   const uniqueNames = [...new Set(names)];
 
-  const results = await Promise.all(
-    uniqueNames.map(async (name) => {
-      const existing = await tx.tag.findUnique({ where: { name } });
-      if (existing) return existing;
-      return tx.tag.create({
-        data: { name, color: "#6366f1" },
-      });
-    }),
+  const existingTags = await tx.tag.findMany({
+    where: { name: { in: uniqueNames } },
+  });
+  const existingNames = new Set(existingTags.map((t) => t.name));
+  const newNames = uniqueNames.filter((n) => !existingNames.has(n));
+
+  const newTags = await Promise.all(
+    newNames.map((name) => tx.tag.create({ data: { name, color: "#6366f1" } })),
   );
 
-  return results;
+  return [...existingTags, ...newTags];
 }

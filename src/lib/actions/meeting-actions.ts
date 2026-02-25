@@ -112,7 +112,7 @@ export async function getMeeting(id: string) {
   return prisma.meeting.findUnique({
     where: { id },
     include: {
-      member: true,
+      member: { select: { id: true, name: true } },
       topics: {
         orderBy: { sortOrder: "asc" },
         include: { tags: { include: { tag: true } } },
