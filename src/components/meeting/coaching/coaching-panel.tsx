@@ -58,7 +58,7 @@ export function CoachingPanel({ compact = false, className }: CoachingPanelProps
               <div className="flex items-center gap-1.5">
                 <Icon className="h-4 w-4" />
                 <span>{category}</span>
-                <span className="ml-1 text-xs text-muted-foreground">- {description}</span>
+                <span className="ml-1 text-xs text-slate-600">- {description}</span>
               </div>
             </AccordionTrigger>
             <AccordionContent>

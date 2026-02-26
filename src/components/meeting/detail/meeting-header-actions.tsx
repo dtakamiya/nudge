@@ -61,7 +61,7 @@ export function MeetingHeaderActions({ meetingId, memberId, meetingDate }: Props
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" aria-label="オプション">
             <MoreHorizontal className="w-4 h-4" />
           </Button>
         </DropdownMenuTrigger>

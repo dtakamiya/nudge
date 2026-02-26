@@ -61,7 +61,9 @@ export async function createMemberAndNavigateToDetail(
     department: options?.department ?? "テスト部",
     position: options?.position,
   });
-  await expect(page.getByRole("heading", { name })).toBeVisible({ timeout: 10000 });
+  // URL が /members/{id} に遷移済みのため、ページが安定してからヘディングを確認する
+  await page.waitForLoadState("networkidle", { timeout: 15000 });
+  await expect(page.getByRole("heading", { name, exact: false })).toBeVisible({ timeout: 15000 });
 }
 
 /**
@@ -157,4 +159,35 @@ export async function getMemberIdFromDashboard(page: Page, name: string): Promis
     throw new Error(`Could not extract member ID from "${linkHref}"`);
   }
   return match[1];
+}
+
+/**
+ * 指定ページで axe-core アクセシビリティスキャンを実行する。
+ * critical / serious レベルの違反があればエラーをスローする。
+ * 違反の詳細（要素セレクタ・ルールID・説明）をエラーメッセージに含める。
+ */
+export async function runAxe(page: Page, pageName: string): Promise<void> {
+  const { AxeBuilder } = await import("@axe-core/playwright");
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    // Sonner（トースト通知ライブラリ）の内部要素はサードパーティのため除外
+    .exclude("[data-sonner-toaster]")
+    .analyze();
+
+  const violations = results.violations.filter(
+    (v) => v.impact === "critical" || v.impact === "serious",
+  );
+
+  if (violations.length > 0) {
+    const details = violations
+      .map(
+        (v) =>
+          `[${v.impact}] ${v.id}: ${v.description}\n` +
+          v.nodes.map((n) => `  要素: ${n.target}`).join("\n"),
+      )
+      .join("\n\n");
+    throw new Error(
+      `${pageName} にアクセシビリティ違反が ${violations.length} 件あります:\n\n${details}`,
+    );
+  }
 }

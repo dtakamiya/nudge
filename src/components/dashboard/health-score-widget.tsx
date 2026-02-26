@@ -49,19 +49,19 @@ function getStatusConfig(status: MemberHealthStatus): StatusConfig {
       return {
         label: "健全",
         icon: <CheckCircle2 className="w-4 h-4 text-success" />,
-        badgeClass: "bg-success/10 text-success border-success/30",
+        badgeClass: "bg-success/10 text-foreground border-success/30",
       };
     case "warning":
       return {
         label: "注意",
         icon: <AlertTriangle className="w-4 h-4 text-warning" />,
-        badgeClass: "bg-warning/10 text-warning border-warning/30",
+        badgeClass: "bg-warning/10 text-foreground border-warning/30",
       };
     case "danger":
       return {
         label: "危険",
         icon: <XCircle className="w-4 h-4 text-destructive" />,
-        badgeClass: "bg-destructive/10 text-destructive border-destructive/30",
+        badgeClass: "bg-destructive/10 text-foreground border-destructive/30",
       };
   }
 }
@@ -101,7 +101,7 @@ function CountBadge({ count, label, colorClass, bgClass, icon }: CountBadgeProps
     <div className={`flex flex-col items-center px-3 py-2 rounded-lg ${bgClass}`}>
       <span aria-hidden="true">{icon}</span>
       <span className={`text-lg font-bold ${colorClass}`}>{count}</span>
-      <span className={`text-xs ${colorClass} opacity-80`}>{label}</span>
+      <span className="text-xs text-foreground">{label}</span>
     </div>
   );
 }
@@ -158,7 +158,12 @@ export function HealthScoreWidget({ data }: Props) {
       </div>
 
       {memberStatuses.length > 0 && (
-        <div className="mt-2 max-h-48 overflow-y-auto">
+        <div
+          className="mt-2 max-h-48 overflow-y-auto"
+          tabIndex={0}
+          role="region"
+          aria-label="メンバーの健全性状態一覧"
+        >
           {memberStatuses.map((member) => (
             <MemberRow key={member.id} member={member} />
           ))}

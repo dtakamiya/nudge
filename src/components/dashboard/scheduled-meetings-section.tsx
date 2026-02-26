@@ -75,7 +75,7 @@ export function ScheduledMeetingsSection({ meetings }: Props) {
                   </span>
                 )}
                 {isPast && !isToday && (
-                  <span className="text-xs text-destructive bg-destructive/10 px-1.5 py-0.5 rounded font-medium shrink-0">
+                  <span className="text-xs text-foreground bg-destructive/10 px-1.5 py-0.5 rounded font-medium shrink-0">
                     要対応
                   </span>
                 )}

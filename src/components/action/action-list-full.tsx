@@ -222,7 +222,7 @@ export function ActionListFull({
                     value={item.status}
                     onValueChange={(val) => handleStatusChange(item.id, val)}
                   >
-                    <SelectTrigger className="w-28">
+                    <SelectTrigger className="w-28" aria-label="ステータスを変更">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

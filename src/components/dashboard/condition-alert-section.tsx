@@ -11,8 +11,8 @@ function AlertBadge({ alert }: { readonly alert: ConditionAlert }) {
   const trendLabel = alert.trend === "low" ? "低値" : "低下傾向";
   const trendClass =
     alert.trend === "low"
-      ? "bg-destructive/10 text-destructive border-destructive/30"
-      : "bg-warning/10 text-warning border-warning/30";
+      ? "bg-destructive/10 text-foreground border-destructive/30"
+      : "bg-warning/10 text-foreground border-warning/30";
 
   return (
     <span
@@ -20,7 +20,7 @@ function AlertBadge({ alert }: { readonly alert: ConditionAlert }) {
     >
       <TrendingDown className="h-3 w-3" aria-hidden="true" />
       {alert.label}
-      <span className="text-[10px] opacity-75">({trendLabel})</span>
+      <span className="text-[10px]">({trendLabel})</span>
     </span>
   );
 }
@@ -36,7 +36,7 @@ export function ConditionAlertSection({ members }: Props) {
       <div className="flex items-center gap-2 mb-3">
         <AlertTriangle className="h-5 w-5 text-warning shrink-0" aria-hidden="true" />
         <h2 className="text-sm font-semibold text-warning">要注目メンバー</h2>
-        <span className="ml-auto rounded-full bg-warning px-2 py-0.5 text-xs font-medium text-warning-foreground">
+        <span className="ml-auto rounded-full bg-warning/15 px-2 py-0.5 text-xs font-medium text-foreground border border-warning/30">
           {members.length}人
         </span>
       </div>

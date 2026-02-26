@@ -64,7 +64,7 @@ export function ActionFilters({ members, tags = [] }: Props) {
           value={searchParams.get("groupBy") ?? "none"}
           onValueChange={(val) => updateFilter("groupBy", val)}
         >
-          <SelectTrigger className="flex-1 min-w-[8rem] sm:w-44">
+          <SelectTrigger className="flex-1 min-w-[8rem] sm:w-44" aria-label="グループ化">
             <SelectValue placeholder="グループ化" />
           </SelectTrigger>
           <SelectContent>
@@ -78,7 +78,7 @@ export function ActionFilters({ members, tags = [] }: Props) {
           value={searchParams.get("status") ?? "all"}
           onValueChange={(val) => updateFilter("status", val)}
         >
-          <SelectTrigger className="flex-1 min-w-[7rem] sm:w-36">
+          <SelectTrigger className="flex-1 min-w-[7rem] sm:w-36" aria-label="ステータスで絞り込み">
             <SelectValue placeholder="ステータス" />
           </SelectTrigger>
           <SelectContent>
@@ -92,7 +92,7 @@ export function ActionFilters({ members, tags = [] }: Props) {
           value={searchParams.get("memberId") ?? "all"}
           onValueChange={(val) => updateFilter("memberId", val)}
         >
-          <SelectTrigger className="flex-1 min-w-[8rem] sm:w-44">
+          <SelectTrigger className="flex-1 min-w-[8rem] sm:w-44" aria-label="メンバーで絞り込み">
             <SelectValue placeholder="メンバー" />
           </SelectTrigger>
           <SelectContent>
@@ -108,7 +108,7 @@ export function ActionFilters({ members, tags = [] }: Props) {
           value={searchParams.get("dateFilter") ?? "all"}
           onValueChange={(val) => updateFilter("dateFilter", val)}
         >
-          <SelectTrigger className="flex-1 min-w-[8rem] sm:w-40">
+          <SelectTrigger className="flex-1 min-w-[8rem] sm:w-40" aria-label="期限で絞り込み">
             <SelectValue placeholder="期限" />
           </SelectTrigger>
           <SelectContent>
@@ -123,7 +123,7 @@ export function ActionFilters({ members, tags = [] }: Props) {
           value={searchParams.get("sort") ?? "dueDate"}
           onValueChange={(val) => updateFilter("sort", val)}
         >
-          <SelectTrigger className="flex-1 min-w-[8rem] sm:w-40">
+          <SelectTrigger className="flex-1 min-w-[8rem] sm:w-40" aria-label="並び順">
             <SelectValue placeholder="並び順" />
           </SelectTrigger>
           <SelectContent>
