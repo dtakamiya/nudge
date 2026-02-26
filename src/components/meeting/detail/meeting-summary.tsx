@@ -1,7 +1,7 @@
 import { calculateConditionDiff, formatConditionDiff } from "@/lib/condition-diff";
 import { formatDateLong } from "@/lib/format";
 
-import { ConditionBar } from "./condition-bar";
+import { ConditionBar } from "../checkin/condition-bar";
 
 export interface MeetingSummaryProps {
   date: string;

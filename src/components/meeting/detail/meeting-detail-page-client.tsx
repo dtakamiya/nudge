@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { useMeetingDetailPage } from "@/hooks/use-meeting-detail-page";
 import type { MeetingSummaryMarkdownData } from "@/lib/meeting-summary-markdown";
 
-import { CoachingSheet } from "./coaching-sheet";
-import { FocusModeIndicator } from "./focus-mode-indicator";
+import { CoachingSheet } from "../coaching/coaching-sheet";
+import { MeetingForm } from "../form/meeting-form";
+import { FocusModeIndicator } from "../recording/focus-mode-indicator";
+import { RecordingMode } from "../recording/recording-mode";
 import { MeetingDetail } from "./meeting-detail";
-import { MeetingForm } from "./meeting-form";
-import { RecordingMode } from "./recording-mode";
 import { SummaryDialog } from "./summary-dialog";
 
 type TagData = {

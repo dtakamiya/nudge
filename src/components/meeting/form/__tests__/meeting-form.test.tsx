@@ -21,7 +21,7 @@ vi.mock("@/lib/actions/meeting-actions", () => ({
 // Mock dnd-kit to avoid jsdom DnD issues
 
 // Mock IcebreakerCard to avoid random messages in tests
-vi.mock("../icebreaker-card", () => ({
+vi.mock("@/components/meeting/prepare/icebreaker-card", () => ({
   IcebreakerCard: () => <div data-testid="icebreaker-card">Icebreaker</div>,
 }));
 

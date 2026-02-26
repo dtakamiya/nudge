@@ -1,5 +1,5 @@
 import { Breadcrumb } from "@/components/layout/breadcrumb";
-import { TemplateManagement } from "@/components/meeting/template-management";
+import { TemplateManagement } from "@/components/meeting/template";
 import { getCustomTemplates } from "@/lib/actions/template-actions";
 
 export default async function TemplatesSettingsPage() {

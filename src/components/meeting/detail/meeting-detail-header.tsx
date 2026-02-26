@@ -3,11 +3,12 @@
 import Link from "next/link";
 
 import { Breadcrumb } from "@/components/layout/breadcrumb";
-import { MeetingHeaderActions } from "@/components/meeting/meeting-header-actions";
-import { PrintButton } from "@/components/meeting/print-button";
 import { Button } from "@/components/ui/button";
 import { useFocusMode } from "@/hooks/use-focus-mode";
 import { cn } from "@/lib/utils";
+
+import { MeetingHeaderActions } from "./meeting-header-actions";
+import { PrintButton } from "./print-button";
 
 interface MeetingDetailHeaderProps {
   readonly memberId: string;

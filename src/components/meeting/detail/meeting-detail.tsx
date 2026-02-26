@@ -6,7 +6,7 @@ import { CATEGORY_LABELS } from "@/lib/constants";
 import { formatDate, formatDuration } from "@/lib/format";
 import { getMoodOption } from "@/lib/mood";
 
-import { ConditionBar } from "./condition-bar";
+import { ConditionBar } from "../checkin/condition-bar";
 
 type Topic = {
   id: string;

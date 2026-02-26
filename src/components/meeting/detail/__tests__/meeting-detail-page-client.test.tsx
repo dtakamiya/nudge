@@ -30,7 +30,7 @@ vi.mock("../meeting-detail", () => ({
 }));
 
 // Mock MeetingForm to simplify tests
-vi.mock("../meeting-form", () => ({
+vi.mock("@/components/meeting/form/meeting-form", () => ({
   MeetingForm: ({
     initialData,
     onSuccess,
@@ -46,7 +46,7 @@ vi.mock("../meeting-form", () => ({
 }));
 
 // Mock RecordingMode
-vi.mock("../recording-mode", () => ({
+vi.mock("@/components/meeting/recording/recording-mode", () => ({
   RecordingMode: ({ onEnd }: { onEnd: () => void }) => (
     <div data-testid="recording-mode">
       <button onClick={onEnd}>mock-end</button>
@@ -55,7 +55,7 @@ vi.mock("../recording-mode", () => ({
 }));
 
 // Mock FocusModeIndicator
-vi.mock("../focus-mode-indicator", () => ({
+vi.mock("@/components/meeting/recording/focus-mode-indicator", () => ({
   FocusModeIndicator: () => <div data-testid="focus-mode-indicator" />,
 }));
 

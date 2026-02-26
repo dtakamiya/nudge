@@ -24,12 +24,12 @@ vi.mock("@/components/layout/breadcrumb", () => ({
 }));
 
 // PrintButton のモック
-vi.mock("@/components/meeting/print-button", () => ({
+vi.mock("@/components/meeting/detail/print-button", () => ({
   PrintButton: () => <button>印刷 / PDFで保存</button>,
 }));
 
 // MeetingHeaderActions のモック
-vi.mock("@/components/meeting/meeting-header-actions", () => ({
+vi.mock("@/components/meeting/detail/meeting-header-actions", () => ({
   MeetingHeaderActions: () => <div data-testid="meeting-header-actions" />,
 }));
 

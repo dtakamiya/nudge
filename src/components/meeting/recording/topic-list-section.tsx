@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { screenReaderInstructions } from "@/lib/dnd-accessibility";
 
-import type { TopicFormData } from "./meeting-form.types";
+import type { TopicFormData } from "../form/meeting-form.types";
 import type { TagData } from "./sortable-action-item";
 import { SortableTopicItem } from "./sortable-topic-item";
 

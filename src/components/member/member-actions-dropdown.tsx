@@ -3,7 +3,7 @@
 import { FileText, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-import { ExportDialog } from "@/components/meeting/export-dialog";
+import { ExportDialog } from "@/components/meeting/detail";
 import { MemberDeleteDialog } from "@/components/member/member-delete-dialog";
 import { MemberEditDialog } from "@/components/member/member-edit-dialog";
 import { Button } from "@/components/ui/button";

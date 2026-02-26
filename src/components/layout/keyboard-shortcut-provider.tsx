@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 import { ShortcutHelpDialog } from "@/components/layout/shortcut-help-dialog";
-import { NewMeetingDialog } from "@/components/meeting/new-meeting-dialog";
+import { NewMeetingDialog } from "@/components/meeting/form";
 import { useFocusMode } from "@/hooks/use-focus-mode";
 import { type ShortcutContext, useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 

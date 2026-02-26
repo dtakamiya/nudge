@@ -7,12 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useMeetingForm } from "@/hooks/use-meeting-form";
 
-import { ActionListSection } from "./action-list-section";
-import { CheckinSection } from "./checkin-section";
-import { ClosingDialog } from "./closing-dialog";
+import { CheckinSection } from "../checkin/checkin-section";
+import { MoodSelector } from "../checkin/mood-selector";
+import { ActionListSection } from "../recording/action-list-section";
+import { ClosingDialog } from "../recording/closing-dialog";
+import { TopicListSection } from "../recording/topic-list-section";
 import type { MeetingFormProps } from "./meeting-form.types";
-import { MoodSelector } from "./mood-selector";
-import { TopicListSection } from "./topic-list-section";
 
 export function MeetingForm(props: MeetingFormProps) {
   const {
