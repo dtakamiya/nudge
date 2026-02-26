@@ -5,6 +5,7 @@ import { cleanDatabase } from "@/test-utils";
 
 import {
   createMeeting,
+  deleteMeeting,
   endMeeting,
   getAdjacentMeetings,
   getMeeting,
@@ -880,5 +881,142 @@ describe("getAdjacentMeetings", () => {
     const { first, second } = await createTestMeetings();
     const result = await getAdjacentMeetings(memberId, second.id);
     expect(result.previous?.mood).toBe(first.mood);
+  });
+});
+
+describe("deleteMeeting", () => {
+  it("ミーティングを削除できる", async () => {
+    const created = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+    if (!created.success) throw new Error(created.error);
+    const result = await deleteMeeting(created.data.id);
+    expect(result.success).toBe(true);
+    const deleted = await getMeeting(created.data.id);
+    expect(deleted).toBeNull();
+  });
+
+  it("IDが空の場合はエラーを返す", async () => {
+    const result = await deleteMeeting("");
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toContain("ミーティングIDが指定されていません");
+    }
+  });
+
+  it("存在しないIDの場合はエラーを返す", async () => {
+    const result = await deleteMeeting("non-existent-id");
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("updateMeeting - タグ付き新規アクションアイテム", () => {
+  it("新規トピックにタグを付けて追加できる", async () => {
+    const tag = await prisma.tag.create({ data: { name: "トピックタグ" } });
+    const created = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+    if (!created.success) throw new Error(created.error);
+    const meeting = created.data;
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: [
+        {
+          category: "WORK_PROGRESS",
+          title: "タグ付きトピック",
+          notes: "",
+          sortOrder: 0,
+          tagIds: [tag.id],
+        },
+      ],
+      actionItems: [],
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    const topicTags = await prisma.topicTag.findMany({
+      where: { topicId: result.data.topics[0].id },
+    });
+    expect(topicTags).toHaveLength(1);
+    expect(topicTags[0].tagId).toBe(tag.id);
+  });
+
+  it("既存アクションアイテムにタグを付けて更新できる", async () => {
+    const tag = await prisma.tag.create({ data: { name: "更新タグ" } });
+    const created = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [{ title: "既存アクション", description: "", sortOrder: 0 }],
+    });
+    if (!created.success) throw new Error(created.error);
+    const meeting = created.data;
+    const actionId = meeting.actionItems[0].id;
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: [],
+      actionItems: [
+        {
+          id: actionId,
+          title: "既存アクション",
+          description: "",
+          sortOrder: 0,
+          tagIds: [tag.id],
+        },
+      ],
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+    });
+    expect(result.success).toBe(true);
+    const tags = await prisma.actionItemTag.findMany({
+      where: { actionItemId: actionId },
+    });
+    expect(tags).toHaveLength(1);
+    expect(tags[0].tagId).toBe(tag.id);
+  });
+
+  it("新規アクションアイテムにタグを付けて追加できる", async () => {
+    const tag = await prisma.tag.create({ data: { name: "テストタグ" } });
+    const created = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+    if (!created.success) throw new Error(created.error);
+    const meeting = created.data;
+    const result = await updateMeeting({
+      meetingId: meeting.id,
+      date: meeting.date.toISOString(),
+      topics: [],
+      actionItems: [
+        {
+          title: "タグ付きアクション",
+          description: "",
+          sortOrder: 0,
+          tagIds: [tag.id],
+        },
+      ],
+      deletedTopicIds: [],
+      deletedActionItemIds: [],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    const updated = await getMeeting(meeting.id);
+    expect(updated?.actionItems[0].title).toBe("タグ付きアクション");
+    const tags = await prisma.actionItemTag.findMany({
+      where: { actionItemId: updated!.actionItems[0].id },
+    });
+    expect(tags).toHaveLength(1);
+    expect(tags[0].tagId).toBe(tag.id);
   });
 });
