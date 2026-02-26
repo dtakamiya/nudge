@@ -63,7 +63,7 @@ export function UpcomingActionsSection({ today, thisWeek }: Props) {
             <span className="text-xs font-medium text-destructive uppercase tracking-wider">
               今日期限
             </span>
-            <Badge className="bg-destructive/10 text-destructive text-xs py-0 px-1.5">
+            <Badge className="bg-destructive/10 text-foreground text-xs py-0 px-1.5">
               {today.length}
             </Badge>
           </div>

@@ -36,7 +36,7 @@ export function ConditionAlertSection({ members }: Props) {
       <div className="flex items-center gap-2 mb-3">
         <AlertTriangle className="h-5 w-5 text-warning shrink-0" aria-hidden="true" />
         <h2 className="text-sm font-semibold text-warning">要注目メンバー</h2>
-        <span className="ml-auto rounded-full bg-warning px-2 py-0.5 text-xs font-medium text-warning-foreground">
+        <span className="ml-auto rounded-full bg-warning/15 px-2 py-0.5 text-xs font-medium text-foreground border border-warning/30">
           {members.length}人
         </span>
       </div>

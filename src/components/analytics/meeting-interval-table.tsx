@@ -13,21 +13,21 @@ import type { RecommendedMeeting } from "@/lib/types";
 function DaysBadge({ member }: { member: RecommendedMeeting }) {
   if (member.lastMeetingDate === null) {
     return (
-      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
+      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-destructive/10 text-foreground">
         未実施
       </span>
     );
   }
   if (member.daysSinceLast > 21) {
     return (
-      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
+      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-destructive/10 text-foreground">
         {member.daysSinceLast} 日前
       </span>
     );
   }
   if (member.daysSinceLast > 14) {
     return (
-      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-warning/10 text-warning">
+      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-warning/10 text-foreground">
         {member.daysSinceLast} 日前
       </span>
     );

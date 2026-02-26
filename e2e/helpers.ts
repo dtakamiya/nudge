@@ -61,7 +61,9 @@ export async function createMemberAndNavigateToDetail(
     department: options?.department ?? "テスト部",
     position: options?.position,
   });
-  await expect(page.getByRole("heading", { name })).toBeVisible({ timeout: 10000 });
+  // URL が /members/{id} に遷移済みのため、ページが安定してからヘディングを確認する
+  await page.waitForLoadState("networkidle", { timeout: 15000 });
+  await expect(page.getByRole("heading", { name, exact: false })).toBeVisible({ timeout: 15000 });
 }
 
 /**

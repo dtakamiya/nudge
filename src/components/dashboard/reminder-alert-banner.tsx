@@ -28,7 +28,7 @@ export function ReminderAlertBanner({ reminders }: Props) {
       <div className="flex items-center gap-2 mb-3">
         <AlertTriangle className="h-5 w-5 text-destructive shrink-0" aria-hidden="true" />
         <h2 className="text-sm font-semibold text-destructive">ミーティングリマインダー</h2>
-        <span className="ml-auto rounded-full bg-destructive px-2 py-0.5 text-xs font-medium text-destructive-foreground">
+        <span className="ml-auto rounded-full bg-destructive/15 px-2 py-0.5 text-xs font-medium text-foreground border border-destructive/30">
           {reminders.length}件
         </span>
       </div>
