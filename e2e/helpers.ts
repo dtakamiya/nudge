@@ -158,3 +158,32 @@ export async function getMemberIdFromDashboard(page: Page, name: string): Promis
   }
   return match[1];
 }
+
+/**
+ * 指定ページで axe-core アクセシビリティスキャンを実行する。
+ * critical / serious レベルの違反があればエラーをスローする。
+ * 違反の詳細（要素セレクタ・ルールID・説明）をエラーメッセージに含める。
+ */
+export async function runAxe(page: Page, pageName: string): Promise<void> {
+  const { AxeBuilder } = await import("@axe-core/playwright");
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+
+  const violations = results.violations.filter(
+    (v) => v.impact === "critical" || v.impact === "serious",
+  );
+
+  if (violations.length > 0) {
+    const details = violations
+      .map(
+        (v) =>
+          `[${v.impact}] ${v.id}: ${v.description}\n` +
+          v.nodes.map((n) => `  要素: ${n.target}`).join("\n"),
+      )
+      .join("\n\n");
+    throw new Error(
+      `${pageName} にアクセシビリティ違反が ${violations.length} 件あります:\n\n${details}`,
+    );
+  }
+}
