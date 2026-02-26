@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { Breadcrumb } from "@/components/layout/breadcrumb";
-import { MeetingPrepare } from "@/components/meeting/meeting-prepare";
+import { MeetingPrepare } from "@/components/meeting/prepare";
 import { getLastMeetingAllActions, getPendingActionItems } from "@/lib/actions/action-item-actions";
 import { getActiveGoals } from "@/lib/actions/goal-actions";
 import { getMember } from "@/lib/actions/member-actions";

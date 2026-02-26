@@ -7,7 +7,7 @@ import { CheckinTrendSection } from "@/components/analytics/checkin-trend-sectio
 import { TopicAnalyticsSection } from "@/components/analytics/topic-analytics-section";
 import { GoalList } from "@/components/goal/goal-list";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
-import { MeetingHistory } from "@/components/meeting/meeting-history";
+import { MeetingHistory } from "@/components/meeting/detail";
 import { CalendarExportButton } from "@/components/member/calendar-export-button";
 import { CheckinSummarySection } from "@/components/member/checkin-summary-section";
 import { MemberActionsDropdown } from "@/components/member/member-actions-dropdown";

@@ -7,8 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getRandomCheckinMessage } from "@/lib/checkin-messages";
 
+import { IcebreakerCard } from "../prepare/icebreaker-card";
 import { type ConditionField, ConditionSelector } from "./condition-selector";
-import { IcebreakerCard } from "./icebreaker-card";
 
 interface CheckinSectionProps {
   conditionHealth: number | null;

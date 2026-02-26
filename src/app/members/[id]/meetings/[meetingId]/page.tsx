@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 
-import { CoachingPanel } from "@/components/meeting/coaching-panel";
-import { MeetingDetailHeader } from "@/components/meeting/meeting-detail-header";
-import { MeetingDetailPageClient } from "@/components/meeting/meeting-detail-page-client";
-import { MeetingNavigation } from "@/components/meeting/meeting-navigation";
+import { CoachingPanel } from "@/components/meeting/coaching";
+import {
+  MeetingDetailHeader,
+  MeetingDetailPageClient,
+  MeetingNavigation,
+} from "@/components/meeting/detail";
 import { getAdjacentMeetings, getMeeting, getPreviousMeeting } from "@/lib/actions/meeting-actions";
 import { formatDate } from "@/lib/format";
 

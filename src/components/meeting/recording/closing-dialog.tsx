@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-import { MeetingSummary, type MeetingSummaryProps } from "./meeting-summary";
+import { MeetingSummary, type MeetingSummaryProps } from "../detail/meeting-summary";
 
 interface ClosingDialogProps {
   open: boolean;

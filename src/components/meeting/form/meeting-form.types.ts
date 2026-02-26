@@ -1,4 +1,4 @@
-import type { TagData } from "./sortable-action-item";
+import type { TagData } from "../recording/sortable-action-item";
 
 export type TopicFormData = {
   id?: string;

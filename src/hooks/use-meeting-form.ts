@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import type { ConditionField } from "@/components/meeting/condition-selector";
+import type { ConditionField } from "@/components/meeting/checkin";
 import {
   type ActionFormData,
   buildTagParams,
@@ -20,8 +20,8 @@ import {
   createEmptyTopic,
   type MeetingFormProps,
   type TopicFormData,
-} from "@/components/meeting/meeting-form.types";
-import type { TagData } from "@/components/meeting/sortable-action-item";
+} from "@/components/meeting/form";
+import type { TagData } from "@/components/meeting/recording";
 import { createMeeting, updateMeeting } from "@/lib/actions/meeting-actions";
 import { createAnnouncements, sortableKeyboardCoordinates } from "@/lib/dnd-accessibility";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";

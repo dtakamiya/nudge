@@ -5,11 +5,6 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { ChevronDown, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
-import { PrepareActionChecklist } from "@/components/meeting/prepare-action-checklist";
-import { PrepareGoalsSection } from "@/components/meeting/prepare-goals-section";
-import { PrepareTopicItem } from "@/components/meeting/prepare-topic-item";
-import { PreviousMeetingReview } from "@/components/meeting/previous-meeting-review";
-import { TemplateSelector } from "@/components/meeting/template-selector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -17,6 +12,12 @@ import type { Goal, MeetingTemplate as DbMeetingTemplate } from "@/generated/pri
 import { useMeetingPrepare } from "@/hooks/use-meeting-prepare";
 import { screenReaderInstructions } from "@/lib/dnd-accessibility";
 import { cn } from "@/lib/utils";
+
+import { TemplateSelector } from "../template/template-selector";
+import { PrepareActionChecklist } from "./prepare-action-checklist";
+import { PrepareGoalsSection } from "./prepare-goals-section";
+import { PrepareTopicItem } from "./prepare-topic-item";
+import { PreviousMeetingReview } from "./previous-meeting-review";
 
 type PendingAction = {
   id: string;
