@@ -7,6 +7,7 @@ import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { DueDateBadge } from "@/components/action/due-date-badge";
+import { PriorityBadge } from "@/components/action/priority-badge";
 import { TagBadge } from "@/components/tag/tag-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -36,6 +37,7 @@ type ActionItemRow = {
   title: string;
   description: string;
   status: string;
+  priority: string;
   dueDate: Date | null;
   member: { id: string; name: string };
   meeting: { id: string; date: Date };
@@ -46,6 +48,7 @@ type EditFormState = {
   title: string;
   description: string;
   dueDate: string;
+  priority: string;
 };
 
 type Props = {
@@ -109,6 +112,7 @@ export function ActionListFull({
     title: "",
     description: "",
     dueDate: "",
+    priority: "MEDIUM",
   });
   const [optimisticItems, setOptimisticItems] = useOptimistic(
     actionItems,
@@ -145,6 +149,7 @@ export function ActionListFull({
       title: item.title,
       description: item.description,
       dueDate: item.dueDate ? new Date(item.dueDate).toISOString().split("T")[0] : "",
+      priority: item.priority,
     });
   }
 
@@ -159,6 +164,7 @@ export function ActionListFull({
         title: editForm.title,
         description: editForm.description,
         dueDate: editForm.dueDate || undefined,
+        priority: editForm.priority as "HIGH" | "MEDIUM" | "LOW",
       });
       if (result.success) {
         toast.success(TOAST_MESSAGES.actionItem.updateSuccess);
@@ -198,6 +204,20 @@ export function ActionListFull({
                     value={editForm.dueDate}
                     onChange={(value) => setEditForm({ ...editForm, dueDate: value })}
                   />
+                  <Select
+                    value={editForm.priority}
+                    onValueChange={(val) => setEditForm({ ...editForm, priority: val })}
+                    aria-label="優先度"
+                  >
+                    <SelectTrigger className="w-24">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="HIGH">高</SelectItem>
+                      <SelectItem value="MEDIUM">中</SelectItem>
+                      <SelectItem value="LOW">低</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex gap-2 justify-end">
                   <Button variant="outline" size="sm" onClick={handleCancel}>
@@ -232,7 +252,10 @@ export function ActionListFull({
                     </SelectContent>
                   </Select>
                   <div>
-                    <p className="font-medium">{item.title}</p>
+                    <div className="flex items-center gap-1.5">
+                      <PriorityBadge priority={item.priority as "HIGH" | "MEDIUM" | "LOW"} />
+                      <p className="font-medium">{item.title}</p>
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       <Link href={`/members/${item.member.id}`} className="hover:underline">
                         {item.member.name}

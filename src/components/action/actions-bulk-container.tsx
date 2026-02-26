@@ -18,6 +18,7 @@ type ActionItemRow = {
   title: string;
   description: string;
   status: string;
+  priority: string;
   dueDate: Date | null;
   member: { id: string; name: string };
   meeting: { id: string; date: Date };

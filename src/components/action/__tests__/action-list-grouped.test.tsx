@@ -32,6 +32,7 @@ function makeItem(id: string, memberName: string, memberId: string) {
     title: `アクション ${id}`,
     description: "",
     status: "TODO",
+    priority: "MEDIUM",
     dueDate: null,
     member: { id: memberId, name: memberName },
     meeting: { id: "meet-1", date: new Date("2024-01-01") },
