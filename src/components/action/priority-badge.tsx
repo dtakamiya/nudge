@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import type { PriorityType } from "@/lib/types";
 
 type Props = {
@@ -7,25 +8,19 @@ type Props = {
 const PRIORITY_CONFIG: Record<PriorityType, { label: string; className: string }> = {
   HIGH: {
     label: "高",
-    className: "text-red-700 bg-red-100 border border-red-200",
+    className: "bg-red-100 text-red-700 border-red-200 hover:bg-red-100",
   },
   MEDIUM: {
     label: "中",
-    className: "text-amber-700 bg-amber-100 border border-amber-200",
+    className: "bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100",
   },
   LOW: {
     label: "低",
-    className: "text-green-700 bg-green-100 border border-green-200",
+    className: "bg-green-100 text-green-700 border-green-200 hover:bg-green-100",
   },
 };
 
 export function PriorityBadge({ priority }: Props) {
   const { label, className } = PRIORITY_CONFIG[priority];
-  return (
-    <span
-      className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${className}`}
-    >
-      {label}
-    </span>
-  );
+  return <Badge className={className}>{label}</Badge>;
 }
