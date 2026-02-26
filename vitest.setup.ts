@@ -3,6 +3,11 @@ import "@testing-library/jest-dom/vitest";
 import React from "react";
 import { vi } from "vitest";
 
+// @testing-library/dom の jestFakeTimersAreEnabled() が正しく動作するように
+// vitest の vi を jest グローバルとして設定する
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(globalThis as any).jest = vi;
+
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
   revalidateTag: vi.fn(),
