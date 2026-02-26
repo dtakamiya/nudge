@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 
 import { searchAll } from "@/lib/actions/search-actions";
 import type { SearchResults } from "@/lib/types";
@@ -20,6 +20,7 @@ export function useGlobalSearch() {
   const [results, setResults] = useState<SearchResults | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -75,12 +76,14 @@ export function useGlobalSearch() {
       return;
     }
 
-    debounceRef.current = setTimeout(async () => {
-      const result = await searchAll(value);
-      if (result.success) {
-        setResults(result.data);
-        setIsOpen(true);
-      }
+    debounceRef.current = setTimeout(() => {
+      startTransition(async () => {
+        const result = await searchAll(value);
+        if (result.success) {
+          setResults(result.data);
+          setIsOpen(true);
+        }
+      });
     }, DEBOUNCE_MS);
   };
 
