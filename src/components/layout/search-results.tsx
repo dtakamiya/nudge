@@ -1,10 +1,22 @@
 // src/components/layout/search-results.tsx
 import { CheckSquare, MessageSquare, Tag, User } from "lucide-react";
+import type React from "react";
 
+import { extractSnippet, highlightText } from "@/lib/highlight";
 import type { SearchResults } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 import { SearchItem, SearchSection } from "./search-item";
+
+function buildContextSnippet(
+  text: string | null | undefined,
+  query: string,
+): React.ReactNode | undefined {
+  if (!text || !text.toLowerCase().includes(query.toLowerCase())) {
+    return undefined;
+  }
+  return highlightText(extractSnippet(text, query), query);
+}
 
 export function SearchResultsDropdown({
   results,
@@ -60,6 +72,7 @@ export function SearchResultsDropdown({
                   icon={<MessageSquare size={12} />}
                   primary={topic.title}
                   secondary={topic.memberName}
+                  context={buildContextSnippet(topic.notes, query)}
                   query={query}
                   isActive={activeIndex === membersCount + i}
                   onClick={() =>
@@ -78,6 +91,7 @@ export function SearchResultsDropdown({
                   icon={<CheckSquare size={12} />}
                   primary={item.title}
                   secondary={item.memberName}
+                  context={buildContextSnippet(item.description, query)}
                   query={query}
                   isActive={activeIndex === membersCount + topicsCount + i}
                   onClick={() =>

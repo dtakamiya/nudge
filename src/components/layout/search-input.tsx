@@ -17,7 +17,7 @@ export function SearchInput({
   query: string;
   isOpen: boolean;
   activeDescendant: string | undefined;
-  inputRef: RefObject<HTMLInputElement>;
+  inputRef: RefObject<HTMLInputElement | null>;
   onChange: (value: string) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onClear: () => void;

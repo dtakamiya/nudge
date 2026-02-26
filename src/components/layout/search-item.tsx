@@ -18,6 +18,7 @@ export function SearchItem({
   icon,
   primary,
   secondary,
+  context,
   query,
   isActive,
   onClick,
@@ -26,6 +27,7 @@ export function SearchItem({
   icon: React.ReactNode;
   primary: string;
   secondary?: string;
+  context?: React.ReactNode;
   query: string;
   isActive?: boolean;
   onClick: () => void;
@@ -48,6 +50,14 @@ export function SearchItem({
       <div className="min-w-0">
         <div className="truncate font-medium">{highlightText(primary, query)}</div>
         {secondary && <div className="truncate text-xs text-muted-foreground">{secondary}</div>}
+        {context && (
+          <div
+            data-testid="search-context"
+            className="truncate text-xs italic text-muted-foreground"
+          >
+            {context}
+          </div>
+        )}
       </div>
     </button>
   );
