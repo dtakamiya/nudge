@@ -33,3 +33,23 @@ export function highlightText(text: string, query: string): React.ReactNode {
     ),
   );
 }
+
+/**
+ * テキストからクエリにマッチした箇所の前後コンテキストを含むスニペットを抽出する。
+ * マッチがない場合は先頭から contextLength*2 文字を返す。
+ */
+export function extractSnippet(text: string, query: string, contextLength = 50): string {
+  if (!text) return "";
+  if (!query) return text.slice(0, contextLength * 2);
+
+  const lower = text.toLowerCase();
+  const idx = lower.indexOf(query.toLowerCase());
+
+  if (idx === -1) return text.slice(0, contextLength * 2);
+
+  const start = Math.max(0, idx - contextLength);
+  const end = Math.min(text.length, idx + query.length + contextLength);
+  const prefix = start > 0 ? "..." : "";
+  const suffix = end < text.length ? "..." : "";
+  return prefix + text.slice(start, end) + suffix;
+}

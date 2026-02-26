@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 
 import { searchAll } from "@/lib/actions/search-actions";
-import { highlightText } from "@/lib/highlight";
+import { extractSnippet, highlightText } from "@/lib/highlight";
 import type { SearchResults } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -223,6 +223,7 @@ export function GlobalSearch() {
                       icon={<MessageSquare size={12} />}
                       primary={topic.title}
                       secondary={topic.memberName}
+                      context={buildContextSnippet(topic.notes, query)}
                       query={query}
                       isActive={activeIndex === results.members.length + i}
                       onClick={() =>
@@ -241,6 +242,7 @@ export function GlobalSearch() {
                       icon={<CheckSquare size={12} />}
                       primary={item.title}
                       secondary={item.memberName}
+                      context={buildContextSnippet(item.description, query)}
                       query={query}
                       isActive={activeIndex === results.members.length + results.topics.length + i}
                       onClick={() =>
@@ -285,6 +287,16 @@ export function GlobalSearch() {
   );
 }
 
+function buildContextSnippet(
+  text: string | null | undefined,
+  query: string,
+): React.ReactNode | undefined {
+  if (!text || !text.toLowerCase().includes(query.toLowerCase())) {
+    return undefined;
+  }
+  return highlightText(extractSnippet(text, query), query);
+}
+
 function SearchSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
@@ -299,6 +311,7 @@ function SearchItem({
   icon,
   primary,
   secondary,
+  context,
   query,
   isActive,
   onClick,
@@ -307,6 +320,7 @@ function SearchItem({
   icon: React.ReactNode;
   primary: string;
   secondary?: string;
+  context?: React.ReactNode;
   query: string;
   isActive?: boolean;
   onClick: () => void;
@@ -329,6 +343,14 @@ function SearchItem({
       <div className="min-w-0">
         <div className="truncate font-medium">{highlightText(primary, query)}</div>
         {secondary && <div className="truncate text-xs text-muted-foreground">{secondary}</div>}
+        {context && (
+          <div
+            data-testid="search-context"
+            className="truncate text-xs italic text-muted-foreground"
+          >
+            {context}
+          </div>
+        )}
       </div>
     </button>
   );

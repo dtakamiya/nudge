@@ -366,4 +366,139 @@ describe("GlobalSearch", () => {
       });
     });
   });
+
+  describe("コンテキスト（ノート・説明文）表示", () => {
+    it("トピックのノートにマッチした場合にスニペットが表示される", async () => {
+      mockSearchAll.mockResolvedValue({
+        success: true,
+        data: {
+          members: [],
+          topics: [
+            {
+              id: "t1",
+              title: "定例ミーティング",
+              notes: "スキルアップに向けた取り組みを話し合う",
+              category: "OTHER",
+              meetingId: "meeting-1",
+              memberId: "m1",
+              memberName: "田中太郎",
+            },
+          ],
+          actionItems: [],
+          tags: [],
+        },
+      });
+
+      const user = userEvent.setup({ delay: null });
+      render(<GlobalSearch />);
+      const input = screen.getByPlaceholderText("検索...");
+
+      await user.type(input, "スキルアップ");
+      await waitFor(() => {
+        const contexts = screen.getAllByTestId("search-context");
+        expect(contexts.length).toBeGreaterThan(0);
+        expect(contexts[0].textContent).toContain("スキルアップ");
+      });
+    });
+
+    it("アクションアイテムの説明にマッチした場合にスニペットが表示される", async () => {
+      mockSearchAll.mockResolvedValue({
+        success: true,
+        data: {
+          members: [],
+          topics: [],
+          actionItems: [
+            {
+              id: "a1",
+              title: "タスクA",
+              description: "ドキュメントを整備する作業",
+              status: "TODO",
+              memberId: "m1",
+              memberName: "田中太郎",
+              meetingId: "meeting-1",
+            },
+          ],
+          tags: [],
+        },
+      });
+
+      const user = userEvent.setup({ delay: null });
+      render(<GlobalSearch />);
+      const input = screen.getByPlaceholderText("検索...");
+
+      await user.type(input, "ドキュメント");
+      await waitFor(() => {
+        const contexts = screen.getAllByTestId("search-context");
+        expect(contexts.length).toBeGreaterThan(0);
+        expect(contexts[0].textContent).toContain("ドキュメント");
+      });
+    });
+
+    it("トピックのノートマッチ箇所が mark タグでハイライトされる", async () => {
+      mockSearchAll.mockResolvedValue({
+        success: true,
+        data: {
+          members: [],
+          topics: [
+            {
+              id: "t1",
+              title: "定例ミーティング",
+              notes: "スキルアップに向けた取り組み",
+              category: "OTHER",
+              meetingId: "meeting-1",
+              memberId: "m1",
+              memberName: "田中太郎",
+            },
+          ],
+          actionItems: [],
+          tags: [],
+        },
+      });
+
+      const user = userEvent.setup({ delay: null });
+      render(<GlobalSearch />);
+      const input = screen.getByPlaceholderText("検索...");
+
+      await user.type(input, "スキルアップ");
+      await waitFor(() => {
+        const marks = document.querySelectorAll("mark");
+        const matchedMarks = Array.from(marks).filter((m) => m.textContent === "スキルアップ");
+        expect(matchedMarks.length).toBeGreaterThan(0);
+      });
+    });
+
+    it("ノートが null の場合はスニペットが表示されない", async () => {
+      mockSearchAll.mockResolvedValue({
+        success: true,
+        data: {
+          members: [],
+          topics: [
+            {
+              id: "t1",
+              title: "キャリア相談",
+              notes: null,
+              category: "CAREER",
+              meetingId: "meeting-1",
+              memberId: "m1",
+              memberName: "田中太郎",
+            },
+          ],
+          actionItems: [],
+          tags: [],
+        },
+      });
+
+      const user = userEvent.setup({ delay: null });
+      render(<GlobalSearch />);
+      const input = screen.getByPlaceholderText("検索...");
+
+      await user.type(input, "キャリア");
+      await waitFor(() => {
+        const listbox = screen.getByRole("listbox");
+        expect(listbox.textContent).toContain("キャリア相談");
+        // notes が null なのでコンテキストスニペット要素は存在しない
+        expect(screen.queryAllByTestId("search-context")).toHaveLength(0);
+      });
+    });
+  });
 });
