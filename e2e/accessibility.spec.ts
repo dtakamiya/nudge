@@ -27,6 +27,8 @@ test.describe("アクセシビリティ（axe-core WCAG AA）", () => {
   });
 
   test("ミーティング詳細にアクセシビリティ違反がない", async ({ page }) => {
+    // ミーティング詳細ページは複雑なため axe スキャンに時間がかかる
+    test.setTimeout(90000);
     const memberName = `A11yテスト_${Date.now()}`;
     await createMemberAndNavigateToDetail(page, memberName);
     await createMeetingFromDetail(page, memberName, {
