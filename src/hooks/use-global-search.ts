@@ -53,6 +53,15 @@ export function useGlobalSearch() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [closeDropdown]);
 
+  // アンマウント時にデバウンスタイマーをクリーンアップ
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
+
   const handleQueryChange = (value: string) => {
     setQuery(value);
     setActiveIndex(-1);
