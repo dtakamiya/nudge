@@ -479,19 +479,24 @@ describe("getActionItems - sortBy: updatedAt", () => {
         { title: "新しいタスク", description: "" },
       ],
     });
+
     const all = await getActionItems();
-    const older = all.items.find((i) => i.title === "古いタスク")!;
-    // 古いほうを先に更新して updatedAt を古くする（新しいほうは後で更新）
-    await new Promise((r) => setTimeout(r, 50));
-    await updateActionItem(older.id, { title: "古いタスク", description: "updated first" });
-    await new Promise((r) => setTimeout(r, 50));
-    const newer = all.items.find(
-      (i) => i.title === "新しいほうのタスク" || i.title === "新しいタスク",
-    )!;
-    await updateActionItem(newer.id, { title: "新しいタスク", description: "updated second" });
+    const olderItem = all.items.find((i) => i.title === "古いタスク")!;
+    const newerItem = all.items.find((i) => i.title === "新しいタスク")!;
+
+    // Prisma で直接 updatedAt を設定して時刻差を確実に作る
+    await prisma.actionItem.update({
+      where: { id: olderItem.id },
+      data: { updatedAt: new Date("2026-01-01T00:00:00Z") },
+    });
+    await prisma.actionItem.update({
+      where: { id: newerItem.id },
+      data: { updatedAt: new Date("2026-01-02T00:00:00Z") },
+    });
 
     const result = await getActionItems({ sortBy: "updatedAt" });
     expect(result.items[0].title).toBe("新しいタスク");
+    expect(result.items[1].title).toBe("古いタスク");
   });
 });
 
