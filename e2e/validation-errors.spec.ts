@@ -78,3 +78,36 @@ test.describe("ミーティング作成 バリデーション", () => {
     await expect(page.locator("form").getByRole("alert")).toBeVisible({ timeout: 10000 });
   });
 });
+
+test.describe("アクションアイテム ステータスサイクル", () => {
+  test("ステータスが TODO → 進行中 → 完了 と遷移できる", async ({ page }) => {
+    const memberName = `ステータスサイクル_${Date.now()}`;
+    const actionTitle = `サイクルテスト_${Date.now()}`;
+
+    // メンバーとアクションアイテム付きミーティングを作成
+    await createMemberAndNavigateToDetail(page, memberName);
+    await page.getByRole("link", { name: "新規1on1" }).click();
+    await page.getByPlaceholder("話題のタイトル").first().fill("ステータステスト");
+    await page.getByRole("button", { name: "+ アクション追加" }).click();
+    await page.getByPlaceholder("アクションのタイトル").first().fill(actionTitle);
+    await page.getByRole("button", { name: "1on1を保存" }).first().click();
+    await confirmSaveMeeting(page);
+    await expect(page.getByRole("heading", { name: memberName })).toBeVisible({
+      timeout: 15000,
+    });
+
+    // 初期状態: 「未着手」が表示される
+    const statusBadge = page.locator("button").filter({ hasText: "未着手" }).first();
+    await expect(statusBadge).toBeVisible({ timeout: 5000 });
+
+    // TODO → 進行中
+    await statusBadge.click();
+    const inProgressBadge = page.locator("button").filter({ hasText: "進行中" }).first();
+    await expect(inProgressBadge).toBeVisible({ timeout: 5000 });
+
+    // 進行中 → 完了
+    await inProgressBadge.click();
+    const doneBadge = page.locator("button").filter({ hasText: "完了" }).first();
+    await expect(doneBadge).toBeVisible({ timeout: 5000 });
+  });
+});
