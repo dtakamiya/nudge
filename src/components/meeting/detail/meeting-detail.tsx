@@ -62,7 +62,7 @@ export function MeetingDetail({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center gap-3">
-        <p className="text-lg text-muted-foreground">{formatDate(date)}</p>
+        <p className="text-lg text-slate-600">{formatDate(date)}</p>
         {hasDuration && (
           <span className="text-sm text-muted-foreground">
             ({formatDuration(startedAt, endedAt)})

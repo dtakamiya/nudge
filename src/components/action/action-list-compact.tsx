@@ -164,7 +164,7 @@ export function ActionListCompact({ actionItems, meetingId, memberId, enableBulk
   return (
     <div className={`flex flex-col gap-2 ${isPending ? "opacity-80" : ""}`}>
       {optimisticItems.length === 0 && canAdd && !showAddForm && (
-        <p className="text-sm text-muted-foreground">アクションアイテムはありません</p>
+        <p className="text-sm text-slate-600">アクションアイテムはありません</p>
       )}
       {optimisticItems.map((item) =>
         editingId === item.id ? (

@@ -36,12 +36,12 @@ export function CoachingTipCard({ category, className }: CoachingTipCardProps) {
               {current.category}
             </Badge>
             <p className="text-sm font-medium text-slate-800">{current.text}</p>
-            {current.detail && <p className="text-xs text-muted-foreground">{current.detail}</p>}
+            {current.detail && <p className="text-xs text-slate-600">{current.detail}</p>}
           </div>
           <button
             type="button"
             onClick={handleRefresh}
-            className="shrink-0 rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+            className="shrink-0 rounded-md px-2 py-1 text-xs text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
           >
             別のTip 🎲
           </button>

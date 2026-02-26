@@ -75,9 +75,7 @@ function KPICard({ title, value, unit, variant, icon, testId, staggerClass }: KP
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-1.5">
           {statusIcon}
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            {title}
-          </p>
+          <p className="text-xs font-medium text-slate-600 uppercase tracking-wider">{title}</p>
         </div>
         <span className={`${getValueClass(variant)} opacity-70`}>{icon}</span>
       </div>
