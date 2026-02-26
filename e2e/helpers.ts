@@ -170,6 +170,8 @@ export async function runAxe(page: Page, pageName: string): Promise<void> {
   const { AxeBuilder } = await import("@axe-core/playwright");
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    // Sonner（トースト通知ライブラリ）の内部要素はサードパーティのため除外
+    .exclude("[data-sonner-toaster]")
     .analyze();
 
   const violations = results.violations.filter(
