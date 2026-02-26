@@ -40,6 +40,7 @@ export function highlightText(text: string, query: string): React.ReactNode {
  */
 export function extractSnippet(text: string, query: string, contextLength = 50): string {
   if (!text) return "";
+  if (!query) return text.slice(0, contextLength * 2);
 
   const lower = text.toLowerCase();
   const idx = lower.indexOf(query.toLowerCase());
