@@ -91,6 +91,7 @@ const defaultProps = {
       description: "Critical",
       sortOrder: 0,
       status: "TODO",
+      priority: "MEDIUM",
       dueDate: new Date("2026-03-01"),
       meeting: { date: new Date("2026-02-20T10:00:00.000Z") },
     },

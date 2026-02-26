@@ -34,6 +34,7 @@ type ActionItem = {
   readonly description: string;
   readonly sortOrder: number;
   readonly status: string;
+  readonly priority: string;
   readonly dueDate: Date | null;
   readonly meeting: { readonly date: Date };
   readonly tags?: ReadonlyArray<TagData>;
@@ -174,6 +175,7 @@ export function MeetingDetailPageClient({
               sortOrder: a.sortOrder,
               dueDate: a.dueDate ? new Date(a.dueDate).toISOString().split("T")[0] : "",
               status: a.status,
+              priority: (a.priority ?? "MEDIUM") as "HIGH" | "MEDIUM" | "LOW",
               tags: a.tags ? [...a.tags] : [],
             })),
           }}

@@ -2,6 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import type { ActionFormData } from "../../form/meeting-form.types";
 import { ActionListSection } from "../action-list-section";
 import type { TagData } from "../sortable-action-item";
 
@@ -12,11 +13,12 @@ const mockAnnouncements = {
   onDragCancel: vi.fn(() => ""),
 };
 
-const defaultAction = (overrides = {}) => ({
+const defaultAction = (overrides: Partial<ActionFormData> = {}): ActionFormData => ({
   title: "テストアクション",
   description: "",
   sortOrder: 0,
   dueDate: "",
+  priority: "MEDIUM",
   tags: [] as TagData[],
   ...overrides,
 });
@@ -35,6 +37,7 @@ describe("ActionListSection", () => {
         onUpdate={vi.fn()}
         onRemove={vi.fn()}
         onTagsChange={vi.fn()}
+        onPriorityChange={vi.fn()}
         onDragEnd={vi.fn()}
       />,
     );
@@ -52,6 +55,7 @@ describe("ActionListSection", () => {
         onUpdate={vi.fn()}
         onRemove={vi.fn()}
         onTagsChange={vi.fn()}
+        onPriorityChange={vi.fn()}
         onDragEnd={vi.fn()}
       />,
     );
@@ -71,6 +75,7 @@ describe("ActionListSection", () => {
         onUpdate={vi.fn()}
         onRemove={vi.fn()}
         onTagsChange={vi.fn()}
+        onPriorityChange={vi.fn()}
         onDragEnd={vi.fn()}
       />,
     );
@@ -89,6 +94,7 @@ describe("ActionListSection", () => {
         onUpdate={vi.fn()}
         onRemove={vi.fn()}
         onTagsChange={vi.fn()}
+        onPriorityChange={vi.fn()}
         onDragEnd={vi.fn()}
       />,
     );
@@ -106,6 +112,7 @@ describe("ActionListSection", () => {
         onUpdate={vi.fn()}
         onRemove={vi.fn()}
         onTagsChange={vi.fn()}
+        onPriorityChange={vi.fn()}
         onDragEnd={vi.fn()}
       />,
     );
@@ -127,6 +134,7 @@ describe("ActionListSection", () => {
         onUpdate={vi.fn()}
         onRemove={vi.fn()}
         onTagsChange={vi.fn()}
+        onPriorityChange={vi.fn()}
         onDragEnd={vi.fn()}
       />,
     );

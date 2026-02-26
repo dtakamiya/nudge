@@ -76,6 +76,7 @@ export default async function MeetingDetailPage({ params }: Props) {
               description: a.description,
               sortOrder: a.sortOrder,
               status: a.status,
+              priority: a.priority ?? "MEDIUM",
               dueDate: a.dueDate,
               meeting: { date: meeting.date },
               tags: a.tags.map((at) => ({

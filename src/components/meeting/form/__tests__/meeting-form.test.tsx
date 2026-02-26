@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 import { MeetingForm } from "../meeting-form";
+import type { MeetingInitialData } from "../meeting-form.types";
 
 const { mockPush } = vi.hoisted(() => ({ mockPush: vi.fn() }));
 
@@ -204,7 +205,7 @@ describe("MeetingForm", () => {
 describe("MeetingForm (edit mode)", () => {
   afterEach(() => cleanup());
 
-  const mockInitialData = {
+  const mockInitialData: MeetingInitialData = {
     meetingId: "meeting-1",
     date: "2026-02-20T10:00:00.000Z",
     conditionHealth: 4,
@@ -229,6 +230,7 @@ describe("MeetingForm (edit mode)", () => {
         sortOrder: 0,
         dueDate: "2026-03-01",
         status: "TODO",
+        priority: "MEDIUM",
       },
     ],
   };

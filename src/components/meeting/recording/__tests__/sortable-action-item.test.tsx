@@ -18,6 +18,7 @@ const defaultProps = {
   title: "レビュー依頼",
   description: "PRレビューをする",
   dueDate: "2026-03-01",
+  priority: "MEDIUM" as const,
   index: 0,
   onUpdate: vi.fn(),
   onRemove: vi.fn(),

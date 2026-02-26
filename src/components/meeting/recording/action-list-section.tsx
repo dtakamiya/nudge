@@ -21,6 +21,7 @@ type Props = {
   onUpdate: (index: number, field: "title" | "description" | "dueDate", value: string) => void;
   onRemove: (index: number) => void;
   onTagsChange: (index: number, tags: TagData[]) => void;
+  onPriorityChange: (index: number, priority: "HIGH" | "MEDIUM" | "LOW") => void;
   onDragEnd: (event: DragEndEvent) => void;
 };
 
@@ -33,6 +34,7 @@ export function ActionListSection({
   onUpdate,
   onRemove,
   onTagsChange,
+  onPriorityChange,
   onDragEnd,
 }: Props) {
   return (
@@ -66,10 +68,12 @@ export function ActionListSection({
                 title={action.title}
                 description={action.description}
                 dueDate={action.dueDate}
+                priority={action.priority}
                 index={index}
                 tags={action.tags}
                 onTagsChange={onTagsChange}
                 onUpdate={onUpdate}
+                onPriorityChange={onPriorityChange}
                 onRemove={onRemove}
               />
             ))}

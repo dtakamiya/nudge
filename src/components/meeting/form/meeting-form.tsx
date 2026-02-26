@@ -53,6 +53,7 @@ export function MeetingForm(props: MeetingFormProps) {
     removeAction,
     updateAction,
     updateActionTags,
+    updateActionPriority,
     handleActionDragEnd,
     handleSubmit,
     handleClosingConfirm,
@@ -131,6 +132,7 @@ export function MeetingForm(props: MeetingFormProps) {
           onUpdate={updateAction}
           onRemove={removeAction}
           onTagsChange={updateActionTags}
+          onPriorityChange={updateActionPriority}
           onDragEnd={handleActionDragEnd}
         />
 
