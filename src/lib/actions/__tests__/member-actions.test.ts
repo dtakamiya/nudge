@@ -41,8 +41,8 @@ describe("createMember", () => {
     const result = await createMember({ name: "" });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(typeof result.error).toBe("string");
-      expect(result.error.length).toBeGreaterThan(0);
+      expect(result.error).toBeTruthy();
+      expect(/[ぁ-ん一-龯]/.test(result.error)).toBe(true);
     }
   });
 });
@@ -205,7 +205,7 @@ describe("updateMember", () => {
     const result = await updateMember("non-existent-id", { name: "New" });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error).toBeTruthy();
+      expect(result.error).toBe("対象のデータが見つかりません");
     }
   });
 });
@@ -229,7 +229,7 @@ describe("deleteMember", () => {
     const result = await deleteMember("non-existent-id");
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error).toBeTruthy();
+      expect(result.error).toBe("対象のデータが見つかりません");
     }
   });
 });
