@@ -117,7 +117,7 @@ export function DashboardClient({
         </div>
       )}
 
-      {settings.memberList && <MemberList members={members} />}
+      {!isFirstTime && settings.memberList && <MemberList members={members} />}
     </div>
   );
 }
