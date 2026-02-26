@@ -11,7 +11,7 @@ test.describe("アクセシビリティ（axe-core WCAG AA）", () => {
 
   test("メンバー一覧にアクセシビリティ違反がない", async ({ page }) => {
     await page.goto("/members");
-    await page.waitForLoadState("networkidle");
+    await expect(page.getByRole("heading", { name: "メンバー一覧" })).toBeVisible();
     await runAxe(page, "メンバー一覧");
   });
 
