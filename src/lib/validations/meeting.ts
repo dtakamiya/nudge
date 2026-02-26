@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { actionItemPriority } from "./action-item";
+
 const topicCategory = z.enum(["WORK_PROGRESS", "CAREER", "ISSUES", "FEEDBACK", "OTHER"]);
 
 const topicInputSchema = z.object({
@@ -16,7 +18,7 @@ const actionItemInputSchema = z.object({
   description: z.string().default(""),
   sortOrder: z.number().int().min(0).default(0),
   dueDate: z.string().optional(),
-  priority: z.enum(["HIGH", "MEDIUM", "LOW"]).optional().default("MEDIUM"),
+  priority: actionItemPriority.optional().default("MEDIUM"),
   tagIds: z.array(z.string().uuid()).default([]),
   newTagNames: z.array(z.string().min(1).max(30)).default([]),
 });
@@ -49,7 +51,7 @@ const updateActionItemInputSchema = z.object({
   description: z.string().default(""),
   sortOrder: z.number().int().min(0).default(0),
   dueDate: z.string().optional(),
-  priority: z.enum(["HIGH", "MEDIUM", "LOW"]).optional().default("MEDIUM"),
+  priority: actionItemPriority.optional().default("MEDIUM"),
   tagIds: z.array(z.string().uuid()).default([]),
   newTagNames: z.array(z.string().min(1).max(30)).default([]),
 });
