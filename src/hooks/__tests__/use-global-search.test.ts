@@ -226,4 +226,129 @@ describe("useGlobalSearch", () => {
       vi.useRealTimers();
     });
   });
+
+  describe("handleKeyDown", () => {
+    const setupWithResults = async () => {
+      vi.useFakeTimers();
+      mockSearchAll.mockResolvedValue({ success: true, data: mockResults });
+      const { result } = renderHook(() => useGlobalSearch());
+
+      act(() => {
+        result.current.handleQueryChange("田中");
+      });
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+      await waitFor(() => {
+        expect(result.current.isOpen).toBe(true);
+      });
+      return result;
+    };
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("Escapeキーでドロップダウンを閉じてクエリをクリアする", async () => {
+      const result = await setupWithResults();
+
+      act(() => {
+        result.current.handleKeyDown({
+          key: "Escape",
+          preventDefault: vi.fn(),
+        } as unknown as React.KeyboardEvent<HTMLInputElement>);
+      });
+
+      expect(result.current.isOpen).toBe(false);
+      expect(result.current.query).toBe("");
+    });
+
+    it("ArrowDownで次のアイテムにフォーカスが移る", async () => {
+      const result = await setupWithResults();
+      expect(result.current.activeIndex).toBe(-1);
+
+      act(() => {
+        result.current.handleKeyDown({
+          key: "ArrowDown",
+          preventDefault: vi.fn(),
+        } as unknown as React.KeyboardEvent<HTMLInputElement>);
+      });
+
+      expect(result.current.activeIndex).toBe(0);
+    });
+
+    it("ArrowDownが最後のアイテムで最初に戻る（循環）", async () => {
+      const result = await setupWithResults();
+      // allItemsは4件（member + topic + action + tag）
+      // 4回ArrowDownで最後（index=3）に
+      for (let i = 0; i < 4; i++) {
+        act(() => {
+          result.current.handleKeyDown({
+            key: "ArrowDown",
+            preventDefault: vi.fn(),
+          } as unknown as React.KeyboardEvent<HTMLInputElement>);
+        });
+      }
+      expect(result.current.activeIndex).toBe(3);
+
+      // もう一回ArrowDownで最初（index=0）に戻る
+      act(() => {
+        result.current.handleKeyDown({
+          key: "ArrowDown",
+          preventDefault: vi.fn(),
+        } as unknown as React.KeyboardEvent<HTMLInputElement>);
+      });
+      expect(result.current.activeIndex).toBe(0);
+    });
+
+    it("ArrowUpで前のアイテムにフォーカスが移る", async () => {
+      const result = await setupWithResults();
+
+      // まずArrowDownで index=1 に移動
+      act(() => {
+        result.current.handleKeyDown({
+          key: "ArrowDown",
+          preventDefault: vi.fn(),
+        } as unknown as React.KeyboardEvent<HTMLInputElement>);
+      });
+      act(() => {
+        result.current.handleKeyDown({
+          key: "ArrowDown",
+          preventDefault: vi.fn(),
+        } as unknown as React.KeyboardEvent<HTMLInputElement>);
+      });
+      expect(result.current.activeIndex).toBe(1);
+
+      act(() => {
+        result.current.handleKeyDown({
+          key: "ArrowUp",
+          preventDefault: vi.fn(),
+        } as unknown as React.KeyboardEvent<HTMLInputElement>);
+      });
+
+      expect(result.current.activeIndex).toBe(0);
+    });
+
+    it("Enterキーでフォーカス中アイテムにナビゲートする", async () => {
+      const result = await setupWithResults();
+
+      // ArrowDownで最初のアイテム（member）にフォーカス
+      act(() => {
+        result.current.handleKeyDown({
+          key: "ArrowDown",
+          preventDefault: vi.fn(),
+        } as unknown as React.KeyboardEvent<HTMLInputElement>);
+      });
+
+      act(() => {
+        result.current.handleKeyDown({
+          key: "Enter",
+          preventDefault: vi.fn(),
+        } as unknown as React.KeyboardEvent<HTMLInputElement>);
+      });
+
+      expect(mockPush).toHaveBeenCalledWith("/members/m1");
+      expect(result.current.isOpen).toBe(false);
+    });
+  });
 });
