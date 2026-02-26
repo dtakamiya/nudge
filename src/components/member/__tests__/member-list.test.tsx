@@ -197,6 +197,20 @@ describe("MemberList", () => {
     });
   });
 
+  it("1on1ボタンが size=sm である（タップターゲット確保）", () => {
+    render(<MemberList members={[baseMember]} />);
+    const linkEl = screen.getAllByRole("link").find((el) => el.textContent?.trim() === "1on1");
+    expect(linkEl).toBeDefined();
+    const buttonEl = linkEl?.querySelector("[data-size]");
+    expect(buttonEl?.getAttribute("data-size")).toBe("sm");
+  });
+
+  it("テーブルラッパーに overflow-x-auto が付与されている（横スクロール対応）", () => {
+    const { container } = render(<MemberList members={[baseMember]} />);
+    const wrapper = container.firstElementChild;
+    expect(wrapper?.className).toContain("overflow-x-auto");
+  });
+
   describe("スナップショット", () => {
     beforeEach(() => {
       vi.useFakeTimers();

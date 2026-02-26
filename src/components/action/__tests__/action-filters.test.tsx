@@ -150,3 +150,14 @@ describe("ActionFilters", () => {
   // hasPointerCapture 非対応のため実行不可。
   // フィルターロジックは buildFilterUrl のユニットテストで検証している。
 });
+
+describe("ActionFilters - モバイルレスポンシブ", () => {
+  it("フィルターのSelectTriggerがモバイル対応クラスを持つ（固定幅なし）", () => {
+    const { container } = render(<ActionFilters members={mockMembers} />);
+    const triggers = container.querySelectorAll('[data-slot="select-trigger"]');
+    expect(triggers.length).toBeGreaterThan(0);
+    triggers.forEach((trigger) => {
+      expect(trigger.className).toContain("flex-1");
+    });
+  });
+});

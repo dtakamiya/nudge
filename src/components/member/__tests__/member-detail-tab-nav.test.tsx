@@ -68,4 +68,10 @@ describe("MemberDetailTabNav", () => {
     const historyLink = screen.getByRole("link", { name: "1on1履歴" });
     expect(historyLink.className).toContain("bg-");
   });
+
+  it("タブリンクに py-3 クラスが付与されている（タップターゲット44px確保）", () => {
+    render(<MemberDetailTabNav memberId={memberId} currentTab="timeline" />);
+    const timelineLink = screen.getByRole("link", { name: "タイムライン" });
+    expect(timelineLink.className).toContain("py-3");
+  });
 });

@@ -118,7 +118,7 @@ export function MemberList({ members }: Props) {
   });
 
   return (
-    <div className="animate-fade-in-up rounded-xl border bg-card overflow-hidden">
+    <div className="animate-fade-in-up rounded-xl border bg-card overflow-hidden overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
@@ -265,7 +265,7 @@ export function MemberList({ members }: Props) {
                     href={`/members/${member.id}/meetings/new`}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <Button size="xs" variant="outline">
+                    <Button size="sm" variant="outline">
                       1on1
                     </Button>
                   </Link>

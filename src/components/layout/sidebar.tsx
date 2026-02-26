@@ -64,7 +64,7 @@ function NavLinks({
             key={item.href}
             href={item.href}
             onClick={onNavigate}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors duration-150 ${
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm transition-colors duration-150 ${
               isActive
                 ? "bg-primary/10 text-primary font-medium"
                 : "text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -105,7 +105,7 @@ function MemberQuickList({
             key={member.id}
             href={`/members/${member.id}`}
             onClick={onNavigate}
-            className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors duration-150"
+            className="flex items-center gap-2.5 px-3 py-3 rounded-lg text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors duration-150"
           >
             <AvatarInitial name={member.name} size="sm" />
             <span className="truncate">{member.name}</span>
