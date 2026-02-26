@@ -25,4 +25,9 @@ export type DateFilterType = "all" | "overdue" | "this-week" | "this-month" | "n
 /**
  * ソート種別
  */
-export type SortByType = "dueDate" | "createdAt" | "updatedAt" | "memberName";
+export type SortByType = "dueDate" | "createdAt" | "updatedAt" | "memberName" | "priority";
+
+/**
+ * 優先度種別
+ */
+export type PriorityType = "HIGH" | "MEDIUM" | "LOW";

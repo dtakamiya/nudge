@@ -2,6 +2,7 @@ export type {
   CarryoverAction,
   DateFilterType,
   LastMeetingPendingActionsResult,
+  PriorityType,
   SortByType,
 } from "./action-item";
 export type {
