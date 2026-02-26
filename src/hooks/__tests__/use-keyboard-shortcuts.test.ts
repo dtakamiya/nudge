@@ -2,7 +2,11 @@ import { fireEvent } from "@testing-library/dom";
 import { renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { KEYBOARD_SHORTCUTS, useKeyboardShortcuts } from "../use-keyboard-shortcuts";
+import {
+  getModifierKey,
+  KEYBOARD_SHORTCUTS,
+  useKeyboardShortcuts,
+} from "../use-keyboard-shortcuts";
 
 const defaultCallbacks = () => ({
   onNewMember: vi.fn(),
@@ -12,6 +16,39 @@ const defaultCallbacks = () => ({
 
 afterEach(() => {
   vi.clearAllMocks();
+  vi.restoreAllMocks();
+});
+
+describe("getModifierKey", () => {
+  it("Mac 環境では ⌘ を返す", () => {
+    vi.spyOn(window.navigator, "platform", "get").mockReturnValue("MacIntel");
+
+    expect(getModifierKey()).toBe("⌘");
+  });
+
+  it("iPhone 環境では ⌘ を返す", () => {
+    vi.spyOn(window.navigator, "platform", "get").mockReturnValue("iPhone");
+
+    expect(getModifierKey()).toBe("⌘");
+  });
+
+  it("iPad 環境では ⌘ を返す", () => {
+    vi.spyOn(window.navigator, "platform", "get").mockReturnValue("iPad");
+
+    expect(getModifierKey()).toBe("⌘");
+  });
+
+  it("Windows 環境では Ctrl を返す", () => {
+    vi.spyOn(window.navigator, "platform", "get").mockReturnValue("Win32");
+
+    expect(getModifierKey()).toBe("Ctrl");
+  });
+
+  it("Linux 環境では Ctrl を返す", () => {
+    vi.spyOn(window.navigator, "platform", "get").mockReturnValue("Linux x86_64");
+
+    expect(getModifierKey()).toBe("Ctrl");
+  });
 });
 
 describe("KEYBOARD_SHORTCUTS 定数", () => {

@@ -7,7 +7,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { KEYBOARD_SHORTCUTS, type ShortcutContext } from "@/hooks/use-keyboard-shortcuts";
+import {
+  getModifierKey,
+  KEYBOARD_SHORTCUTS,
+  type ShortcutContext,
+} from "@/hooks/use-keyboard-shortcuts";
 
 type Props = {
   readonly open: boolean;
@@ -32,6 +36,9 @@ function ShortcutRow({ keyLabel, description }: { keyLabel: string; description:
 }
 
 export function ShortcutHelpDialog({ open, onClose, context }: Props) {
+  const modifierKey = getModifierKey();
+  const formatKey = (key: string) => key.replace("⌘", modifierKey);
+
   const globalShortcuts = KEYBOARD_SHORTCUTS.filter((s) => s.context === "global");
   const recordingShortcuts = KEYBOARD_SHORTCUTS.filter((s) => s.context === "recording");
 
@@ -52,7 +59,7 @@ export function ShortcutHelpDialog({ open, onClose, context }: Props) {
             </p>
             <dl className="space-y-3">
               {globalShortcuts.map(({ key, description }) => (
-                <ShortcutRow key={key} keyLabel={key} description={description} />
+                <ShortcutRow key={key} keyLabel={formatKey(key)} description={description} />
               ))}
             </dl>
           </section>
@@ -68,7 +75,7 @@ export function ShortcutHelpDialog({ open, onClose, context }: Props) {
               </p>
               <dl className="space-y-3">
                 {recordingShortcuts.map(({ key, description }) => (
-                  <ShortcutRow key={key} keyLabel={key} description={description} />
+                  <ShortcutRow key={key} keyLabel={formatKey(key)} description={description} />
                 ))}
               </dl>
             </section>
