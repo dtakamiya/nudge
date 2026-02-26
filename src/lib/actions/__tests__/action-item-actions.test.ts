@@ -481,8 +481,12 @@ describe("getActionItems - sortBy: updatedAt", () => {
     });
 
     const all = await getActionItems();
-    const olderItem = all.items.find((i) => i.title === "古いタスク")!;
-    const newerItem = all.items.find((i) => i.title === "新しいタスク")!;
+    const olderItem = all.items.find((i) => i.title === "古いタスク");
+    const newerItem = all.items.find((i) => i.title === "新しいタスク");
+
+    if (!olderItem || !newerItem) {
+      throw new Error("Expected both items to exist in initial fetch");
+    }
 
     // Prisma で直接 updatedAt を設定して時刻差を確実に作る
     await prisma.actionItem.update({
@@ -495,6 +499,7 @@ describe("getActionItems - sortBy: updatedAt", () => {
     });
 
     const result = await getActionItems({ sortBy: "updatedAt" });
+    expect(result.items).toHaveLength(2);
     expect(result.items[0].title).toBe("新しいタスク");
     expect(result.items[1].title).toBe("古いタスク");
   });
