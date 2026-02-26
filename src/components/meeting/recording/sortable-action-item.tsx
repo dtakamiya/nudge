@@ -4,6 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 
+import type { ActionPriority } from "@/components/meeting/form";
 import { TagBadge } from "@/components/tag/tag-badge";
 import { TagInput } from "@/components/tag/tag-input";
 import { Button } from "@/components/ui/button";
@@ -23,8 +24,6 @@ export type TagData = {
   name: string;
   color?: string;
 };
-
-type ActionPriority = "HIGH" | "MEDIUM" | "LOW";
 
 type Props = {
   readonly id: string;

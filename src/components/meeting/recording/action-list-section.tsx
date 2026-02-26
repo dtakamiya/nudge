@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { screenReaderInstructions } from "@/lib/dnd-accessibility";
 
-import type { ActionFormData } from "../form/meeting-form.types";
+import type { ActionFormData, ActionPriority } from "../form/meeting-form.types";
 import type { TagData } from "./sortable-action-item";
 import { SortableActionItem } from "./sortable-action-item";
 
@@ -21,7 +21,7 @@ type Props = {
   onUpdate: (index: number, field: "title" | "description" | "dueDate", value: string) => void;
   onRemove: (index: number) => void;
   onTagsChange: (index: number, tags: TagData[]) => void;
-  onPriorityChange: (index: number, priority: "HIGH" | "MEDIUM" | "LOW") => void;
+  onPriorityChange: (index: number, priority: ActionPriority) => void;
   onDragEnd: (event: DragEndEvent) => void;
 };
 
