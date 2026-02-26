@@ -7,6 +7,7 @@ import { ShortcutHelpDialog } from "../shortcut-help-dialog";
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  vi.restoreAllMocks();
 });
 
 describe("ShortcutHelpDialog", () => {
@@ -66,6 +67,38 @@ describe("ShortcutHelpDialog", () => {
       render(<ShortcutHelpDialog open={true} onClose={() => {}} />);
 
       expect(screen.getByText("グローバル")).toBeDefined();
+    });
+  });
+
+  describe("OS 別修飾キー表記", () => {
+    it("Mac 環境では ⌘ K が表示される", () => {
+      vi.spyOn(window.navigator, "platform", "get").mockReturnValue("MacIntel");
+
+      render(<ShortcutHelpDialog open={true} onClose={() => {}} />);
+
+      const kbdElements = screen.getAllByRole("term");
+      const searchKbd = kbdElements.find((el) => el.textContent === "⌘ K");
+      expect(searchKbd).toBeDefined();
+    });
+
+    it("Windows 環境では Ctrl K が表示される", () => {
+      vi.spyOn(window.navigator, "platform", "get").mockReturnValue("Win32");
+
+      render(<ShortcutHelpDialog open={true} onClose={() => {}} />);
+
+      const kbdElements = screen.getAllByRole("term");
+      const searchKbd = kbdElements.find((el) => el.textContent === "Ctrl K");
+      expect(searchKbd).toBeDefined();
+    });
+
+    it("Linux 環境では Ctrl K が表示される", () => {
+      vi.spyOn(window.navigator, "platform", "get").mockReturnValue("Linux x86_64");
+
+      render(<ShortcutHelpDialog open={true} onClose={() => {}} />);
+
+      const kbdElements = screen.getAllByRole("term");
+      const searchKbd = kbdElements.find((el) => el.textContent === "Ctrl K");
+      expect(searchKbd).toBeDefined();
     });
   });
 

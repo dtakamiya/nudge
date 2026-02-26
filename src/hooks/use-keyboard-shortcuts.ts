@@ -22,6 +22,11 @@ export const KEYBOARD_SHORTCUTS: ReadonlyArray<ShortcutEntry> = [
   { key: "Esc", description: "ダイアログを閉じる", context: "global" },
 ];
 
+export function getModifierKey(): string {
+  if (typeof window === "undefined") return "⌘";
+  return /Mac|iPod|iPhone|iPad/.test(window.navigator.platform) ? "⌘" : "Ctrl";
+}
+
 type ShortcutCallbacks = {
   readonly onNewMember: () => void;
   readonly onNewMeeting: () => void;
