@@ -223,11 +223,7 @@ export function GlobalSearch() {
                       icon={<MessageSquare size={12} />}
                       primary={topic.title}
                       secondary={topic.memberName}
-                      context={
-                        topic.notes && topic.notes.toLowerCase().includes(query.toLowerCase())
-                          ? highlightText(extractSnippet(topic.notes, query), query)
-                          : undefined
-                      }
+                      context={buildContextSnippet(topic.notes, query)}
                       query={query}
                       isActive={activeIndex === results.members.length + i}
                       onClick={() =>
@@ -246,12 +242,7 @@ export function GlobalSearch() {
                       icon={<CheckSquare size={12} />}
                       primary={item.title}
                       secondary={item.memberName}
-                      context={
-                        item.description &&
-                        item.description.toLowerCase().includes(query.toLowerCase())
-                          ? highlightText(extractSnippet(item.description, query), query)
-                          : undefined
-                      }
+                      context={buildContextSnippet(item.description, query)}
                       query={query}
                       isActive={activeIndex === results.members.length + results.topics.length + i}
                       onClick={() =>
@@ -294,6 +285,16 @@ export function GlobalSearch() {
       )}
     </div>
   );
+}
+
+function buildContextSnippet(
+  text: string | null | undefined,
+  query: string,
+): React.ReactNode | undefined {
+  if (!text || !text.toLowerCase().includes(query.toLowerCase())) {
+    return undefined;
+  }
+  return highlightText(extractSnippet(text, query), query);
 }
 
 function SearchSection({ label, children }: { label: string; children: React.ReactNode }) {
