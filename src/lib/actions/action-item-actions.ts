@@ -10,7 +10,11 @@ import type {
   LastMeetingPendingActionsResult,
   SortByType,
 } from "@/lib/types";
-import type { ActionItemStatusType, UpdateActionItemInput } from "@/lib/validations/action-item";
+import type {
+  ActionItemPriorityType,
+  ActionItemStatusType,
+  UpdateActionItemInput,
+} from "@/lib/validations/action-item";
 import {
   bulkDeleteSchema,
   bulkUpdateStatusSchema,
@@ -20,8 +24,11 @@ import {
 
 import { type ActionResult, runAction } from "./types";
 
+const PRIORITY_ORDER: Record<string, number> = { HIGH: 0, MEDIUM: 1, LOW: 2 };
+
 type ActionItemFilters = {
   status?: ActionItemStatusType;
+  priority?: ActionItemPriorityType;
   memberId?: string;
   tagIds?: string[];
   keyword?: string;
@@ -67,6 +74,7 @@ function buildOrderBy(sortBy: SortByType): Prisma.ActionItemOrderByWithRelationI
 export async function getActionItems(filters: ActionItemFilters = {}) {
   const where: Prisma.ActionItemWhereInput = {};
   if (filters.status) where.status = filters.status;
+  if (filters.priority) where.priority = filters.priority;
   if (filters.memberId) where.memberId = filters.memberId;
   if (filters.tagIds && filters.tagIds.length > 0) {
     where.tags = { some: { tagId: { in: filters.tagIds } } };
@@ -81,10 +89,31 @@ export async function getActionItems(filters: ActionItemFilters = {}) {
     Object.assign(where, buildDateFilter(filters.dateFilter));
   }
 
-  const orderBy = buildOrderBy(filters.sortBy ?? "dueDate");
   const page = Math.max(1, filters.page ?? 1);
   const perPage = filters.perPage ?? 20;
   const skip = (page - 1) * perPage;
+
+  // priority ソートは SQLite が CASE 非対応のため in-memory で処理
+  if (filters.sortBy === "priority") {
+    const allItems = await prisma.actionItem.findMany({
+      where,
+      orderBy: [{ createdAt: "desc" }],
+      include: {
+        member: { select: { id: true, name: true } },
+        meeting: { select: { id: true, date: true } },
+        tags: { include: { tag: true } },
+      },
+    });
+    const total = allItems.length;
+    const sorted = [...allItems].sort(
+      (a, b) => (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1),
+    );
+    const items = sorted.slice(skip, skip + perPage);
+    const totalPages = Math.ceil(total / perPage);
+    return { items, total, page, perPage, totalPages };
+  }
+
+  const orderBy = buildOrderBy(filters.sortBy ?? "dueDate");
 
   const [items, total] = await Promise.all([
     prisma.actionItem.findMany({
@@ -145,6 +174,7 @@ export async function updateActionItem(
         title: validated.title,
         description: validated.description,
         dueDate,
+        priority: validated.priority,
       },
     });
     revalidatePath("/", "layout");
@@ -203,6 +233,7 @@ export async function createActionItemForMeeting(
         description: validated.description,
         sortOrder: existingCount,
         dueDate,
+        priority: validated.priority,
       },
     });
     revalidatePath("/", "layout");
