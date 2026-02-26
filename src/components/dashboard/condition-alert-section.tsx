@@ -11,8 +11,8 @@ function AlertBadge({ alert }: { readonly alert: ConditionAlert }) {
   const trendLabel = alert.trend === "low" ? "低値" : "低下傾向";
   const trendClass =
     alert.trend === "low"
-      ? "bg-destructive/10 text-destructive border-destructive/30"
-      : "bg-warning/10 text-warning border-warning/30";
+      ? "bg-destructive/10 text-foreground border-destructive/30"
+      : "bg-warning/10 text-foreground border-warning/30";
 
   return (
     <span
@@ -20,7 +20,7 @@ function AlertBadge({ alert }: { readonly alert: ConditionAlert }) {
     >
       <TrendingDown className="h-3 w-3" aria-hidden="true" />
       {alert.label}
-      <span className="text-[10px] opacity-75">({trendLabel})</span>
+      <span className="text-[10px]">({trendLabel})</span>
     </span>
   );
 }

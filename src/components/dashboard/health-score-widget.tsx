@@ -101,7 +101,7 @@ function CountBadge({ count, label, colorClass, bgClass, icon }: CountBadgeProps
     <div className={`flex flex-col items-center px-3 py-2 rounded-lg ${bgClass}`}>
       <span aria-hidden="true">{icon}</span>
       <span className={`text-lg font-bold ${colorClass}`}>{count}</span>
-      <span className={`text-xs ${colorClass} opacity-80`}>{label}</span>
+      <span className={`text-xs ${colorClass}`}>{label}</span>
     </div>
   );
 }
@@ -158,7 +158,12 @@ export function HealthScoreWidget({ data }: Props) {
       </div>
 
       {memberStatuses.length > 0 && (
-        <div className="mt-2 max-h-48 overflow-y-auto">
+        <div
+          className="mt-2 max-h-48 overflow-y-auto"
+          tabIndex={0}
+          role="region"
+          aria-label="メンバーの健全性状態一覧"
+        >
           {memberStatuses.map((member) => (
             <MemberRow key={member.id} member={member} />
           ))}

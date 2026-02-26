@@ -66,14 +66,14 @@ function NavLinks({
             onClick={onNavigate}
             className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm transition-colors duration-150 ${
               isActive
-                ? "bg-primary/10 text-primary font-medium"
+                ? "bg-primary/10 text-foreground font-medium"
                 : "text-muted-foreground hover:bg-accent hover:text-foreground"
             }`}
           >
             <item.icon className="w-4 h-4" />
             <span className="flex-1">{item.label}</span>
             {badge && (
-              <span className="ml-auto inline-flex items-center justify-center rounded-full bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">
+              <span className="ml-auto inline-flex items-center justify-center rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-primary-foreground">
                 {actionCount}
               </span>
             )}
