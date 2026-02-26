@@ -11,6 +11,7 @@ import {
   type WidgetKey,
   type WidgetSettings,
 } from "@/hooks/use-dashboard-widget-settings";
+import { cn } from "@/lib/utils";
 
 type Props = {
   readonly settings: WidgetSettings;
@@ -39,7 +40,10 @@ export function DashboardSettingsPopover({ settings, visibleCount, onToggle }: P
             return (
               <label
                 key={key}
-                className={`flex items-center gap-2 ${isLastVisible ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                className={cn(
+                  "flex items-center gap-2",
+                  isLastVisible ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
+                )}
               >
                 <Checkbox
                   checked={settings[key]}
