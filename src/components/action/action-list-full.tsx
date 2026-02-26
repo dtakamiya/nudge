@@ -207,9 +207,8 @@ export function ActionListFull({
                   <Select
                     value={editForm.priority}
                     onValueChange={(val) => setEditForm({ ...editForm, priority: val })}
-                    aria-label="優先度"
                   >
-                    <SelectTrigger className="w-24">
+                    <SelectTrigger className="w-24" aria-label="優先度">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
