@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { highlightText } from "../highlight";
+import { extractSnippet, highlightText } from "../highlight";
 
 describe("highlightText", () => {
   describe("基本動作", () => {
@@ -64,5 +64,49 @@ describe("highlightText", () => {
       const result = highlightText("", "テスト");
       expect(result).toBe("");
     });
+  });
+});
+
+describe("extractSnippet", () => {
+  it("クエリにマッチした箇所の前後コンテキストを返す", () => {
+    const text = "これはサンプルテキストです。スキルアップに向けた取り組みを話し合います。";
+    const result = extractSnippet(text, "スキルアップ", 10);
+    expect(result).toContain("スキルアップ");
+  });
+
+  it("マッチがない場合は先頭から contextLength*2 文字を返す", () => {
+    const text = "abcdefghij1234567890";
+    const result = extractSnippet(text, "xyz", 5);
+    expect(result).toBe("abcdefghij");
+  });
+
+  it("テキスト先頭でマッチした場合は先頭に ... を付けない", () => {
+    const text = "スキルアップの方法について";
+    const result = extractSnippet(text, "スキルアップ", 5);
+    expect(result.startsWith("...")).toBe(false);
+  });
+
+  it("テキスト末尾でマッチした場合は末尾に ... を付けない", () => {
+    const text = "取り組みの結果としてスキルアップ";
+    const result = extractSnippet(text, "スキルアップ", 5);
+    expect(result.endsWith("...")).toBe(false);
+  });
+
+  it("テキスト中間でマッチした場合は両端に ... を付ける", () => {
+    const text = "AAAAAAAAAAAAAAAAAAAAABBBCCCCCCCCCCCCCCCCCCCCC";
+    const result = extractSnippet(text, "BBB", 5);
+    expect(result.startsWith("...")).toBe(true);
+    expect(result.endsWith("...")).toBe(true);
+  });
+
+  it("大文字小文字を区別せずマッチする", () => {
+    const text = "hello WORLD test";
+    const result = extractSnippet(text, "world", 3);
+    expect(result).toContain("WORLD");
+  });
+
+  it("テキストが空の場合は空文字を返す", () => {
+    const result = extractSnippet("", "test");
+    expect(result).toBe("");
   });
 });
