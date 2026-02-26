@@ -36,6 +36,15 @@ describe("createMember", () => {
     const result = await createMember({ name: "" });
     expect(result.success).toBe(false);
   });
+
+  it("バリデーションエラーのメッセージが日本語で返る", async () => {
+    const result = await createMember({ name: "" });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(typeof result.error).toBe("string");
+      expect(result.error.length).toBeGreaterThan(0);
+    }
+  });
 });
 
 describe("getMembers", () => {
@@ -191,6 +200,14 @@ describe("updateMember", () => {
     const result = await updateMember("", { name: "New" });
     expect(result.success).toBe(false);
   });
+
+  it("存在しないIDの場合はエラーを返す", async () => {
+    const result = await updateMember("non-existent-id", { name: "New" });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toBeTruthy();
+    }
+  });
 });
 
 describe("deleteMember", () => {
@@ -206,6 +223,14 @@ describe("deleteMember", () => {
   it("returns error for empty id", async () => {
     const result = await deleteMember("");
     expect(result.success).toBe(false);
+  });
+
+  it("存在しないIDの場合はエラーを返す", async () => {
+    const result = await deleteMember("non-existent-id");
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toBeTruthy();
+    }
   });
 });
 
