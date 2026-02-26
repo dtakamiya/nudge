@@ -94,16 +94,16 @@ describe("buildFilterUrl", () => {
 });
 
 describe("ActionFilters", () => {
-  it("5つのフィルターセレクトが表示される（グループ化・ステータス・メンバー・期限・並び順）", () => {
+  it("6つのフィルターセレクトが表示される（グループ化・ステータス・優先度・メンバー・期限・並び順）", () => {
     render(<ActionFilters members={mockMembers} />);
     const triggers = screen.getAllByRole("combobox");
-    expect(triggers.length).toBe(5);
+    expect(triggers.length).toBe(6);
   });
 
   it("空のメンバーリストでもレンダリングされる", () => {
     render(<ActionFilters members={[]} />);
     const triggers = screen.getAllByRole("combobox");
-    expect(triggers.length).toBe(5);
+    expect(triggers.length).toBe(6);
   });
 
   it("キーワード検索のインプットが表示される", () => {
@@ -149,6 +149,16 @@ describe("ActionFilters", () => {
   // Note: Radix UI Select の onValueChange テストは jsdom 環境では
   // hasPointerCapture 非対応のため実行不可。
   // フィルターロジックは buildFilterUrl のユニットテストで検証している。
+
+  it("優先度フィルタの Select が表示される", () => {
+    mockSearchParamsGet.mockReturnValue(null);
+    render(<ActionFilters members={mockMembers} />);
+    expect(screen.getByText("すべての優先度")).toBeDefined();
+  });
+
+  it("ソートの選択肢に優先度順が含まれる", () => {
+    expect(buildFilterUrl("", "sort", "priority")).toBe("/actions?sort=priority");
+  });
 });
 
 describe("ActionFilters - モバイルレスポンシブ", () => {
