@@ -70,17 +70,15 @@ export function useDashboardWidgetSettings() {
 
   const visibleCount = WIDGET_KEYS.filter((key) => settings[key]).length;
 
-  const toggle = useCallback(
-    (key: WidgetKey) => {
-      if (settings[key] && visibleCount === 1) return;
-      setSettings((prev) => {
-        const next = { ...prev, [key]: !prev[key] };
-        saveSettings(next);
-        return next;
-      });
-    },
-    [settings, visibleCount],
-  );
+  const toggle = useCallback((key: WidgetKey) => {
+    setSettings((prev) => {
+      const currentVisibleCount = WIDGET_KEYS.filter((k) => prev[k]).length;
+      if (prev[key] && currentVisibleCount === 1) return prev;
+      const next = { ...prev, [key]: !prev[key] };
+      saveSettings(next);
+      return next;
+    });
+  }, []);
 
   return { settings, toggle, visibleCount };
 }

@@ -6,6 +6,7 @@ import {
   useDashboardWidgetSettings,
   WIDGET_KEYS,
   WIDGET_LABELS,
+  type WidgetSettings,
 } from "../use-dashboard-widget-settings";
 
 const STORAGE_KEY = "nudge-dashboard-widgets";
@@ -61,11 +62,8 @@ describe("useDashboardWidgetSettings", () => {
 
   it("最後の1件は toggle できない（最低1件保証）", () => {
     // 全部OFFにして最後の1件だけ残す
-    const oneVisible = { ...DEFAULT_WIDGET_SETTINGS };
-    WIDGET_KEYS.forEach((k) => {
-      oneVisible[k] = false;
-    });
-    oneVisible.summary = true;
+    const allHidden = Object.fromEntries(WIDGET_KEYS.map((k) => [k, false])) as WidgetSettings;
+    const oneVisible: WidgetSettings = { ...allHidden, summary: true };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(oneVisible));
 
     const { result } = renderHook(() => useDashboardWidgetSettings());
