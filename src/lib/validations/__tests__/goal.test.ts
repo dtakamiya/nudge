@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { createGoalSchema, goalStatus, updateGoalProgressSchema, updateGoalSchema } from "../goal";
+import {
+  createGoalSchema,
+  goalProgressMode,
+  goalStatus,
+  updateGoalProgressSchema,
+  updateGoalSchema,
+} from "../goal";
 
 describe("goalStatus", () => {
   it("有効なステータスを受け付ける", () => {
@@ -78,6 +84,28 @@ describe("updateGoalSchema", () => {
   it("空オブジェクトを受け付ける", () => {
     const result = updateGoalSchema.safeParse({});
     expect(result.success).toBe(true);
+  });
+});
+
+describe("goalProgressMode", () => {
+  it("有効なモードを受け付ける", () => {
+    for (const mode of ["MANUAL", "AUTO"]) {
+      const result = createGoalSchema.safeParse({ title: "目標", progressMode: mode });
+      expect(result.success).toBe(true);
+    }
+  });
+
+  it("無効なモードを拒否する", () => {
+    const result = createGoalSchema.safeParse({ title: "目標", progressMode: "INVALID" });
+    expect(result.success).toBe(false);
+  });
+
+  it("省略時はデフォルトMANUAL", () => {
+    const result = createGoalSchema.safeParse({ title: "目標" });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.progressMode).toBe("MANUAL");
+    }
   });
 });
 

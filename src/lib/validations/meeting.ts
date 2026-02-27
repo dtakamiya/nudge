@@ -19,6 +19,7 @@ const actionItemInputSchema = z.object({
   sortOrder: z.number().int().min(0).default(0),
   dueDate: z.string().optional(),
   priority: actionItemPriority.optional().default("MEDIUM"),
+  goalId: z.string().uuid().nullable().optional(),
   tagIds: z.array(z.string().uuid()).default([]),
   newTagNames: z.array(z.string().min(1).max(30)).default([]),
 });
@@ -52,6 +53,7 @@ const updateActionItemInputSchema = z.object({
   sortOrder: z.number().int().min(0).default(0),
   dueDate: z.string().optional(),
   priority: actionItemPriority.optional().default("MEDIUM"),
+  goalId: z.string().uuid().nullable().optional(),
   tagIds: z.array(z.string().uuid()).default([]),
   newTagNames: z.array(z.string().min(1).max(30)).default([]),
 });

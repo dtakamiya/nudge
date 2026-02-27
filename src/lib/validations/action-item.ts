@@ -13,6 +13,7 @@ export const updateActionItemSchema = z.object({
   description: z.string().default(""),
   dueDate: z.string().optional(),
   priority: actionItemPriority.optional().default("MEDIUM"),
+  goalId: z.string().uuid("無効な目標IDです").nullable().optional(),
 });
 
 export const bulkUpdateStatusSchema = z.object({
