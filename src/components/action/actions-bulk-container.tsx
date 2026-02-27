@@ -4,8 +4,10 @@ import { ActionListFull } from "@/components/action/action-list-full";
 import { ActionListGrouped } from "@/components/action/action-list-grouped";
 import { ActionPagination } from "@/components/action/action-pagination";
 import { BulkActionBar } from "@/components/action/bulk-action-bar";
+import { Badge } from "@/components/ui/badge";
 import { useBulkSelection } from "@/hooks/use-bulk-selection";
 import type { GroupByType } from "@/lib/group-actions";
+import { cn } from "@/lib/utils";
 
 type TagData = {
   id: string;
@@ -45,6 +47,7 @@ type Props = {
   searchParams: SearchParams;
   hasMembers: boolean;
   hasFilter: boolean;
+  total: number;
 };
 
 export function ActionsBulkContainer({
@@ -57,11 +60,20 @@ export function ActionsBulkContainer({
   searchParams,
   hasMembers,
   hasFilter,
+  total,
 }: Props) {
   const { selectedIds, toggleItem, clearAll } = useBulkSelection();
 
   return (
     <>
+      <div className="mb-4">
+        <Badge
+          variant={hasFilter ? "secondary" : "outline"}
+          className={cn("text-sm", !hasFilter && "text-muted-foreground")}
+        >
+          {total} 件
+        </Badge>
+      </div>
       {isGrouped ? (
         <ActionListGrouped
           actionItems={actionItems}

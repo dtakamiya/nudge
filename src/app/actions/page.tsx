@@ -4,7 +4,6 @@ import { ActionFilters } from "@/components/action/action-filters";
 import { ActionListSkeleton } from "@/components/action/action-list-skeleton";
 import { ActionsBulkContainer } from "@/components/action/actions-bulk-container";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
-import { Badge } from "@/components/ui/badge";
 import { FilterResultAnnouncer } from "@/components/ui/filter-result-announcer";
 import { getActionItems } from "@/lib/actions/action-item-actions";
 import { getMembers } from "@/lib/actions/member-actions";
@@ -105,17 +104,8 @@ export default async function ActionsPage({ searchParams }: Props) {
         itemLabel="アクション"
         emptyMessage="該当するアクションが見つかりませんでした"
       />
-      <div className="flex items-center gap-3 mb-6">
+      <div className="mb-6">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">アクション一覧</h1>
-        {hasFilter ? (
-          <Badge variant="secondary" className="text-sm">
-            {total} 件
-          </Badge>
-        ) : (
-          <Badge variant="outline" className="text-sm text-muted-foreground">
-            {total} 件
-          </Badge>
-        )}
       </div>
       <Suspense>
         <ActionFilters members={memberList} tags={tagList} />
@@ -131,6 +121,7 @@ export default async function ActionsPage({ searchParams }: Props) {
           searchParams={params}
           hasMembers={members.length > 0}
           hasFilter={hasFilter}
+          total={total}
         />
       </Suspense>
     </div>
