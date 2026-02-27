@@ -1,7 +1,10 @@
 "use client";
 
+import { type ReactNode } from "react";
+
 import { MemberList } from "@/components/member/member-list";
-import { useDashboardWidgetSettings } from "@/hooks/use-dashboard-widget-settings";
+import { useDashboardWidgetOrder } from "@/hooks/use-dashboard-widget-order";
+import { useDashboardWidgetSettings, type WidgetKey } from "@/hooks/use-dashboard-widget-settings";
 import type { HealthScoreData } from "@/lib/actions/dashboard-actions";
 import type { getMembers } from "@/lib/actions/member-actions";
 import type {
@@ -52,7 +55,43 @@ export function DashboardClient({
   conditionAlertMembers,
 }: Props) {
   const { settings, toggle, visibleCount } = useDashboardWidgetSettings();
+  const { order, reorder } = useDashboardWidgetOrder();
   const isFirstTime = members.length === 0;
+
+  const widgetRenderers: Record<WidgetKey, () => ReactNode> = {
+    summary: () => <DashboardSummaryWidget summary={summary} />,
+    healthScore: () => (
+      <div className="mb-8">
+        <HealthScoreWidget data={healthScore} />
+      </div>
+    ),
+    recentActivity: () => (
+      <div className="rounded-xl border bg-card p-5 mb-8">
+        <h2 className="text-base font-semibold text-foreground mb-4">最近のアクティビティ</h2>
+        <RecentActivityFeed activities={recentActivity} />
+      </div>
+    ),
+    upcomingActions: () => (
+      <div className="rounded-xl border bg-card p-5 mb-8">
+        <h2 className="text-base font-semibold text-foreground mb-4">今週のタスク</h2>
+        <UpcomingActionsSection today={upcomingActions.today} thisWeek={upcomingActions.thisWeek} />
+      </div>
+    ),
+    scheduledMeetings: () => (
+      <div className="rounded-xl border bg-card p-5 mb-8">
+        <h2 className="text-base font-semibold text-foreground mb-4">今週の1on1予定</h2>
+        <ScheduledMeetingsSection meetings={scheduledMeetings} />
+      </div>
+    ),
+    recommendedMeetings: () =>
+      recommendedMeetings.length > 0 ? (
+        <div className="rounded-xl border bg-card p-5 mb-8">
+          <h2 className="text-base font-semibold text-foreground mb-4">1on1すべきメンバー</h2>
+          <RecommendedMeetingsSection members={recommendedMeetings} />
+        </div>
+      ) : null,
+    memberList: () => <MemberList members={members} />,
+  };
 
   return (
     <div>
@@ -62,7 +101,9 @@ export function DashboardClient({
           <DashboardSettingsPopover
             settings={settings}
             visibleCount={visibleCount}
+            order={order}
             onToggle={toggle}
+            onReorder={reorder}
           />
         )}
       </div>
@@ -74,50 +115,14 @@ export function DashboardClient({
       {isFirstTime ? (
         <OnboardingCard />
       ) : (
-        settings.summary && <DashboardSummaryWidget summary={summary} />
-      )}
-
-      {!isFirstTime && settings.healthScore && (
-        <div className="mb-8">
-          <HealthScoreWidget data={healthScore} />
-        </div>
-      )}
-
-      {!isFirstTime && (settings.recentActivity || settings.upcomingActions) && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {settings.recentActivity && (
-            <div className="lg:col-span-2 rounded-xl border bg-card p-5">
-              <h2 className="text-base font-semibold text-foreground mb-4">最近のアクティビティ</h2>
-              <RecentActivityFeed activities={recentActivity} />
+        order
+          .filter((key) => settings[key])
+          .map((key) => (
+            <div key={key} data-testid={`widget-${key}`}>
+              {widgetRenderers[key]()}
             </div>
-          )}
-          {settings.upcomingActions && (
-            <div className="rounded-xl border bg-card p-5">
-              <h2 className="text-base font-semibold text-foreground mb-4">今週のタスク</h2>
-              <UpcomingActionsSection
-                today={upcomingActions.today}
-                thisWeek={upcomingActions.thisWeek}
-              />
-            </div>
-          )}
-        </div>
+          ))
       )}
-
-      {!isFirstTime && settings.scheduledMeetings && (
-        <div className="rounded-xl border bg-card p-5 mb-8">
-          <h2 className="text-base font-semibold text-foreground mb-4">今週の1on1予定</h2>
-          <ScheduledMeetingsSection meetings={scheduledMeetings} />
-        </div>
-      )}
-
-      {!isFirstTime && settings.recommendedMeetings && recommendedMeetings.length > 0 && (
-        <div className="rounded-xl border bg-card p-5 mb-8">
-          <h2 className="text-base font-semibold text-foreground mb-4">1on1すべきメンバー</h2>
-          <RecommendedMeetingsSection members={recommendedMeetings} />
-        </div>
-      )}
-
-      {!isFirstTime && settings.memberList && <MemberList members={members} />}
     </div>
   );
 }
