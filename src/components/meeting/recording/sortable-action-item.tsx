@@ -33,6 +33,8 @@ type Props = {
   readonly priority: ActionPriority;
   readonly index: number;
   readonly tags?: TagData[];
+  readonly goalId?: string | null;
+  readonly goals?: ReadonlyArray<{ id: string; title: string }>;
   readonly onTagsChange?: (index: number, tags: TagData[]) => void;
   readonly onUpdate: (
     index: number,
@@ -40,6 +42,7 @@ type Props = {
     value: string,
   ) => void;
   readonly onPriorityChange?: (index: number, priority: ActionPriority) => void;
+  readonly onGoalChange?: (index: number, goalId: string | null) => void;
   readonly onRemove: (index: number) => void;
 };
 
@@ -51,9 +54,12 @@ export function SortableActionItem({
   priority,
   index,
   tags = [],
+  goalId,
+  goals = [],
   onTagsChange,
   onUpdate,
   onPriorityChange,
+  onGoalChange,
   onRemove,
 }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -138,6 +144,27 @@ export function SortableActionItem({
           placeholder="詳細（任意）"
         />
       </div>
+      {goals.length > 0 && (
+        <div>
+          <Label htmlFor={`action-${itemId}-goal`}>ゴール</Label>
+          <Select
+            value={goalId ?? "none"}
+            onValueChange={(val) => onGoalChange?.(index, val === "none" ? null : val)}
+          >
+            <SelectTrigger id={`action-${itemId}-goal`} className="w-full">
+              <SelectValue placeholder="なし" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">なし</SelectItem>
+              {goals.map((g) => (
+                <SelectItem key={g.id} value={g.id}>
+                  {g.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
       <div>
         <Label>タグ</Label>
         {onTagsChange ? (

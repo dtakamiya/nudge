@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -60,6 +61,7 @@ function GoalForm({
   const [description, setDescription] = useState(goal?.description ?? "");
   const [progress, setProgress] = useState(goal?.progress ?? 0);
   const [status, setStatus] = useState<string>(goal?.status ?? "IN_PROGRESS");
+  const [progressMode, setProgressMode] = useState<string>(goal?.progressMode ?? "MANUAL");
   const [dueDate, setDueDate] = useState(toDateInputValue(goal?.dueDate));
 
   function handleSubmit(e: React.FormEvent) {
@@ -68,8 +70,9 @@ function GoalForm({
       const input = {
         title,
         description,
-        progress,
+        progress: progressMode === "AUTO" ? 0 : progress,
         status: status as "IN_PROGRESS" | "COMPLETED" | "CANCELLED",
+        progressMode: progressMode as "MANUAL" | "AUTO",
         dueDate: dueDate || undefined,
       };
 
@@ -122,16 +125,41 @@ function GoalForm({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>進捗: {progress}%</Label>
-          <Slider
-            value={[progress]}
-            onValueChange={(v) => setProgress(v[0])}
-            min={0}
-            max={100}
-            step={5}
-            aria-label="進捗"
-          />
+          <Label>進捗モード</Label>
+          <RadioGroup value={progressMode} onValueChange={setProgressMode} className="flex gap-4">
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="MANUAL" id="mode-manual" />
+              <Label htmlFor="mode-manual" className="font-normal">
+                手動
+              </Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="AUTO" id="mode-auto" />
+              <Label htmlFor="mode-auto" className="font-normal">
+                自動（アクション完了率）
+              </Label>
+            </div>
+          </RadioGroup>
+          {progressMode === "AUTO" && (
+            <p className="text-muted-foreground text-xs">
+              紐付けたアクションアイテムの完了率から進捗が自動計算されます
+            </p>
+          )}
         </div>
+
+        {progressMode === "MANUAL" && (
+          <div className="flex flex-col gap-2">
+            <Label>進捗: {progress}%</Label>
+            <Slider
+              value={[progress]}
+              onValueChange={(v) => setProgress(v[0])}
+              min={0}
+              max={100}
+              step={5}
+              aria-label="進捗"
+            />
+          </div>
+        )}
 
         <div className="flex flex-col gap-2">
           <Label htmlFor="goal-status">ステータス</Label>

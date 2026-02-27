@@ -102,6 +102,7 @@ export async function getActionItems(filters: ActionItemFilters = {}) {
         member: { select: { id: true, name: true } },
         meeting: { select: { id: true, date: true } },
         tags: { include: { tag: true } },
+        goal: { select: { id: true, title: true } },
       },
     });
     const total = allItems.length;
@@ -125,6 +126,7 @@ export async function getActionItems(filters: ActionItemFilters = {}) {
         member: { select: { id: true, name: true } },
         meeting: { select: { id: true, date: true } },
         tags: { include: { tag: true } },
+        goal: { select: { id: true, title: true } },
       },
     }),
     prisma.actionItem.count({ where }),
@@ -155,6 +157,13 @@ export async function updateActionItemStatus(
       where: { id },
       data: { status: validatedStatus, completedAt },
     });
+
+    // 紐付きゴールがAUTOモードなら進捗を再計算
+    if (result.goalId) {
+      const { calculateGoalProgress } = await import("./goal-actions");
+      await calculateGoalProgress(result.goalId);
+    }
+
     revalidatePath("/", "layout");
     return result;
   });
@@ -167,16 +176,38 @@ export async function updateActionItem(
   return runAction(async () => {
     const validated = updateActionItemSchema.parse(input);
     if (!id) throw new Error("アクションアイテムIDが指定されていません");
+
+    // goalId 変更前の状態を取得（旧ゴールの進捗再計算のため）
+    const oldItem = await prisma.actionItem.findUnique({
+      where: { id },
+      select: { goalId: true },
+    });
+
     const dueDate = validated.dueDate ? new Date(validated.dueDate) : null;
+    const data: Record<string, unknown> = {
+      title: validated.title,
+      description: validated.description,
+      dueDate,
+      priority: validated.priority,
+    };
+    if (validated.goalId !== undefined) {
+      data.goalId = validated.goalId;
+    }
+
     const result = await prisma.actionItem.update({
       where: { id },
-      data: {
-        title: validated.title,
-        description: validated.description,
-        dueDate,
-        priority: validated.priority,
-      },
+      data,
     });
+
+    // goalId が変更された場合、旧ゴールと新ゴールの進捗を再計算
+    const { calculateGoalProgress } = await import("./goal-actions");
+    if (oldItem?.goalId && oldItem.goalId !== result.goalId) {
+      await calculateGoalProgress(oldItem.goalId);
+    }
+    if (result.goalId && result.goalId !== oldItem?.goalId) {
+      await calculateGoalProgress(result.goalId);
+    }
+
     revalidatePath("/", "layout");
     return result;
   });
@@ -250,11 +281,26 @@ export async function bulkUpdateActionItemStatus(
       ids,
       status,
     });
+
+    // 更新前にゴールIDを取得
+    const items = await prisma.actionItem.findMany({
+      where: { id: { in: validatedIds }, goalId: { not: null } },
+      select: { goalId: true },
+    });
+    const goalIds = [...new Set(items.map((i) => i.goalId).filter(Boolean))] as string[];
+
     const completedAt = validatedStatus === "DONE" ? new Date() : null;
     const result = await prisma.actionItem.updateMany({
       where: { id: { in: validatedIds } },
       data: { status: validatedStatus, completedAt },
     });
+
+    // 関連ゴールの進捗を再計算
+    if (goalIds.length > 0) {
+      const { calculateGoalProgress } = await import("./goal-actions");
+      await Promise.all(goalIds.map((gid) => calculateGoalProgress(gid)));
+    }
+
     revalidatePath("/", "layout");
     return { count: result.count };
   });
@@ -329,6 +375,7 @@ export async function getMyTasks(filters: { memberId?: string } = {}) {
       member: { select: { id: true, name: true } },
       meeting: { select: { id: true, date: true } },
       tags: { include: { tag: true } },
+      goal: { select: { id: true, title: true } },
     },
   });
 

@@ -23,6 +23,7 @@ import {
   type TopicFormData,
 } from "@/components/meeting/form";
 import type { TagData } from "@/components/meeting/recording";
+import { getActiveGoals } from "@/lib/actions/goal-actions";
 import { createMeeting, updateMeeting } from "@/lib/actions/meeting-actions";
 import { createAnnouncements, sortableKeyboardCoordinates } from "@/lib/dnd-accessibility";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
@@ -72,10 +73,27 @@ export function useMeetingForm({
           sortOrder: a.sortOrder ?? index,
           dueDate: a.dueDate,
           priority: (a.priority ?? "MEDIUM") as ActionPriority,
+          goalId: a.goalId ?? null,
           tags: a.tags ? [...a.tags] : [],
         }))
       : [],
   );
+
+  const [goals, setGoals] = useState<{ id: string; title: string }[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchGoals() {
+      const activeGoals = await getActiveGoals(memberId);
+      if (!cancelled) {
+        setGoals(activeGoals.map((g) => ({ id: g.id, title: g.title })));
+      }
+    }
+    fetchGoals();
+    return () => {
+      cancelled = true;
+    };
+  }, [memberId]);
 
   const [mood, setMood] = useState<number | null>(initialData?.mood ?? null);
   const [conditionHealth, setConditionHealth] = useState<number | null>(
@@ -168,6 +186,10 @@ export function useMeetingForm({
     setActionItems((prev) => prev.map((a, i) => (i === index ? { ...a, priority } : a)));
   }
 
+  function updateActionGoal(index: number, goalId: string | null) {
+    setActionItems((prev) => prev.map((item, i) => (i === index ? { ...item, goalId } : item)));
+  }
+
   function handleActionDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -211,6 +233,7 @@ export function useMeetingForm({
             sortOrder: a.sortOrder ?? index,
             dueDate: a.dueDate || undefined,
             priority: a.priority,
+            goalId: a.goalId ?? null,
             ...buildTagParams(a.tags),
           })),
           deletedTopicIds,
@@ -249,6 +272,7 @@ export function useMeetingForm({
             sortOrder: a.sortOrder ?? index,
             dueDate: a.dueDate || undefined,
             priority: a.priority,
+            goalId: a.goalId ?? null,
             ...buildTagParams(a.tags),
           })),
         });
@@ -347,6 +371,8 @@ export function useMeetingForm({
     updateAction,
     updateActionTags,
     updateActionPriority,
+    updateActionGoal,
+    goals,
     handleActionDragEnd,
     handleSubmit,
     handleClosingConfirm,

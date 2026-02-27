@@ -105,3 +105,28 @@ describe("updateActionItemSchema - priority", () => {
     ).toThrow();
   });
 });
+
+describe("updateActionItemSchema with goalId", () => {
+  it("goalId を受け付ける", () => {
+    const result = updateActionItemSchema.safeParse({
+      title: "アクション",
+      goalId: "550e8400-e29b-41d4-a716-446655440000",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("goalId を省略可能", () => {
+    const result = updateActionItemSchema.safeParse({ title: "アクション" });
+    expect(result.success).toBe(true);
+  });
+
+  it("goalId に null を受け付ける（紐付け解除）", () => {
+    const result = updateActionItemSchema.safeParse({ title: "アクション", goalId: null });
+    expect(result.success).toBe(true);
+  });
+
+  it("無効なUUIDを拒否する", () => {
+    const result = updateActionItemSchema.safeParse({ title: "アクション", goalId: "invalid" });
+    expect(result.success).toBe(false);
+  });
+});

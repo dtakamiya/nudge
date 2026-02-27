@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { Goal } from "@/generated/prisma/client";
+import type { GoalWithActionItems } from "@/lib/actions/goal-actions";
 
 import { GoalCard } from "./goal-card";
 import { GoalFormDialog } from "./goal-form-dialog";
@@ -20,8 +21,8 @@ const FILTER_OPTIONS: { value: FilterValue; label: string }[] = [
 ];
 
 type Props = {
-  goals: Goal[];
   memberId: string;
+  goals: GoalWithActionItems[];
 };
 
 export function GoalList({ goals, memberId }: Props) {

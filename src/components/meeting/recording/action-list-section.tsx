@@ -17,11 +17,13 @@ type Props = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sensors: any;
   announcements: Announcements;
+  goals?: ReadonlyArray<{ id: string; title: string }>;
   onAdd: () => void;
   onUpdate: (index: number, field: "title" | "description" | "dueDate", value: string) => void;
   onRemove: (index: number) => void;
   onTagsChange: (index: number, tags: TagData[]) => void;
   onPriorityChange: (index: number, priority: ActionPriority) => void;
+  onGoalChange?: (index: number, goalId: string | null) => void;
   onDragEnd: (event: DragEndEvent) => void;
 };
 
@@ -30,11 +32,13 @@ export function ActionListSection({
   actionIds,
   sensors,
   announcements,
+  goals,
   onAdd,
   onUpdate,
   onRemove,
   onTagsChange,
   onPriorityChange,
+  onGoalChange,
   onDragEnd,
 }: Props) {
   return (
@@ -71,9 +75,12 @@ export function ActionListSection({
                 priority={action.priority}
                 index={index}
                 tags={action.tags}
+                goalId={action.goalId}
+                goals={goals}
                 onTagsChange={onTagsChange}
                 onUpdate={onUpdate}
                 onPriorityChange={onPriorityChange}
+                onGoalChange={onGoalChange}
                 onRemove={onRemove}
               />
             ))}

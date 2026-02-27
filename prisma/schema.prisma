@@ -72,21 +72,23 @@ enum TopicCategory {
 }
 
 model ActionItem {
-  id          String           @id @default(uuid())
+  id          String             @id @default(uuid())
   meetingId   String
   memberId    String
   title       String
-  description String           @default("")
-  status      ActionItemStatus  @default(TODO)
+  description String             @default("")
+  status      ActionItemStatus   @default(TODO)
   priority    ActionItemPriority @default(MEDIUM)
-  sortOrder   Int              @default(0)
+  sortOrder   Int                @default(0)
   dueDate     DateTime?
   completedAt DateTime?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  goalId      String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
 
   meeting Meeting         @relation(fields: [meetingId], references: [id], onDelete: Cascade)
   member  Member          @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  goal    Goal?           @relation(fields: [goalId], references: [id], onDelete: SetNull)
   tags    ActionItemTag[]
 
   @@index([meetingId])
@@ -95,6 +97,7 @@ model ActionItem {
   @@index([memberId, status])
   @@index([status])
   @@index([priority])
+  @@index([goalId])
 }
 
 enum ActionItemStatus {
@@ -143,17 +146,19 @@ model ActionItemTag {
 }
 
 model Goal {
-  id          String     @id @default(uuid())
-  memberId    String
-  title       String
-  description String     @default("")
-  progress    Int        @default(0)
-  status      GoalStatus @default(IN_PROGRESS)
-  dueDate     DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id           String           @id @default(uuid())
+  memberId     String
+  title        String
+  description  String           @default("")
+  progress     Int              @default(0)
+  status       GoalStatus       @default(IN_PROGRESS)
+  progressMode GoalProgressMode @default(MANUAL)
+  dueDate      DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
 
-  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  member      Member       @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  actionItems ActionItem[]
 
   @@index([memberId])
   @@index([memberId, status])
@@ -163,6 +168,11 @@ enum GoalStatus {
   IN_PROGRESS
   COMPLETED
   CANCELLED
+}
+
+enum GoalProgressMode {
+  MANUAL
+  AUTO
 }
 
 model MeetingTemplate {

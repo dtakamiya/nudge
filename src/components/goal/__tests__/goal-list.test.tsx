@@ -2,7 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
-import type { Goal } from "@/generated/prisma/client";
+import type { GoalWithActionItems } from "@/lib/actions/goal-actions";
 
 import { GoalList } from "../goal-list";
 
@@ -38,7 +38,7 @@ afterEach(() => {
 
 const memberId = "member-1";
 
-const mockGoals: Goal[] = [
+const mockGoals: GoalWithActionItems[] = [
   {
     id: "goal-1",
     memberId,
@@ -46,9 +46,11 @@ const mockGoals: Goal[] = [
     description: "型システムを理解する",
     progress: 30,
     status: "IN_PROGRESS",
+    progressMode: "MANUAL",
     dueDate: new Date("2026-06-01"),
     createdAt: new Date(),
     updatedAt: new Date(),
+    actionItems: [],
   },
   {
     id: "goal-2",
@@ -57,9 +59,11 @@ const mockGoals: Goal[] = [
     description: "",
     progress: 100,
     status: "COMPLETED",
+    progressMode: "MANUAL",
     dueDate: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    actionItems: [],
   },
 ];
 

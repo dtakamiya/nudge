@@ -81,6 +81,28 @@ describe("updateGoalSchema", () => {
   });
 });
 
+describe("goalProgressMode", () => {
+  it("有効なモードを受け付ける", () => {
+    for (const mode of ["MANUAL", "AUTO"]) {
+      const result = createGoalSchema.safeParse({ title: "目標", progressMode: mode });
+      expect(result.success).toBe(true);
+    }
+  });
+
+  it("無効なモードを拒否する", () => {
+    const result = createGoalSchema.safeParse({ title: "目標", progressMode: "INVALID" });
+    expect(result.success).toBe(false);
+  });
+
+  it("省略時はデフォルトMANUAL", () => {
+    const result = createGoalSchema.safeParse({ title: "目標" });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.progressMode).toBe("MANUAL");
+    }
+  });
+});
+
 describe("updateGoalProgressSchema", () => {
   it("有効な進捗を受け付ける", () => {
     const result = updateGoalProgressSchema.safeParse({ progress: 50 });

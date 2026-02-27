@@ -54,6 +54,8 @@ export function MeetingForm(props: MeetingFormProps) {
     updateAction,
     updateActionTags,
     updateActionPriority,
+    updateActionGoal,
+    goals,
     handleActionDragEnd,
     handleSubmit,
     handleClosingConfirm,
@@ -128,11 +130,13 @@ export function MeetingForm(props: MeetingFormProps) {
           actionIds={actionIds}
           sensors={sensors}
           announcements={actionAnnouncements}
+          goals={goals}
           onAdd={addAction}
           onUpdate={updateAction}
           onRemove={removeAction}
           onTagsChange={updateActionTags}
           onPriorityChange={updateActionPriority}
+          onGoalChange={updateActionGoal}
           onDragEnd={handleActionDragEnd}
         />
 

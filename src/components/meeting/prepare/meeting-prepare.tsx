@@ -9,8 +9,9 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import type { Goal, MeetingTemplate as DbMeetingTemplate } from "@/generated/prisma/client";
+import type { MeetingTemplate as DbMeetingTemplate } from "@/generated/prisma/client";
 import { useMeetingPrepare } from "@/hooks/use-meeting-prepare";
+import type { GoalWithActionItems } from "@/lib/actions/goal-actions";
 import { screenReaderInstructions } from "@/lib/dnd-accessibility";
 import type { FollowUpActionData } from "@/lib/export";
 import { formatPrepareAgendaMarkdown } from "@/lib/export";
@@ -44,7 +45,7 @@ type Props = {
   pendingActions: PendingAction[];
   lastMeetingData: LastMeetingData;
   customTemplates?: DbMeetingTemplate[];
-  activeGoals?: Goal[];
+  activeGoals?: GoalWithActionItems[];
 };
 
 export function MeetingPrepare({
