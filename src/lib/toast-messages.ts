@@ -40,4 +40,12 @@ export const TOAST_MESSAGES = {
     agendaCopied: "アジェンダをクリップボードにコピーしました",
     agendaCopyError: "コピーに失敗しました",
   },
+  note: {
+    createSuccess: "メモを保存しました",
+    createError: "メモの保存に失敗しました",
+    updateSuccess: "メモを更新しました",
+    updateError: "メモの更新に失敗しました",
+    deleteSuccess: "メモを削除しました",
+    deleteError: "メモの削除に失敗しました",
+  },
 } as const;
