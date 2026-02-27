@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { cleanDatabase } from "@/test-utils";
 
 import {
+  bulkUpdateActionItemStatus,
   createActionItemForMeeting,
   getActionItems,
   getLastMeetingAllActions,
@@ -695,5 +696,106 @@ describe("getLastMeetingPendingActions", () => {
     expect(result).not.toBeNull();
     expect(result!.meetingId).toBeDefined();
     expect(result!.meetingDate).toBeInstanceOf(Date);
+  });
+});
+
+describe("updateActionItemStatus with goal progress recalculation", () => {
+  it("ステータス変更時に紐付きAUTOゴールの進捗を再計算する", async () => {
+    const goal = await prisma.goal.create({
+      data: { memberId, title: "自動目標", progressMode: "AUTO" },
+    });
+
+    const [a1] = await Promise.all([
+      prisma.actionItem.create({
+        data: { meetingId, memberId, title: "A1", goalId: goal.id, status: "TODO" },
+      }),
+      prisma.actionItem.create({
+        data: { meetingId, memberId, title: "A2", goalId: goal.id, status: "TODO" },
+      }),
+    ]);
+
+    await updateActionItemStatus(a1.id, "DONE");
+
+    const updated = await prisma.goal.findUnique({ where: { id: goal.id } });
+    expect(updated?.progress).toBe(50);
+  });
+
+  it("MANUALゴールの場合は進捗を再計算しない", async () => {
+    const goal = await prisma.goal.create({
+      data: { memberId, title: "手動目標", progress: 30 },
+    });
+
+    const action = await prisma.actionItem.create({
+      data: { meetingId, memberId, title: "A1", goalId: goal.id, status: "TODO" },
+    });
+
+    await updateActionItemStatus(action.id, "DONE");
+
+    const updated = await prisma.goal.findUnique({ where: { id: goal.id } });
+    expect(updated?.progress).toBe(30);
+  });
+});
+
+describe("updateActionItem with goalId", () => {
+  it("アクションにゴールを紐付けできる", async () => {
+    const goal = await prisma.goal.create({
+      data: { memberId, title: "目標" },
+    });
+
+    const action = await prisma.actionItem.create({
+      data: { meetingId, memberId, title: "アクション" },
+    });
+
+    const result = await updateActionItem(action.id, {
+      title: "アクション",
+      goalId: goal.id,
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.goalId).toBe(goal.id);
+    }
+  });
+
+  it("ゴール紐付けを解除できる（null）", async () => {
+    const goal = await prisma.goal.create({
+      data: { memberId, title: "目標" },
+    });
+
+    const action = await prisma.actionItem.create({
+      data: { meetingId, memberId, title: "アクション", goalId: goal.id },
+    });
+
+    const result = await updateActionItem(action.id, {
+      title: "アクション",
+      goalId: null,
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.goalId).toBeNull();
+    }
+  });
+});
+
+describe("bulkUpdateActionItemStatus with goal progress recalculation", () => {
+  it("一括ステータス変更時に紐付きゴールの進捗を再計算する", async () => {
+    const goal = await prisma.goal.create({
+      data: { memberId, title: "一括更新目標", progressMode: "AUTO" },
+    });
+
+    const [a1, a2] = await Promise.all([
+      prisma.actionItem.create({
+        data: { meetingId, memberId, title: "B1", goalId: goal.id, status: "TODO" },
+      }),
+      prisma.actionItem.create({
+        data: { meetingId, memberId, title: "B2", goalId: goal.id, status: "TODO" },
+      }),
+    ]);
+
+    await bulkUpdateActionItemStatus([a1.id, a2.id], "DONE");
+
+    const updated = await prisma.goal.findUnique({ where: { id: goal.id } });
+    expect(updated?.progress).toBe(100);
   });
 });
