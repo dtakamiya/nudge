@@ -1,12 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  createGoalSchema,
-  goalProgressMode,
-  goalStatus,
-  updateGoalProgressSchema,
-  updateGoalSchema,
-} from "../goal";
+import { createGoalSchema, goalStatus, updateGoalProgressSchema, updateGoalSchema } from "../goal";
 
 describe("goalStatus", () => {
   it("有効なステータスを受け付ける", () => {
