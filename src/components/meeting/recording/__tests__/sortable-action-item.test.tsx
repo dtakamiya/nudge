@@ -36,7 +36,8 @@ describe("SortableActionItem", () => {
     expect(screen.getByTestId("drag-handle-action-0")).toBeTruthy();
     expect(screen.getByDisplayValue("レビュー依頼")).toBeTruthy();
     expect(screen.getByDisplayValue("PRレビューをする")).toBeTruthy();
-    expect(screen.getByDisplayValue("2026-03-01")).toBeTruthy();
+    // レスポンシブレイアウトでデスクトップ用・モバイル用の2つの期限入力がある
+    expect(screen.getAllByDisplayValue("2026-03-01").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByRole("button", { name: "削除" })).toBeTruthy();
   });
 
@@ -70,9 +71,10 @@ describe("SortableActionItem", () => {
 
   it("calls onUpdate when dueDate changes", () => {
     render(<SortableActionItem {...defaultProps} />);
-    const input = screen.getByDisplayValue("2026-03-01");
+    // レスポンシブレイアウトでデスクトップ用・モバイル用の2つの期限入力がある
+    const inputs = screen.getAllByDisplayValue("2026-03-01");
     // date inputs don't respond to userEvent.type in jsdom; use fireEvent.change
-    fireEvent.change(input, { target: { value: "2026-04-01" } });
+    fireEvent.change(inputs[0], { target: { value: "2026-04-01" } });
     expect(defaultProps.onUpdate).toHaveBeenCalledWith(0, "dueDate", "2026-04-01");
   });
 
@@ -81,5 +83,24 @@ describe("SortableActionItem", () => {
     render(<SortableActionItem {...defaultProps} />);
     await user.click(screen.getByRole("button", { name: "削除" }));
     expect(defaultProps.onRemove).toHaveBeenCalledWith(0);
+  });
+
+  it("ドラッグハンドルに p-2 のタッチエリアが設定されている", () => {
+    render(<SortableActionItem {...defaultProps} />);
+    const handle = screen.getByTestId("drag-handle-action-0");
+    expect(handle.className).toContain("p-2");
+  });
+
+  it("削除ボタンにモバイル用タッチターゲットが設定されている", () => {
+    render(<SortableActionItem {...defaultProps} />);
+    const deleteBtn = screen.getByRole("button", { name: "削除" });
+    expect(deleteBtn.className).toContain("min-h-[44px]");
+  });
+
+  it("フォーム行に flex-wrap クラスが設定されている", () => {
+    render(<SortableActionItem {...defaultProps} />);
+    const handle = screen.getByTestId("drag-handle-action-0");
+    const formRow = handle.parentElement;
+    expect(formRow?.className).toContain("flex-wrap");
   });
 });

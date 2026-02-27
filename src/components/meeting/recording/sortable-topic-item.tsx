@@ -84,11 +84,11 @@ export function SortableTopicItem({
       style={style}
       className={`border rounded p-3 flex flex-col gap-2 bg-card ${isDragging ? "opacity-50 ring-2 ring-primary" : ""}`}
     >
-      <div className="flex gap-2 items-end">
+      <div className="flex flex-wrap md:flex-nowrap gap-2 items-end">
         <button
           type="button"
           data-testid={`drag-handle-${id}`}
-          className="cursor-grab touch-none text-muted-foreground hover:text-foreground self-center p-1"
+          className="cursor-grab touch-none text-muted-foreground hover:text-foreground self-center p-2"
           {...attributes}
           {...listeners}
           aria-label={`${title || "話題"}を並び替え`}
@@ -121,7 +121,13 @@ export function SortableTopicItem({
           />
         </div>
         {showDelete && (
-          <Button type="button" variant="ghost" size="sm" onClick={() => onRemove(index)}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
+            onClick={() => onRemove(index)}
+          >
             削除
           </Button>
         )}

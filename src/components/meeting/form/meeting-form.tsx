@@ -11,6 +11,7 @@ import { CheckinSection } from "../checkin/checkin-section";
 import { MoodSelector } from "../checkin/mood-selector";
 import { ActionListSection } from "../recording/action-list-section";
 import { ClosingDialog } from "../recording/closing-dialog";
+import { MobileFab } from "../recording/mobile-fab";
 import { TopicListSection } from "../recording/topic-list-section";
 import type { MeetingFormProps } from "./meeting-form.types";
 
@@ -178,6 +179,8 @@ export function MeetingForm(props: MeetingFormProps) {
           actionItemTitles,
         }}
       />
+
+      <MobileFab onAddTopic={addTopic} onAddAction={addAction} />
     </>
   );
 }

@@ -223,4 +223,11 @@ describe("RecordingMode", () => {
       resolveUpdate({ success: true, data: {} as never });
     });
   });
+
+  it("ヘッダーに flex-wrap クラスが設定されている", () => {
+    mockUpdateTopicNotes.mockResolvedValue({ success: true, data: {} as never });
+    render(<RecordingMode {...defaultProps} />);
+    const header = screen.getByText("ミーティングを終了する").closest("div")?.parentElement;
+    expect(header?.className).toContain("flex-wrap");
+  });
 });

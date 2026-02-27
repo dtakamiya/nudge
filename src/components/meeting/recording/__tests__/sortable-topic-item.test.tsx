@@ -73,6 +73,18 @@ describe("SortableTopicItem", () => {
     await user.click(screen.getByRole("button", { name: "削除" }));
     expect(defaultProps.onRemove).toHaveBeenCalledWith(0);
   });
+
+  it("ドラッグハンドルに p-2 のタッチエリアが設定されている", () => {
+    render(<SortableTopicItem {...defaultProps} />);
+    const handle = screen.getByTestId("drag-handle-topic-0");
+    expect(handle.className).toContain("p-2");
+  });
+
+  it("削除ボタンにモバイル用タッチターゲットが設定されている", () => {
+    render(<SortableTopicItem {...defaultProps} />);
+    const deleteBtn = screen.getByRole("button", { name: "削除" });
+    expect(deleteBtn.className).toContain("min-h-[44px]");
+  });
 });
 
 describe("SortableTopicItem - デフォルト折りたたみ", () => {

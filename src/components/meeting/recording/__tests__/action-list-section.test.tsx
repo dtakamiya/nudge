@@ -141,4 +141,24 @@ describe("ActionListSection", () => {
     expect(screen.getByDisplayValue("アクション1")).toBeTruthy();
     expect(screen.getByDisplayValue("アクション2")).toBeTruthy();
   });
+
+  it("追加ボタンに hidden md:inline-flex クラスが設定されている", () => {
+    render(
+      <ActionListSection
+        actionItems={[defaultAction()]}
+        actionIds={["action-0"]}
+        sensors={[]}
+        announcements={mockAnnouncements}
+        onAdd={vi.fn()}
+        onUpdate={vi.fn()}
+        onRemove={vi.fn()}
+        onTagsChange={vi.fn()}
+        onPriorityChange={vi.fn()}
+        onDragEnd={vi.fn()}
+      />,
+    );
+    const addButton = screen.getByRole("button", { name: "+ アクション追加" });
+    expect(addButton.className).toContain("hidden");
+    expect(addButton.className).toContain("md:inline-flex");
+  });
 });

@@ -139,4 +139,23 @@ describe("TopicListSection", () => {
     const deleteButtons = screen.getAllByRole("button", { name: /削除/ });
     expect(deleteButtons.length).toBe(2);
   });
+
+  it("追加ボタンに hidden md:inline-flex クラスが設定されている", () => {
+    render(
+      <TopicListSection
+        topics={[defaultTopic()]}
+        topicIds={["topic-0"]}
+        sensors={[]}
+        announcements={mockAnnouncements}
+        onAdd={vi.fn()}
+        onUpdate={vi.fn()}
+        onRemove={vi.fn()}
+        onTagsChange={vi.fn()}
+        onDragEnd={vi.fn()}
+      />,
+    );
+    const addButton = screen.getByRole("button", { name: "+ 話題を追加" });
+    expect(addButton.className).toContain("hidden");
+    expect(addButton.className).toContain("md:inline-flex");
+  });
 });

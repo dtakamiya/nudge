@@ -36,8 +36,8 @@ export function RecordingMode({ meetingId, startedAt, topics, onEnd }: Props) {
   } = useRecordingSession({ meetingId, topics, onEnd });
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between border-b pb-4">
+    <div className="flex flex-col gap-3 md:gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-4">
         <ElapsedTimer startedAt={startedAt} />
         <AutoSaveIndicator status={saveStatus} onRetry={handleRetry} onIdle={handleSaveIdle} />
         <div className="flex items-center gap-2">
@@ -47,10 +47,17 @@ export function RecordingMode({ meetingId, startedAt, topics, onEnd }: Props) {
             onClick={toggleFocusMode}
             aria-label="フォーカスモード切り替え (F)"
             title="フォーカスモード切り替え (F)"
+            className="min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
           >
             {isFocusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
           </Button>
-          <Button variant="destructive" size="sm" onClick={handleEndRequest} disabled={isEnding}>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={handleEndRequest}
+            disabled={isEnding}
+            className="min-h-[44px] md:min-h-0"
+          >
             {isEnding ? "終了中..." : "ミーティングを終了する"}
           </Button>
         </div>

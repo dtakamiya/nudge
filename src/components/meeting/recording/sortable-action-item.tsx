@@ -86,11 +86,11 @@ export function SortableActionItem({
       style={style}
       className={`border rounded p-3 flex flex-col gap-2 bg-card ${isDragging ? "opacity-50 ring-2 ring-primary" : ""}`}
     >
-      <div className="flex gap-2 items-end">
+      <div className="flex flex-wrap md:flex-nowrap gap-2 items-end">
         <button
           type="button"
           data-testid={`drag-handle-${id}`}
-          className="cursor-grab touch-none text-muted-foreground hover:text-foreground self-center p-1"
+          className="cursor-grab touch-none text-muted-foreground hover:text-foreground self-center p-2"
           {...attributes}
           {...listeners}
           aria-label={`${title || "アクションアイテム"}を並び替え`}
@@ -107,7 +107,7 @@ export function SortableActionItem({
             placeholder="アクションのタイトル"
           />
         </div>
-        <div className="flex-1">
+        <div className="hidden md:block flex-1">
           <Label htmlFor={dueDateId}>期限</Label>
           <DatePicker
             id={dueDateId}
@@ -115,7 +115,7 @@ export function SortableActionItem({
             onChange={(value) => onUpdate(index, "dueDate", value)}
           />
         </div>
-        <div className="flex-none w-20">
+        <div className="hidden md:block flex-none w-20">
           <Label htmlFor={`action-${itemId}-priority`}>優先度</Label>
           <Select
             value={priority}
@@ -131,9 +131,42 @@ export function SortableActionItem({
             </SelectContent>
           </Select>
         </div>
-        <Button type="button" variant="ghost" size="sm" onClick={() => onRemove(index)}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
+          onClick={() => onRemove(index)}
+        >
           削除
         </Button>
+      </div>
+      {/* モバイル用 2行目: 期限・優先度 */}
+      <div className="flex gap-2 items-end pl-8 md:hidden">
+        <div className="flex-1">
+          <Label htmlFor={`${dueDateId}-mobile`}>期限</Label>
+          <DatePicker
+            id={`${dueDateId}-mobile`}
+            value={dueDate}
+            onChange={(value) => onUpdate(index, "dueDate", value)}
+          />
+        </div>
+        <div className="flex-none w-24">
+          <Label htmlFor={`action-${itemId}-priority-mobile`}>優先度</Label>
+          <Select
+            value={priority}
+            onValueChange={(val) => onPriorityChange?.(index, val as ActionPriority)}
+          >
+            <SelectTrigger id={`action-${itemId}-priority-mobile`} className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="HIGH">高</SelectItem>
+              <SelectItem value="MEDIUM">中</SelectItem>
+              <SelectItem value="LOW">低</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
       <div>
         <Label htmlFor={descriptionId}>説明</Label>
