@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -24,12 +24,13 @@ export function MemberNoteForm({ memberId, editingNote, onCancelEdit }: Props) {
   const [content, setContent] = useState(editingNote?.content ?? "");
   const [category, setCategory] = useState(editingNote?.category ?? "good");
 
-  useEffect(() => {
-    if (editingNote) {
-      setContent(editingNote.content);
-      setCategory(editingNote.category);
-    }
-  }, [editingNote]);
+  const editingId = editingNote?.id ?? null;
+  const [prevEditingId, setPrevEditingId] = useState(editingId);
+  if (editingId !== prevEditingId) {
+    setPrevEditingId(editingId);
+    setContent(editingNote?.content ?? "");
+    setCategory(editingNote?.category ?? "good");
+  }
 
   const isEditing = !!editingNote;
   const canSubmit = content.trim().length > 0;

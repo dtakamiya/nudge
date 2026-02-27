@@ -7,7 +7,6 @@ import { CheckinTrendSection } from "@/components/analytics/checkin-trend-sectio
 import { TopicAnalyticsSection } from "@/components/analytics/topic-analytics-section";
 import { GoalList } from "@/components/goal/goal-list";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
-import { MemberNoteTab } from "@/components/member/member-note-tab";
 import { MeetingHistory } from "@/components/meeting/detail";
 import { CalendarExportButton } from "@/components/member/calendar-export-button";
 import { CheckinSummarySection } from "@/components/member/checkin-summary-section";
@@ -16,6 +15,7 @@ import {
   type MemberDetailTab,
   MemberDetailTabNav,
 } from "@/components/member/member-detail-tab-nav";
+import { MemberNoteTab } from "@/components/member/member-note-tab";
 import { MemberQuickActions } from "@/components/member/member-quick-actions";
 import { MemberStatsBar } from "@/components/member/member-stats-bar";
 import { MemberTimeline } from "@/components/member/member-timeline";
