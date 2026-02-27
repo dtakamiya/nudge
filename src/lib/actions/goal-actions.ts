@@ -13,19 +13,29 @@ import {
 
 import { type ActionResult, runAction } from "./types";
 
+export type GoalWithActionItems = Goal & {
+  actionItems: { id: string; status: string }[];
+};
+
 /** メンバーの目標一覧を取得 */
-export async function getGoals(memberId: string): Promise<Goal[]> {
+export async function getGoals(memberId: string): Promise<GoalWithActionItems[]> {
   return prisma.goal.findMany({
     where: { memberId },
     orderBy: [{ status: "asc" }, { updatedAt: "desc" }],
+    include: {
+      actionItems: { select: { id: true, status: true } },
+    },
   });
 }
 
 /** メンバーの進行中目標を取得（準備画面向け） */
-export async function getActiveGoals(memberId: string): Promise<Goal[]> {
+export async function getActiveGoals(memberId: string): Promise<GoalWithActionItems[]> {
   return prisma.goal.findMany({
     where: { memberId, status: "IN_PROGRESS" },
     orderBy: [{ dueDate: "asc" }, { updatedAt: "desc" }],
+    include: {
+      actionItems: { select: { id: true, status: true } },
+    },
   });
 }
 
@@ -45,6 +55,7 @@ export async function createGoal(
         description: validated.description,
         progress: validated.progress,
         status: validated.status,
+        progressMode: validated.progressMode,
         dueDate,
       },
     });
@@ -63,6 +74,7 @@ export async function updateGoal(id: string, input: UpdateGoalInput): Promise<Ac
     if (validated.description !== undefined) data.description = validated.description;
     if (validated.progress !== undefined) data.progress = validated.progress;
     if (validated.status !== undefined) data.status = validated.status;
+    if (validated.progressMode !== undefined) data.progressMode = validated.progressMode;
     if (validated.dueDate !== undefined) {
       data.dueDate = validated.dueDate ? new Date(validated.dueDate) : null;
     }
@@ -98,6 +110,34 @@ export async function deleteGoal(id: string): Promise<ActionResult<Goal>> {
   return runAction(async () => {
     if (!id) throw new Error("目標IDが指定されていません");
     const result = await prisma.goal.delete({ where: { id } });
+    revalidatePath("/", "layout");
+    return result;
+  });
+}
+
+/** AUTO モードの目標進捗を再計算 */
+export async function calculateGoalProgress(goalId: string): Promise<ActionResult<Goal>> {
+  return runAction(async () => {
+    if (!goalId) throw new Error("目標IDが指定されていません");
+    const goal = await prisma.goal.findUnique({
+      where: { id: goalId },
+      include: { actionItems: { select: { status: true } } },
+    });
+    if (!goal) throw new Error("目標が見つかりません");
+
+    // MANUAL モードの場合は現在の値をそのまま返す
+    if (goal.progressMode === "MANUAL") {
+      return goal;
+    }
+
+    const total = goal.actionItems.length;
+    const done = goal.actionItems.filter((a) => a.status === "DONE").length;
+    const progress = total === 0 ? 0 : Math.round((done / total) * 100);
+
+    const result = await prisma.goal.update({
+      where: { id: goalId },
+      data: { progress },
+    });
     revalidatePath("/", "layout");
     return result;
   });
