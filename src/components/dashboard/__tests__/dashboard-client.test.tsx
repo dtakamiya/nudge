@@ -68,6 +68,31 @@ vi.mock("@/hooks/use-dashboard-widget-settings", () => ({
   },
 }));
 
+vi.mock("@/hooks/use-dashboard-widget-order", () => ({
+  useDashboardWidgetOrder: () => ({
+    order: [
+      "summary",
+      "healthScore",
+      "recentActivity",
+      "upcomingActions",
+      "scheduledMeetings",
+      "recommendedMeetings",
+      "memberList",
+    ],
+    reorder: vi.fn(),
+    resetOrder: vi.fn(),
+  }),
+  DEFAULT_WIDGET_ORDER: [
+    "summary",
+    "healthScore",
+    "recentActivity",
+    "upcomingActions",
+    "scheduledMeetings",
+    "recommendedMeetings",
+    "memberList",
+  ],
+}));
+
 const baseSummary: DashboardSummary = {
   needsFollowUp: 0,
   actionCompletionRate: 0,
