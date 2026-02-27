@@ -337,7 +337,11 @@ export async function endMeeting(input: EndMeetingInput): Promise<ActionResult<M
       }
       return tx.meeting.update({
         where: { id: validated.meetingId },
-        data: { endedAt: new Date() },
+        data: {
+          endedAt: new Date(),
+          qualityScore: validated.qualityScore ?? null,
+          usefulnessScore: validated.usefulnessScore ?? null,
+        },
       });
     });
     revalidatePath("/", "layout");
