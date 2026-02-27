@@ -33,7 +33,7 @@ type Props = {
 };
 
 function resolveTab(tab: string | undefined): MemberDetailTab {
-  if (tab === "history" || tab === "actions" || tab === "goals") return tab;
+  if (tab === "history" || tab === "actions" || tab === "goals" || tab === "notes") return tab;
   return "timeline";
 }
 
