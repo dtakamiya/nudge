@@ -95,29 +95,60 @@ describe("useRecordingSession", () => {
     expect(result.current.saveStatus).toBe("idle");
   });
 
-  it("handleEnd 成功時に endMeeting が呼ばれ、onEnd が呼ばれる", async () => {
+  it("handleEndRequest で showQualityDialog が true になる", () => {
+    const { result } = renderHook(() =>
+      useRecordingSession({ meetingId: "m1", topics: sampleTopics, onEnd: vi.fn() }),
+    );
+    expect(result.current.showQualityDialog).toBe(false);
+    act(() => {
+      result.current.handleEndRequest();
+    });
+    expect(result.current.showQualityDialog).toBe(true);
+  });
+
+  it("handleEndWithScores 成功時に endMeeting がスコア付きで呼ばれ、onEnd が呼ばれる", async () => {
     mockEndMeeting.mockResolvedValue({ success: true, data: {} as never });
     const onEnd = vi.fn();
     const { result } = renderHook(() =>
       useRecordingSession({ meetingId: "meeting-abc", topics: sampleTopics, onEnd }),
     );
     await act(async () => {
-      await result.current.handleEnd();
+      await result.current.handleEndWithScores({ qualityScore: 4, usefulnessScore: 5 });
     });
-    expect(mockEndMeeting).toHaveBeenCalledWith({ meetingId: "meeting-abc" });
+    expect(mockEndMeeting).toHaveBeenCalledWith({
+      meetingId: "meeting-abc",
+      qualityScore: 4,
+      usefulnessScore: 5,
+    });
     expect(onEnd).toHaveBeenCalled();
   });
 
-  it("handleEnd 失敗時に onEnd が呼ばれない", async () => {
+  it("handleEndWithScores 失敗時に onEnd が呼ばれない", async () => {
     mockEndMeeting.mockResolvedValue({ success: false, error: "失敗" });
     const onEnd = vi.fn();
     const { result } = renderHook(() =>
       useRecordingSession({ meetingId: "m1", topics: sampleTopics, onEnd }),
     );
     await act(async () => {
-      await result.current.handleEnd();
+      await result.current.handleEndWithScores({ qualityScore: 3, usefulnessScore: 3 });
     });
     expect(onEnd).not.toHaveBeenCalled();
+  });
+
+  it("handleSkipQuality で endMeeting が null スコアで呼ばれる", async () => {
+    mockEndMeeting.mockResolvedValue({ success: true, data: {} as never });
+    const onEnd = vi.fn();
+    const { result } = renderHook(() =>
+      useRecordingSession({ meetingId: "m1", topics: sampleTopics, onEnd }),
+    );
+    await act(async () => {
+      result.current.handleSkipQuality();
+    });
+    expect(mockEndMeeting).toHaveBeenCalledWith({
+      meetingId: "m1",
+      qualityScore: null,
+      usefulnessScore: null,
+    });
   });
 
   it("handleBlur で updateTopicNotes が呼ばれる", async () => {

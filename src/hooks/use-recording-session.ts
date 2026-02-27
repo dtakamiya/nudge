@@ -11,6 +11,11 @@ import { useDebounce } from "./use-debounce";
 
 export type { SaveStatus };
 
+export type QualityScores = {
+  qualityScore: number | null;
+  usefulnessScore: number | null;
+};
+
 export type Topic = {
   id: string;
   category: string;
@@ -32,6 +37,7 @@ export function useRecordingSession({ meetingId, topics, onEnd }: UseRecordingSe
   const [dirtyTopicIds, setDirtyTopicIds] = useState<Set<string>>(new Set());
   const [isEnding, setIsEnding] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const [showQualityDialog, setShowQualityDialog] = useState(false);
   const debouncedNotes = useDebounce(localNotes, 500);
   const isFirstRender = useRef(true);
 
@@ -110,10 +116,19 @@ export function useRecordingSession({ meetingId, topics, onEnd }: UseRecordingSe
     setSaveStatus("idle");
   }, []);
 
-  async function handleEnd() {
+  function handleEndRequest() {
+    setShowQualityDialog(true);
+  }
+
+  async function handleEndWithScores(scores: QualityScores) {
+    setShowQualityDialog(false);
     setIsEnding(true);
     try {
-      const result = await endMeeting({ meetingId });
+      const result = await endMeeting({
+        meetingId,
+        qualityScore: scores.qualityScore,
+        usefulnessScore: scores.usefulnessScore,
+      });
       if (result.success) {
         toast.success(TOAST_MESSAGES.meeting.recordingEnd);
         onEnd();
@@ -127,15 +142,22 @@ export function useRecordingSession({ meetingId, topics, onEnd }: UseRecordingSe
     }
   }
 
+  function handleSkipQuality() {
+    void handleEndWithScores({ qualityScore: null, usefulnessScore: null });
+  }
+
   return {
     localNotes,
     sortedTopics,
     isEnding,
     saveStatus,
+    showQualityDialog,
     handleNotesChange,
     handleBlur,
     handleRetry,
     handleSaveIdle,
-    handleEnd,
+    handleEndRequest,
+    handleEndWithScores,
+    handleSkipQuality,
   };
 }
