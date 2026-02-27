@@ -7,6 +7,7 @@ import { CheckinTrendSection } from "@/components/analytics/checkin-trend-sectio
 import { TopicAnalyticsSection } from "@/components/analytics/topic-analytics-section";
 import { GoalList } from "@/components/goal/goal-list";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { MemberNoteTab } from "@/components/member/member-note-tab";
 import { MeetingHistory } from "@/components/meeting/detail";
 import { CalendarExportButton } from "@/components/member/calendar-export-button";
 import { CheckinSummarySection } from "@/components/member/checkin-summary-section";
@@ -25,6 +26,7 @@ import { Separator } from "@/components/ui/separator";
 import { getGoals } from "@/lib/actions/goal-actions";
 import { getMoodTrend } from "@/lib/actions/meeting-actions";
 import { getMember, getMemberMeetings, getMemberTimeline } from "@/lib/actions/member-actions";
+import { getMemberNotes } from "@/lib/actions/member-note-actions";
 import { calcNextRecommendedDate } from "@/lib/schedule";
 
 type Props = {
@@ -54,10 +56,11 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
     member.meetingIntervalDays,
   );
 
-  const [meetingsPage, timeline, goals] = await Promise.all([
+  const [meetingsPage, timeline, goals, notes] = await Promise.all([
     currentTab === "history" ? getMemberMeetings(id, page) : Promise.resolve(null),
     currentTab === "timeline" ? getMemberTimeline(id) : Promise.resolve(null),
     currentTab === "goals" ? getGoals(id) : Promise.resolve(null),
+    currentTab === "notes" ? getMemberNotes(id) : Promise.resolve(null),
   ]);
 
   return (
@@ -154,6 +157,13 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
           <>
             <Separator className="mb-6" />
             <GoalList goals={goals} memberId={id} />
+          </>
+        )}
+
+        {currentTab === "notes" && notes !== null && (
+          <>
+            <Separator className="mb-6" />
+            <MemberNoteTab notes={notes} memberId={id} />
           </>
         )}
       </div>
