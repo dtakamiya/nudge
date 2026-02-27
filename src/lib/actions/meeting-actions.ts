@@ -54,6 +54,7 @@ export async function createMeeting(
               sortOrder: item.sortOrder ?? index,
               dueDate: item.dueDate ? new Date(item.dueDate) : null,
               priority: item.priority ?? "MEDIUM",
+              goalId: item.goalId ?? null,
             })),
           },
         },
@@ -103,6 +104,15 @@ export async function createMeeting(
 
       return meeting;
     });
+
+    // アクションに紐付くゴールの進捗を再計算
+    const goalIds = [
+      ...new Set(result.actionItems.map((a) => a.goalId).filter(Boolean)),
+    ] as string[];
+    if (goalIds.length > 0) {
+      const { calculateGoalProgress } = await import("./goal-actions");
+      await Promise.all(goalIds.map((gid) => calculateGoalProgress(gid)));
+    }
 
     revalidatePath("/", "layout");
     return result;
@@ -236,6 +246,7 @@ export async function updateMeeting(
               sortOrder: item.sortOrder,
               dueDate: item.dueDate ? new Date(item.dueDate) : null,
               priority: item.priority ?? "MEDIUM",
+              goalId: item.goalId ?? null,
             },
           });
           // タグを全削除してから再作成
@@ -255,6 +266,7 @@ export async function updateMeeting(
               sortOrder: item.sortOrder,
               dueDate: item.dueDate ? new Date(item.dueDate) : null,
               priority: item.priority ?? "MEDIUM",
+              goalId: item.goalId ?? null,
             },
           });
           if (allTagIds.length > 0) {
