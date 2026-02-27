@@ -343,4 +343,44 @@ describe("ActionListFull", () => {
       expect(screen.getByText("低")).toBeDefined();
     });
   });
+
+  describe("クリック競合防止", () => {
+    it("ステータスSelect クリックでは編集モードに入らない", async () => {
+      const user = userEvent.setup();
+      render(<ActionListFull actionItems={baseItems} />);
+
+      const statusTrigger = screen.getAllByRole("combobox", { name: "ステータスを変更" })[0];
+      await user.click(statusTrigger);
+
+      expect(screen.queryByDisplayValue("レビュー依頼")).toBeNull();
+    });
+
+    it("メンバーリンククリックでは編集モードに入らない", async () => {
+      const user = userEvent.setup();
+      render(<ActionListFull actionItems={baseItems} />);
+
+      const memberLink = screen.getByText("田中太郎");
+      await user.click(memberLink);
+
+      expect(screen.queryByDisplayValue("レビュー依頼")).toBeNull();
+    });
+
+    it("バルクモード Checkbox クリックでは編集モードに入らない", async () => {
+      const user = userEvent.setup();
+      const mockToggle = vi.fn();
+      render(
+        <ActionListFull
+          actionItems={baseItems}
+          selectedIds={new Set<string>()}
+          onToggleSelect={mockToggle}
+        />,
+      );
+
+      const checkbox = screen.getByRole("checkbox", { name: "レビュー依頼を選択" });
+      await user.click(checkbox);
+
+      expect(mockToggle).toHaveBeenCalledWith("action-1");
+      expect(screen.queryByDisplayValue("レビュー依頼")).toBeNull();
+    });
+  });
 });
