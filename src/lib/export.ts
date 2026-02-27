@@ -31,6 +31,17 @@ export type MemberExportData = {
   position?: string | null;
 };
 
+export type PrepareTopicData = {
+  category: string;
+  title: string;
+  notes: string;
+};
+
+export type FollowUpActionData = {
+  title: string;
+  description: string;
+};
+
 function formatTopics(topics: TopicExportData[]): string {
   if (topics.length === 0) return "";
 
@@ -97,6 +108,45 @@ export function formatMeetingMarkdown(
 
   for (const meeting of meetings) {
     lines.push(formatSingleMeetingMarkdown(meeting));
+    lines.push("");
+  }
+
+  return lines.join("\n");
+}
+
+export function formatPrepareAgendaMarkdown(
+  memberName: string,
+  topics: PrepareTopicData[],
+  followUpActions: FollowUpActionData[],
+): string {
+  const validTopics = topics.filter((t) => t.title.trim() !== "");
+
+  const lines: string[] = [
+    `# 1on1 アジェンダ - ${memberName}`,
+    `**日付:** ${formatDate(new Date())}`,
+    "",
+  ];
+
+  if (validTopics.length > 0) {
+    lines.push("## アジェンダ", "");
+    validTopics.forEach((topic, index) => {
+      const categoryLabel = CATEGORY_LABELS[topic.category] ?? topic.category;
+      lines.push(`${index + 1}. [${categoryLabel}] ${topic.title}`);
+      if (topic.notes) {
+        lines.push(`   ${topic.notes}`);
+      }
+    });
+    lines.push("");
+  }
+
+  if (followUpActions.length > 0) {
+    lines.push("## 前回からの引き継ぎ", "");
+    for (const action of followUpActions) {
+      lines.push(`- [ ] ${action.title}`);
+      if (action.description) {
+        lines.push(`  ${action.description}`);
+      }
+    }
     lines.push("");
   }
 
