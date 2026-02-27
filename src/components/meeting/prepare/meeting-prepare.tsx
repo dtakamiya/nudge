@@ -12,8 +12,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import type { Goal, MeetingTemplate as DbMeetingTemplate } from "@/generated/prisma/client";
 import { useMeetingPrepare } from "@/hooks/use-meeting-prepare";
 import { screenReaderInstructions } from "@/lib/dnd-accessibility";
-import { formatPrepareAgendaMarkdown } from "@/lib/export";
 import type { FollowUpActionData } from "@/lib/export";
+import { formatPrepareAgendaMarkdown } from "@/lib/export";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 import { cn } from "@/lib/utils";
 

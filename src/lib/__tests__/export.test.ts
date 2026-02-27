@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  type FollowUpActionData,
   formatMeetingMarkdown,
-  formatSingleMeetingMarkdown,
   formatPrepareAgendaMarkdown,
+  formatSingleMeetingMarkdown,
   type MeetingExportData,
   type MemberExportData,
   type PrepareTopicData,
-  type FollowUpActionData,
 } from "@/lib/export";
 
 const sampleMember: MemberExportData = {
