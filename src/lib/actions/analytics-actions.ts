@@ -452,3 +452,51 @@ export async function getRecommendedAndScheduledMeetings(): Promise<{
 
   return { recommended, scheduled };
 }
+
+export type QualityTrendEntry = {
+  date: string;
+  quality: number | null;
+  usefulness: number | null;
+};
+
+export async function getQualityTrend(memberId: string, limit = 12): Promise<QualityTrendEntry[]> {
+  const meetings = await prisma.meeting.findMany({
+    where: {
+      memberId,
+      OR: [{ qualityScore: { not: null } }, { usefulnessScore: { not: null } }],
+    },
+    orderBy: { date: "asc" },
+    take: limit,
+    select: { date: true, qualityScore: true, usefulnessScore: true },
+  });
+
+  return meetings.map((m) => ({
+    date: formatDate(m.date),
+    quality: m.qualityScore,
+    usefulness: m.usefulnessScore,
+  }));
+}
+
+export async function getAggregatedQualityTrend(
+  period: number,
+  department?: string,
+): Promise<QualityTrendEntry[]> {
+  const since = new Date();
+  since.setMonth(since.getMonth() - period);
+
+  const meetings = await prisma.meeting.findMany({
+    where: {
+      date: { gte: since },
+      OR: [{ qualityScore: { not: null } }, { usefulnessScore: { not: null } }],
+      ...(department ? { member: { department } } : {}),
+    },
+    orderBy: { date: "asc" },
+    select: { date: true, qualityScore: true, usefulnessScore: true },
+  });
+
+  return meetings.map((m) => ({
+    date: formatDate(m.date),
+    quality: m.qualityScore,
+    usefulness: m.usefulnessScore,
+  }));
+}
