@@ -37,5 +37,7 @@ export const TOAST_MESSAGES = {
   },
   prepare: {
     topicCopied: "話題をアジェンダにコピーしました",
+    agendaCopied: "アジェンダをクリップボードにコピーしました",
+    agendaCopyError: "コピーに失敗しました",
   },
 } as const;
