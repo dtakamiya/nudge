@@ -21,19 +21,16 @@ test.describe("アクションフィルタリング", () => {
 
   /**
    * ステータスフィルターのコンボボックスを取得する
-   * ActionFilters の SelectTrigger は w-36 クラスを持つ
    */
   function getStatusFilter(page: import("@playwright/test").Page) {
-    return page.locator("main button[role='combobox'].w-36");
+    return page.getByRole("combobox", { name: "ステータスで絞り込み" });
   }
 
   /**
    * メンバーフィルターのコンボボックスを取得する
-   * ActionFilters には w-44 の SelectTrigger が2つ（グループ化・メンバー）あるため
-   * 2番目（nth(1)）を取得する
    */
   function getMemberFilter(page: import("@playwright/test").Page) {
-    return page.locator("main button[role='combobox'].w-44").nth(1);
+    return page.getByRole("combobox", { name: "メンバーで絞り込み" });
   }
 
   test("フィルターUIが表示される", async ({ page }) => {

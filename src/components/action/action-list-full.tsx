@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil, SquareCheck, UserPlus } from "lucide-react";
+import { SquareCheck, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
@@ -183,6 +183,17 @@ export function ActionListFull({
     });
   }
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      handleCancel();
+    }
+    if (e.key === "Enter" && !e.shiftKey && e.target instanceof HTMLInputElement) {
+      e.preventDefault();
+      handleSave();
+    }
+  }
+
   return (
     <div className={`flex flex-col gap-3 ${isPending ? "opacity-80" : ""}`}>
       {optimisticItems.map((item) => {
@@ -190,12 +201,19 @@ export function ActionListFull({
         return (
           <Card
             key={item.id}
-            className={`hover:shadow-sm hover:border-[oklch(0.88_0.008_260)] transition-colors ${isSelected ? "bg-primary/5 border-primary/30" : ""}`}
+            data-testid={`action-card-${item.id}`}
+            className={`hover:shadow-sm hover:border-[oklch(0.88_0.008_260)] transition-colors cursor-pointer ${isSelected ? "bg-primary/5 border-primary/30" : ""}`}
+            onClick={() => {
+              if (editingId !== item.id) {
+                handleEdit(item);
+              }
+            }}
           >
             {editingId === item.id ? (
-              <CardContent className="p-4 flex flex-col gap-3">
+              <CardContent className="p-4 flex flex-col gap-3" onKeyDown={handleKeyDown}>
                 <div className="flex flex-col gap-2">
                   <Input
+                    autoFocus
                     value={editForm.title}
                     onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
                     placeholder="タイトル"
@@ -238,17 +256,23 @@ export function ActionListFull({
               <CardContent className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {isBulkMode && (
-                    <Checkbox
-                      checked={isSelected}
-                      onCheckedChange={() => onToggleSelect(item.id)}
-                      aria-label={`${item.title}を選択`}
-                    />
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => onToggleSelect(item.id)}
+                        aria-label={`${item.title}を選択`}
+                      />
+                    </div>
                   )}
                   <Select
                     value={item.status}
                     onValueChange={(val) => handleStatusChange(item.id, val)}
                   >
-                    <SelectTrigger className="w-28" aria-label="ステータスを変更">
+                    <SelectTrigger
+                      className="w-28"
+                      aria-label="ステータスを変更"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -263,7 +287,11 @@ export function ActionListFull({
                       <p className="font-medium">{item.title}</p>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      <Link href={`/members/${item.member.id}`} className="hover:underline">
+                      <Link
+                        href={`/members/${item.member.id}`}
+                        className="hover:underline"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         {item.member.name}
                       </Link>
                       {" ・ "}
@@ -285,14 +313,6 @@ export function ActionListFull({
                 </div>
                 <div className="flex items-center gap-3">
                   {item.dueDate && <DueDateBadge dueDate={item.dueDate} status={item.status} />}
-                  <Button
-                    variant="ghost"
-                    size="icon-xs"
-                    aria-label="編集"
-                    onClick={() => handleEdit(item)}
-                  >
-                    <Pencil />
-                  </Button>
                 </div>
               </CardContent>
             )}

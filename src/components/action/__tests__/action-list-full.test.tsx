@@ -1,7 +1,14 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+
+// Radix UI Select が jsdom で要求するポインターキャプチャ API のスタブ
+beforeAll(() => {
+  Element.prototype.hasPointerCapture = () => false;
+  Element.prototype.setPointerCapture = () => {};
+  Element.prototype.releasePointerCapture = () => {};
+});
 
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
@@ -113,27 +120,24 @@ describe("ActionListFull", () => {
     expect(link.closest("a")?.getAttribute("href")).toBe("/members/member-1");
   });
 
-  it("編集ボタンが各行に表示される", () => {
-    render(<ActionListFull actionItems={baseItems} />);
-    const editButtons = screen.getAllByRole("button", { name: /編集/ });
-    expect(editButtons.length).toBe(2);
-  });
-
-  it("編集ボタンクリックで編集フォームが表示される", async () => {
+  it("行クリックで編集フォームが表示される", async () => {
     const user = userEvent.setup();
     render(<ActionListFull actionItems={baseItems} />);
-    const editButtons = screen.getAllByRole("button", { name: /編集/ });
-    await user.click(editButtons[0]);
+    await user.click(screen.getByTestId("action-card-action-1"));
     expect(screen.getByDisplayValue("レビュー依頼")).toBeDefined();
     expect(screen.getByRole("button", { name: /保存/ })).toBeDefined();
     expect(screen.getByRole("button", { name: /キャンセル/ })).toBeDefined();
   });
 
+  it("編集ボタンは表示されない", () => {
+    render(<ActionListFull actionItems={baseItems} />);
+    expect(screen.queryByRole("button", { name: /編集/ })).toBeNull();
+  });
+
   it("キャンセルボタンで編集モードを終了する", async () => {
     const user = userEvent.setup();
     render(<ActionListFull actionItems={baseItems} />);
-    const editButtons = screen.getAllByRole("button", { name: /編集/ });
-    await user.click(editButtons[0]);
+    await user.click(screen.getByTestId("action-card-action-1"));
     const cancelBtn = screen.getByRole("button", { name: /キャンセル/ });
     await user.click(cancelBtn);
     expect(screen.queryByDisplayValue("レビュー依頼")).toBeNull();
@@ -143,8 +147,7 @@ describe("ActionListFull", () => {
     const user = userEvent.setup();
     mockUpdateActionItem.mockResolvedValue({ success: true, data: {} });
     render(<ActionListFull actionItems={baseItems} />);
-    const editButtons = screen.getAllByRole("button", { name: /編集/ });
-    await user.click(editButtons[0]);
+    await user.click(screen.getByTestId("action-card-action-1"));
 
     const titleInput = screen.getByDisplayValue("レビュー依頼");
     await user.clear(titleInput);
@@ -163,8 +166,7 @@ describe("ActionListFull", () => {
     const user = userEvent.setup();
     mockUpdateActionItem.mockResolvedValue({ success: true, data: {} });
     render(<ActionListFull actionItems={baseItems} />);
-    const editButtons = screen.getAllByRole("button", { name: /編集/ });
-    await user.click(editButtons[0]);
+    await user.click(screen.getByTestId("action-card-action-1"));
 
     const saveBtn = screen.getByRole("button", { name: /保存/ });
     await user.click(saveBtn);
@@ -176,8 +178,7 @@ describe("ActionListFull", () => {
     const user = userEvent.setup();
     mockUpdateActionItem.mockResolvedValue({ success: false, error: "Error" });
     render(<ActionListFull actionItems={baseItems} />);
-    const editButtons = screen.getAllByRole("button", { name: /編集/ });
-    await user.click(editButtons[0]);
+    await user.click(screen.getByTestId("action-card-action-1"));
 
     const saveBtn = screen.getByRole("button", { name: /保存/ });
     await user.click(saveBtn);
@@ -299,11 +300,94 @@ describe("ActionListFull", () => {
     });
   });
 
+  describe("キーボードショートカット", () => {
+    it("Enter キーで保存される", async () => {
+      const user = userEvent.setup();
+      mockUpdateActionItem.mockResolvedValue({ success: true, data: {} });
+      render(<ActionListFull actionItems={baseItems} />);
+
+      // 行クリックで編集モードに入る
+      await user.click(screen.getByTestId("action-card-action-1"));
+
+      // タイトル入力欄にフォーカスがあることを確認
+      const titleInput = screen.getByDisplayValue("レビュー依頼");
+      expect(document.activeElement).toBe(titleInput);
+
+      // Enter で保存
+      await user.keyboard("{Enter}");
+      expect(mockUpdateActionItem).toHaveBeenCalledWith(
+        "action-1",
+        expect.objectContaining({ title: "レビュー依頼" }),
+      );
+    });
+
+    it("Escape キーでキャンセルされる", async () => {
+      const user = userEvent.setup();
+      render(<ActionListFull actionItems={baseItems} />);
+
+      await user.click(screen.getByTestId("action-card-action-1"));
+      expect(screen.getByDisplayValue("レビュー依頼")).toBeDefined();
+
+      await user.keyboard("{Escape}");
+      expect(screen.queryByDisplayValue("レビュー依頼")).toBeNull();
+    });
+
+    it("タイトルにフォーカスが自動的に当たる", async () => {
+      const user = userEvent.setup();
+      render(<ActionListFull actionItems={baseItems} />);
+
+      await user.click(screen.getByTestId("action-card-action-1"));
+
+      const titleInput = screen.getByDisplayValue("レビュー依頼");
+      expect(document.activeElement).toBe(titleInput);
+    });
+  });
+
   describe("ActionListFull - priority", () => {
     it("優先度バッジが表示される", () => {
       render(<ActionListFull actionItems={baseItems} />);
       expect(screen.getByText("高")).toBeDefined();
       expect(screen.getByText("低")).toBeDefined();
+    });
+  });
+
+  describe("クリック競合防止", () => {
+    it("ステータスSelect クリックでは編集モードに入らない", async () => {
+      const user = userEvent.setup();
+      render(<ActionListFull actionItems={baseItems} />);
+
+      const statusTrigger = screen.getAllByRole("combobox", { name: "ステータスを変更" })[0];
+      await user.click(statusTrigger);
+
+      expect(screen.queryByDisplayValue("レビュー依頼")).toBeNull();
+    });
+
+    it("メンバーリンククリックでは編集モードに入らない", async () => {
+      const user = userEvent.setup();
+      render(<ActionListFull actionItems={baseItems} />);
+
+      const memberLink = screen.getByText("田中太郎");
+      await user.click(memberLink);
+
+      expect(screen.queryByDisplayValue("レビュー依頼")).toBeNull();
+    });
+
+    it("バルクモード Checkbox クリックでは編集モードに入らない", async () => {
+      const user = userEvent.setup();
+      const mockToggle = vi.fn();
+      render(
+        <ActionListFull
+          actionItems={baseItems}
+          selectedIds={new Set<string>()}
+          onToggleSelect={mockToggle}
+        />,
+      );
+
+      const checkbox = screen.getByRole("checkbox", { name: "レビュー依頼を選択" });
+      await user.click(checkbox);
+
+      expect(mockToggle).toHaveBeenCalledWith("action-1");
+      expect(screen.queryByDisplayValue("レビュー依頼")).toBeNull();
     });
   });
 });
