@@ -116,8 +116,7 @@ describe("ActionListFull", () => {
   it("行クリックで編集フォームが表示される", async () => {
     const user = userEvent.setup();
     render(<ActionListFull actionItems={baseItems} />);
-    const title = screen.getByText("レビュー依頼");
-    await user.click(title.closest('[data-testid="action-card-action-1"]')!);
+    await user.click(screen.getByTestId("action-card-action-1"));
     expect(screen.getByDisplayValue("レビュー依頼")).toBeDefined();
     expect(screen.getByRole("button", { name: /保存/ })).toBeDefined();
     expect(screen.getByRole("button", { name: /キャンセル/ })).toBeDefined();
@@ -131,8 +130,7 @@ describe("ActionListFull", () => {
   it("キャンセルボタンで編集モードを終了する", async () => {
     const user = userEvent.setup();
     render(<ActionListFull actionItems={baseItems} />);
-    const card = screen.getByText("レビュー依頼").closest('[data-testid="action-card-action-1"]')!;
-    await user.click(card);
+    await user.click(screen.getByTestId("action-card-action-1"));
     const cancelBtn = screen.getByRole("button", { name: /キャンセル/ });
     await user.click(cancelBtn);
     expect(screen.queryByDisplayValue("レビュー依頼")).toBeNull();
@@ -142,8 +140,7 @@ describe("ActionListFull", () => {
     const user = userEvent.setup();
     mockUpdateActionItem.mockResolvedValue({ success: true, data: {} });
     render(<ActionListFull actionItems={baseItems} />);
-    const card = screen.getByText("レビュー依頼").closest('[data-testid="action-card-action-1"]')!;
-    await user.click(card);
+    await user.click(screen.getByTestId("action-card-action-1"));
 
     const titleInput = screen.getByDisplayValue("レビュー依頼");
     await user.clear(titleInput);
@@ -162,8 +159,7 @@ describe("ActionListFull", () => {
     const user = userEvent.setup();
     mockUpdateActionItem.mockResolvedValue({ success: true, data: {} });
     render(<ActionListFull actionItems={baseItems} />);
-    const card = screen.getByText("レビュー依頼").closest('[data-testid="action-card-action-1"]')!;
-    await user.click(card);
+    await user.click(screen.getByTestId("action-card-action-1"));
 
     const saveBtn = screen.getByRole("button", { name: /保存/ });
     await user.click(saveBtn);
@@ -175,8 +171,7 @@ describe("ActionListFull", () => {
     const user = userEvent.setup();
     mockUpdateActionItem.mockResolvedValue({ success: false, error: "Error" });
     render(<ActionListFull actionItems={baseItems} />);
-    const card = screen.getByText("レビュー依頼").closest('[data-testid="action-card-action-1"]')!;
-    await user.click(card);
+    await user.click(screen.getByTestId("action-card-action-1"));
 
     const saveBtn = screen.getByRole("button", { name: /保存/ });
     await user.click(saveBtn);
@@ -295,6 +290,49 @@ describe("ActionListFull", () => {
       ];
       render(<ActionListFull actionItems={dueSoonItems} />);
       expect(screen.getByText("もうすぐ期限")).toBeDefined();
+    });
+  });
+
+  describe("キーボードショートカット", () => {
+    it("Enter キーで保存される", async () => {
+      const user = userEvent.setup();
+      mockUpdateActionItem.mockResolvedValue({ success: true, data: {} });
+      render(<ActionListFull actionItems={baseItems} />);
+
+      // 行クリックで編集モードに入る
+      await user.click(screen.getByTestId("action-card-action-1"));
+
+      // タイトル入力欄にフォーカスがあることを確認
+      const titleInput = screen.getByDisplayValue("レビュー依頼");
+      expect(document.activeElement).toBe(titleInput);
+
+      // Enter で保存
+      await user.keyboard("{Enter}");
+      expect(mockUpdateActionItem).toHaveBeenCalledWith(
+        "action-1",
+        expect.objectContaining({ title: "レビュー依頼" }),
+      );
+    });
+
+    it("Escape キーでキャンセルされる", async () => {
+      const user = userEvent.setup();
+      render(<ActionListFull actionItems={baseItems} />);
+
+      await user.click(screen.getByTestId("action-card-action-1"));
+      expect(screen.getByDisplayValue("レビュー依頼")).toBeDefined();
+
+      await user.keyboard("{Escape}");
+      expect(screen.queryByDisplayValue("レビュー依頼")).toBeNull();
+    });
+
+    it("タイトルにフォーカスが自動的に当たる", async () => {
+      const user = userEvent.setup();
+      render(<ActionListFull actionItems={baseItems} />);
+
+      await user.click(screen.getByTestId("action-card-action-1"));
+
+      const titleInput = screen.getByDisplayValue("レビュー依頼");
+      expect(document.activeElement).toBe(titleInput);
     });
   });
 

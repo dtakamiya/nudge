@@ -176,6 +176,17 @@ export function ActionListFull({
     });
   }
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      handleCancel();
+    }
+    if (e.key === "Enter" && !e.shiftKey && e.target instanceof HTMLInputElement) {
+      e.preventDefault();
+      handleSave();
+    }
+  }
+
   return (
     <div className={`flex flex-col gap-3 ${isPending ? "opacity-80" : ""}`}>
       {optimisticItems.map((item) => {
@@ -192,9 +203,10 @@ export function ActionListFull({
             }}
           >
             {editingId === item.id ? (
-              <CardContent className="p-4 flex flex-col gap-3">
+              <CardContent className="p-4 flex flex-col gap-3" onKeyDown={handleKeyDown}>
                 <div className="flex flex-col gap-2">
                   <Input
+                    autoFocus
                     value={editForm.title}
                     onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
                     placeholder="タイトル"
