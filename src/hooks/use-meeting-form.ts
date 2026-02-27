@@ -82,11 +82,17 @@ export function useMeetingForm({
   const [goals, setGoals] = useState<{ id: string; title: string }[]>([]);
 
   useEffect(() => {
+    let cancelled = false;
     async function fetchGoals() {
       const activeGoals = await getActiveGoals(memberId);
-      setGoals(activeGoals.map((g) => ({ id: g.id, title: g.title })));
+      if (!cancelled) {
+        setGoals(activeGoals.map((g) => ({ id: g.id, title: g.title })));
+      }
     }
     fetchGoals();
+    return () => {
+      cancelled = true;
+    };
   }, [memberId]);
 
   const [mood, setMood] = useState<number | null>(initialData?.mood ?? null);

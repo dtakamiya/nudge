@@ -14,6 +14,10 @@ vi.mock("@/lib/actions/meeting-actions", () => ({
   updateMeeting: vi.fn(),
 }));
 
+vi.mock("@/lib/actions/goal-actions", () => ({
+  getActiveGoals: vi.fn().mockResolvedValue([]),
+}));
+
 vi.mock("@/lib/dnd-accessibility", () => ({
   sortableKeyboardCoordinates: vi.fn(),
   createAnnouncements: vi.fn(() => ({
