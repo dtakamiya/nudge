@@ -1,8 +1,8 @@
 import { GoalProgressBar } from "@/components/goal/goal-progress-bar";
-import type { Goal } from "@/generated/prisma/client";
+import type { GoalWithActionItems } from "@/lib/actions/goal-actions";
 
 type Props = {
-  goals: Goal[];
+  goals: GoalWithActionItems[];
 };
 
 export function PrepareGoalsSection({ goals }: Props) {
@@ -25,7 +25,20 @@ export function PrepareGoalsSection({ goals }: Props) {
               </span>
             )}
           </div>
-          <GoalProgressBar progress={goal.progress} size="sm" />
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <GoalProgressBar progress={goal.progress} size="sm" />
+            </div>
+            {goal.progressMode === "AUTO" && (
+              <span className="text-xs text-muted-foreground shrink-0">(自動)</span>
+            )}
+          </div>
+          {goal.actionItems && goal.actionItems.length > 0 && (
+            <p className="text-xs text-muted-foreground">
+              アクション {goal.actionItems.filter((a) => a.status === "DONE").length}/
+              {goal.actionItems.length} 完了
+            </p>
+          )}
           {goal.description && (
             <p className="text-xs text-muted-foreground line-clamp-2">{goal.description}</p>
           )}
