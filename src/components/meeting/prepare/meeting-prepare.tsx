@@ -2,8 +2,9 @@
 
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, ClipboardCopy } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +12,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import type { Goal, MeetingTemplate as DbMeetingTemplate } from "@/generated/prisma/client";
 import { useMeetingPrepare } from "@/hooks/use-meeting-prepare";
 import { screenReaderInstructions } from "@/lib/dnd-accessibility";
+import { formatPrepareAgendaMarkdown } from "@/lib/export";
+import type { FollowUpActionData } from "@/lib/export";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
 import { cn } from "@/lib/utils";
 
 import { TemplateSelector } from "../template/template-selector";
@@ -71,6 +75,25 @@ export function MeetingPrepare({
     handleCarryoverToggle,
     buildStartUrl,
   } = useMeetingPrepare({ memberId });
+
+  const hasContent = topics.some((t) => t.title.trim() !== "") || selectedFollowUpIds.size > 0;
+
+  async function handleCopyAgenda() {
+    const followUpActions: FollowUpActionData[] = lastMeetingData
+      ? lastMeetingData.pendingActions
+          .filter((a) => selectedFollowUpIds.has(a.id))
+          .map((a) => ({ title: a.title, description: "" }))
+      : [];
+
+    const markdown = formatPrepareAgendaMarkdown(memberName, topics, followUpActions);
+
+    try {
+      await navigator.clipboard.writeText(markdown);
+      toast.success(TOAST_MESSAGES.prepare.agendaCopied);
+    } catch {
+      toast.error(TOAST_MESSAGES.prepare.agendaCopyError);
+    }
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -175,9 +198,21 @@ export function MeetingPrepare({
             <CardHeader className="pb-3">
               <div className="flex justify-between items-center">
                 <CardTitle className="text-sm font-medium">アジェンダ</CardTitle>
-                <Button type="button" variant="outline" size="sm" onClick={addTopic}>
-                  + 話題を追加
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCopyAgenda}
+                    disabled={!hasContent}
+                    aria-label="アジェンダをクリップボードにコピー"
+                  >
+                    <ClipboardCopy className="w-4 h-4" />
+                  </Button>
+                  <Button type="button" variant="outline" size="sm" onClick={addTopic}>
+                    + 話題を追加
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
