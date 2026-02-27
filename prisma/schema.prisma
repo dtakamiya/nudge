@@ -20,6 +20,7 @@ model Member {
   meetings    Meeting[]
   actionItems ActionItem[]
   goals       Goal[]
+  notes       MemberNote[]
 }
 
 model Meeting {
@@ -170,4 +171,17 @@ model MeetingTemplate {
   isDefault   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model MemberNote {
+  id        String   @id @default(uuid())
+  content   String
+  category  String
+  memberId  String
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([memberId])
+  @@index([memberId, category])
 }
