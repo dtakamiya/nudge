@@ -7,6 +7,7 @@ import { formatDate, formatDuration } from "@/lib/format";
 import { getMoodOption } from "@/lib/mood";
 
 import { ConditionBar } from "../checkin/condition-bar";
+import { StarRating } from "../quality/star-rating";
 
 type Topic = {
   id: string;
@@ -38,6 +39,8 @@ type Props = {
   actionItems: ActionItem[];
   startedAt?: Date | null;
   endedAt?: Date | null;
+  qualityScore?: number | null;
+  usefulnessScore?: number | null;
 };
 
 export function MeetingDetail({
@@ -53,6 +56,8 @@ export function MeetingDetail({
   actionItems,
   startedAt,
   endedAt,
+  qualityScore,
+  usefulnessScore,
 }: Props) {
   const moodOption = getMoodOption(mood);
   const hasAnyCondition =
@@ -110,6 +115,26 @@ export function MeetingDetail({
               <p className="text-sm whitespace-pre-wrap">{checkinNote}</p>
             </div>
           )}
+        </div>
+      )}
+
+      {(qualityScore != null || usefulnessScore != null) && (
+        <div className="flex flex-col gap-2">
+          <h2 className="text-lg font-semibold tracking-tight">品質評価</h2>
+          <div className="flex items-center gap-6">
+            {qualityScore != null && (
+              <div className="flex flex-col gap-1">
+                <span className="text-sm text-muted-foreground">満足度</span>
+                <StarRating value={qualityScore} label="満足度" readOnly />
+              </div>
+            )}
+            {usefulnessScore != null && (
+              <div className="flex flex-col gap-1">
+                <span className="text-sm text-muted-foreground">有用度</span>
+                <StarRating value={usefulnessScore} label="有用度" readOnly />
+              </div>
+            )}
+          </div>
         </div>
       )}
 

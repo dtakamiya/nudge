@@ -61,6 +61,8 @@ type Props = {
   readonly startedAt?: Date | null;
   readonly endedAt?: Date | null;
   readonly previousConditions?: PreviousConditions;
+  readonly qualityScore?: number | null;
+  readonly usefulnessScore?: number | null;
 };
 
 export function MeetingDetailPageClient({
@@ -78,6 +80,8 @@ export function MeetingDetailPageClient({
   startedAt,
   endedAt,
   previousConditions,
+  qualityScore,
+  usefulnessScore,
 }: Props) {
   const {
     isEditing,
@@ -218,6 +222,8 @@ export function MeetingDetailPageClient({
         actionItems={[...actionItems]}
         startedAt={startedAt}
         endedAt={endedAt}
+        qualityScore={qualityScore}
+        usefulnessScore={usefulnessScore}
       />
       <SummaryDialog
         open={isSummaryDialogOpen}

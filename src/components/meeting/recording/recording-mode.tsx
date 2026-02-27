@@ -2,6 +2,7 @@
 
 import { Maximize2, Minimize2 } from "lucide-react";
 
+import { QualityScoreDialog } from "@/components/meeting/quality/quality-score-dialog";
 import { Button } from "@/components/ui/button";
 import { useFocusMode } from "@/hooks/use-focus-mode";
 import { type Topic, useRecordingSession } from "@/hooks/use-recording-session";
@@ -24,11 +25,14 @@ export function RecordingMode({ meetingId, startedAt, topics, onEnd }: Props) {
     sortedTopics,
     isEnding,
     saveStatus,
+    showQualityDialog,
     handleNotesChange,
     handleBlur,
     handleRetry,
     handleSaveIdle,
-    handleEnd,
+    handleEndRequest,
+    handleEndWithScores,
+    handleSkipQuality,
   } = useRecordingSession({ meetingId, topics, onEnd });
 
   return (
@@ -46,7 +50,7 @@ export function RecordingMode({ meetingId, startedAt, topics, onEnd }: Props) {
           >
             {isFocusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
           </Button>
-          <Button variant="destructive" size="sm" onClick={handleEnd} disabled={isEnding}>
+          <Button variant="destructive" size="sm" onClick={handleEndRequest} disabled={isEnding}>
             {isEnding ? "終了中..." : "ミーティングを終了する"}
           </Button>
         </div>
@@ -71,6 +75,12 @@ export function RecordingMode({ meetingId, startedAt, topics, onEnd }: Props) {
           ))}
         </div>
       )}
+
+      <QualityScoreDialog
+        open={showQualityDialog}
+        onSubmit={handleEndWithScores}
+        onSkip={handleSkipQuality}
+      />
     </div>
   );
 }

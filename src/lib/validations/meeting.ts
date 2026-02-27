@@ -81,6 +81,8 @@ export const startMeetingSchema = z.object({
 
 export const endMeetingSchema = z.object({
   meetingId: z.string().min(1, "ミーティングIDは必須です"),
+  qualityScore: z.number().int().min(1).max(5).nullable().optional(),
+  usefulnessScore: z.number().int().min(1).max(5).nullable().optional(),
 });
 
 export const updateTopicNotesSchema = z.object({

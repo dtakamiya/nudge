@@ -10,11 +10,12 @@ import {
   getMeetingFrequencyByMonth,
   getMemberActionTrends,
   getMemberMeetingHeatmap,
+  getQualityTrend,
   getRecommendedAndScheduledMeetings,
   getRecommendedMeetings,
   getScheduledMeetingsThisWeek,
 } from "../analytics-actions";
-import { createMeeting } from "../meeting-actions";
+import { createMeeting, endMeeting, startMeeting } from "../meeting-actions";
 import { createMember } from "../member-actions";
 
 beforeEach(async () => {
@@ -772,5 +773,78 @@ describe("getRecommendedAndScheduledMeetings", () => {
     expect(result).toHaveProperty("scheduled");
     expect(Array.isArray(result.recommended)).toBe(true);
     expect(Array.isArray(result.scheduled)).toBe(true);
+  });
+});
+
+describe("getQualityTrend", () => {
+  let memberId: string;
+
+  beforeEach(async () => {
+    const result = await createMember({ name: "Test Member" });
+    if (!result.success) throw new Error(result.error);
+    memberId = result.data.id;
+  });
+
+  it("品質スコアが記録されたミーティングのみ返す", async () => {
+    // スコアありのミーティング
+    const m1 = await createMeeting({
+      memberId,
+      date: "2026-01-15T10:00:00Z",
+      topics: [],
+      actionItems: [],
+    });
+    if (!m1.success) throw new Error(m1.error);
+    await startMeeting({ meetingId: m1.data.id });
+    await endMeeting({ meetingId: m1.data.id, qualityScore: 4, usefulnessScore: 3 });
+
+    // スコアなしのミーティング
+    const m2 = await createMeeting({
+      memberId,
+      date: "2026-02-15T10:00:00Z",
+      topics: [],
+      actionItems: [],
+    });
+    if (!m2.success) throw new Error(m2.error);
+    await startMeeting({ meetingId: m2.data.id });
+    await endMeeting({ meetingId: m2.data.id });
+
+    const trend = await getQualityTrend(memberId);
+    expect(trend).toHaveLength(1);
+    expect(trend[0].quality).toBe(4);
+    expect(trend[0].usefulness).toBe(3);
+  });
+
+  it("日付の昇順で返す", async () => {
+    for (const [date, score] of [
+      ["2026-02-15T10:00:00Z", 3],
+      ["2026-01-15T10:00:00Z", 5],
+    ] as const) {
+      const m = await createMeeting({ memberId, date, topics: [], actionItems: [] });
+      if (!m.success) throw new Error(m.error);
+      await startMeeting({ meetingId: m.data.id });
+      await endMeeting({ meetingId: m.data.id, qualityScore: score, usefulnessScore: score });
+    }
+
+    const trend = await getQualityTrend(memberId);
+    expect(trend).toHaveLength(2);
+    expect(trend[0].quality).toBe(5); // 1月が先
+    expect(trend[1].quality).toBe(3); // 2月が後
+  });
+
+  it("limit パラメータで件数を制限できる", async () => {
+    for (let i = 0; i < 5; i++) {
+      const m = await createMeeting({
+        memberId,
+        date: `2026-0${i + 1}-15T10:00:00Z`,
+        topics: [],
+        actionItems: [],
+      });
+      if (!m.success) throw new Error(m.error);
+      await startMeeting({ meetingId: m.data.id });
+      await endMeeting({ meetingId: m.data.id, qualityScore: 3, usefulnessScore: 4 });
+    }
+
+    const trend = await getQualityTrend(memberId, 3);
+    expect(trend).toHaveLength(3);
   });
 });

@@ -913,6 +913,48 @@ describe("deleteMeeting", () => {
   });
 });
 
+describe("endMeeting - quality scores", () => {
+  it("qualityScore と usefulnessScore を保存できる", async () => {
+    const created = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+    if (!created.success) throw new Error(created.error);
+    await startMeeting({ meetingId: created.data.id });
+
+    const result = await endMeeting({
+      meetingId: created.data.id,
+      qualityScore: 4,
+      usefulnessScore: 5,
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.qualityScore).toBe(4);
+    expect(result.data.usefulnessScore).toBe(5);
+    expect(result.data.endedAt).toBeTruthy();
+  });
+
+  it("qualityScore/usefulnessScore なしでも終了できる", async () => {
+    const created = await createMeeting({
+      memberId,
+      date: new Date().toISOString(),
+      topics: [],
+      actionItems: [],
+    });
+    if (!created.success) throw new Error(created.error);
+    await startMeeting({ meetingId: created.data.id });
+
+    const result = await endMeeting({ meetingId: created.data.id });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.qualityScore).toBeNull();
+    expect(result.data.usefulnessScore).toBeNull();
+    expect(result.data.endedAt).toBeTruthy();
+  });
+});
+
 describe("updateMeeting - タグ付き新規アクションアイテム", () => {
   it("新規トピックにタグを付けて追加できる", async () => {
     const tag = await prisma.tag.create({ data: { name: "トピックタグ" } });

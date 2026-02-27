@@ -547,6 +547,88 @@ describe("updateTopicNotesSchema", () => {
   });
 });
 
+describe("endMeetingSchema - qualityScore/usefulnessScore", () => {
+  it("qualityScore と usefulnessScore を指定できる", () => {
+    const result = endMeetingSchema.safeParse({
+      meetingId: "some-meeting-uuid",
+      qualityScore: 4,
+      usefulnessScore: 5,
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.qualityScore).toBe(4);
+      expect(result.data.usefulnessScore).toBe(5);
+    }
+  });
+
+  it("qualityScore と usefulnessScore は省略可能", () => {
+    const result = endMeetingSchema.safeParse({
+      meetingId: "some-meeting-uuid",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("qualityScore が null は有効", () => {
+    const result = endMeetingSchema.safeParse({
+      meetingId: "some-meeting-uuid",
+      qualityScore: null,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("qualityScore が 0 はエラー", () => {
+    const result = endMeetingSchema.safeParse({
+      meetingId: "some-meeting-uuid",
+      qualityScore: 0,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("qualityScore が 6 はエラー", () => {
+    const result = endMeetingSchema.safeParse({
+      meetingId: "some-meeting-uuid",
+      qualityScore: 6,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("usefulnessScore が 0 はエラー", () => {
+    const result = endMeetingSchema.safeParse({
+      meetingId: "some-meeting-uuid",
+      usefulnessScore: 0,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("usefulnessScore が 6 はエラー", () => {
+    const result = endMeetingSchema.safeParse({
+      meetingId: "some-meeting-uuid",
+      usefulnessScore: 6,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("qualityScore が 1-5 の範囲で有効", () => {
+    for (const val of [1, 2, 3, 4, 5]) {
+      const result = endMeetingSchema.safeParse({
+        meetingId: "some-meeting-uuid",
+        qualityScore: val,
+      });
+      expect(result.success).toBe(true);
+    }
+  });
+
+  it("usefulnessScore が 1-5 の範囲で有効", () => {
+    for (const val of [1, 2, 3, 4, 5]) {
+      const result = endMeetingSchema.safeParse({
+        meetingId: "some-meeting-uuid",
+        usefulnessScore: val,
+      });
+      expect(result.success).toBe(true);
+    }
+  });
+});
+
 describe("createMeetingSchema - actionItems priority", () => {
   it("actionItem に priority を指定できる", () => {
     const input = {

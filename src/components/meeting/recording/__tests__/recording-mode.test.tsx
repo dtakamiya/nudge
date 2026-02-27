@@ -80,17 +80,39 @@ describe("RecordingMode", () => {
     expect(screen.getByRole("button", { name: "ミーティングを終了する" })).toBeTruthy();
   });
 
-  it("終了ボタンクリックで endMeeting が呼ばれる", async () => {
+  it("終了ボタンクリックで品質スコアダイアログが表示される", async () => {
+    const user = userEvent.setup();
+    mockUpdateTopicNotes.mockResolvedValue({ success: true, data: {} as never });
+    render(<RecordingMode {...defaultProps} />);
+    const endButton = screen.getByRole("button", { name: "ミーティングを終了する" });
+    await user.click(endButton);
+    await waitFor(() => {
+      expect(screen.getByText("ミーティングの振り返り")).toBeTruthy();
+    });
+  });
+
+  it("ダイアログのスキップで endMeeting が null スコアで呼ばれる", async () => {
     const user = userEvent.setup();
     mockEndMeeting.mockResolvedValue({ success: true, data: {} as never });
     mockUpdateTopicNotes.mockResolvedValue({ success: true, data: {} as never });
     render(<RecordingMode {...defaultProps} />);
     const endButton = screen.getByRole("button", { name: "ミーティングを終了する" });
     await user.click(endButton);
-    expect(mockEndMeeting).toHaveBeenCalledWith({ meetingId: "meeting-1" });
+    await waitFor(() => {
+      expect(screen.getByText("スキップ")).toBeTruthy();
+    });
+    const skipButton = screen.getByRole("button", { name: "スキップ" });
+    await user.click(skipButton);
+    await waitFor(() => {
+      expect(mockEndMeeting).toHaveBeenCalledWith({
+        meetingId: "meeting-1",
+        qualityScore: null,
+        usefulnessScore: null,
+      });
+    });
   });
 
-  it("endMeeting 成功後に onEnd が呼ばれる", async () => {
+  it("ダイアログのスキップで endMeeting 成功後に onEnd が呼ばれる", async () => {
     const user = userEvent.setup();
     const onEnd = vi.fn();
     mockEndMeeting.mockResolvedValue({ success: true, data: {} as never });
@@ -98,6 +120,11 @@ describe("RecordingMode", () => {
     render(<RecordingMode {...defaultProps} onEnd={onEnd} />);
     const endButton = screen.getByRole("button", { name: "ミーティングを終了する" });
     await user.click(endButton);
+    await waitFor(() => {
+      expect(screen.getByText("スキップ")).toBeTruthy();
+    });
+    const skipButton = screen.getByRole("button", { name: "スキップ" });
+    await user.click(skipButton);
     await waitFor(() => {
       expect(onEnd).toHaveBeenCalled();
     });
@@ -117,6 +144,11 @@ describe("RecordingMode", () => {
     render(<RecordingMode {...defaultProps} onEnd={onEnd} />);
     const endButton = screen.getByRole("button", { name: "ミーティングを終了する" });
     await user.click(endButton);
+    await waitFor(() => {
+      expect(screen.getByText("スキップ")).toBeTruthy();
+    });
+    const skipButton = screen.getByRole("button", { name: "スキップ" });
+    await user.click(skipButton);
     await waitFor(() => {
       expect(mockEndMeeting).toHaveBeenCalled();
     });
