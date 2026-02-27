@@ -49,6 +49,8 @@ export default async function MeetingDetailPage({ params }: Props) {
             checkinNote={meeting.checkinNote}
             startedAt={meeting.startedAt}
             endedAt={meeting.endedAt}
+            qualityScore={meeting.qualityScore}
+            usefulnessScore={meeting.usefulnessScore}
             previousConditions={
               previousMeeting
                 ? {

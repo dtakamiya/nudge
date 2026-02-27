@@ -5,14 +5,15 @@ import { useState } from "react";
 
 type Props = {
   value: number | null;
-  onChange: (value: number | null) => void;
+  onChange?: (value: number | null) => void;
   label: string;
+  readOnly?: boolean;
 };
 
-export function StarRating({ value, onChange, label }: Props) {
+export function StarRating({ value, onChange, label, readOnly = false }: Props) {
   const [hoverValue, setHoverValue] = useState<number | null>(null);
 
-  const displayValue = hoverValue ?? value ?? 0;
+  const displayValue = readOnly ? (value ?? 0) : (hoverValue ?? value ?? 0);
 
   return (
     <div role="radiogroup" aria-label={label} className="flex items-center gap-1">
@@ -23,10 +24,13 @@ export function StarRating({ value, onChange, label }: Props) {
           role="radio"
           aria-checked={value !== null && star <= value}
           aria-label={`${star}点`}
-          className="rounded-md p-1 transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          onClick={() => onChange(value === star ? null : star)}
-          onMouseEnter={() => setHoverValue(star)}
-          onMouseLeave={() => setHoverValue(null)}
+          className={`rounded-md p-1 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+            readOnly ? "cursor-default" : "hover:scale-110"
+          }`}
+          onClick={readOnly ? undefined : () => onChange?.(value === star ? null : star)}
+          onMouseEnter={readOnly ? undefined : () => setHoverValue(star)}
+          onMouseLeave={readOnly ? undefined : () => setHoverValue(null)}
+          tabIndex={readOnly ? -1 : 0}
         >
           <Star
             className={`h-6 w-6 transition-colors ${
