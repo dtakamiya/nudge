@@ -43,3 +43,16 @@ export const CONDITION_ALERT_CHECK_COUNT = 3;
 export const MOOD_LOW_THRESHOLD = 2;
 /** コンディションアラート: コンディションスコアの低値閾値（5段階中） */
 export const CONDITION_LOW_THRESHOLD = 2;
+
+export const NOTE_CATEGORIES = [
+  { value: "good", label: "良い点" },
+  { value: "improvement", label: "改善点" },
+  { value: "notice", label: "気づき" },
+] as const;
+
+export type NoteCategory = (typeof NOTE_CATEGORIES)[number]["value"];
+
+export function getNoteCategoryLabel(category: string): string {
+  const found = NOTE_CATEGORIES.find((c) => c.value === category);
+  return found?.label ?? category;
+}

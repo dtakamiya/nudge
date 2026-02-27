@@ -43,6 +43,7 @@ export default async function PrepareMeetingPage({ params }: Props) {
       </div>
       <MeetingPrepare
         memberId={id}
+        memberName={member.name}
         pendingActions={pendingActions}
         lastMeetingData={lastMeetingData}
         customTemplates={customTemplates}

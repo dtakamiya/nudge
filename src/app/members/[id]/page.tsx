@@ -15,6 +15,7 @@ import {
   type MemberDetailTab,
   MemberDetailTabNav,
 } from "@/components/member/member-detail-tab-nav";
+import { MemberNoteTab } from "@/components/member/member-note-tab";
 import { MemberQuickActions } from "@/components/member/member-quick-actions";
 import { MemberStatsBar } from "@/components/member/member-stats-bar";
 import { MemberTimeline } from "@/components/member/member-timeline";
@@ -25,6 +26,7 @@ import { Separator } from "@/components/ui/separator";
 import { getGoals } from "@/lib/actions/goal-actions";
 import { getMoodTrend } from "@/lib/actions/meeting-actions";
 import { getMember, getMemberMeetings, getMemberTimeline } from "@/lib/actions/member-actions";
+import { getMemberNotes } from "@/lib/actions/member-note-actions";
 import { calcNextRecommendedDate } from "@/lib/schedule";
 
 type Props = {
@@ -33,7 +35,7 @@ type Props = {
 };
 
 function resolveTab(tab: string | undefined): MemberDetailTab {
-  if (tab === "history" || tab === "actions" || tab === "goals") return tab;
+  if (tab === "history" || tab === "actions" || tab === "goals" || tab === "notes") return tab;
   return "timeline";
 }
 
@@ -54,10 +56,11 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
     member.meetingIntervalDays,
   );
 
-  const [meetingsPage, timeline, goals] = await Promise.all([
+  const [meetingsPage, timeline, goals, notes] = await Promise.all([
     currentTab === "history" ? getMemberMeetings(id, page) : Promise.resolve(null),
     currentTab === "timeline" ? getMemberTimeline(id) : Promise.resolve(null),
     currentTab === "goals" ? getGoals(id) : Promise.resolve(null),
+    currentTab === "notes" ? getMemberNotes(id) : Promise.resolve(null),
   ]);
 
   return (
@@ -154,6 +157,13 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
           <>
             <Separator className="mb-6" />
             <GoalList goals={goals} memberId={id} />
+          </>
+        )}
+
+        {currentTab === "notes" && notes !== null && (
+          <>
+            <Separator className="mb-6" />
+            <MemberNoteTab notes={notes} memberId={id} />
           </>
         )}
       </div>
