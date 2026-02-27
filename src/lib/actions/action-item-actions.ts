@@ -102,6 +102,7 @@ export async function getActionItems(filters: ActionItemFilters = {}) {
         member: { select: { id: true, name: true } },
         meeting: { select: { id: true, date: true } },
         tags: { include: { tag: true } },
+        goal: { select: { id: true, title: true } },
       },
     });
     const total = allItems.length;
@@ -125,6 +126,7 @@ export async function getActionItems(filters: ActionItemFilters = {}) {
         member: { select: { id: true, name: true } },
         meeting: { select: { id: true, date: true } },
         tags: { include: { tag: true } },
+        goal: { select: { id: true, title: true } },
       },
     }),
     prisma.actionItem.count({ where }),
@@ -373,6 +375,7 @@ export async function getMyTasks(filters: { memberId?: string } = {}) {
       member: { select: { id: true, name: true } },
       meeting: { select: { id: true, date: true } },
       tags: { include: { tag: true } },
+      goal: { select: { id: true, title: true } },
     },
   });
 

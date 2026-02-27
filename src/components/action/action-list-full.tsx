@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { DueDateBadge } from "@/components/action/due-date-badge";
 import { PriorityBadge } from "@/components/action/priority-badge";
 import { TagBadge } from "@/components/tag/tag-badge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -39,9 +40,11 @@ type ActionItemRow = {
   status: string;
   priority: string;
   dueDate: Date | null;
+  goalId?: string | null;
   member: { id: string; name: string };
   meeting: { id: string; date: Date };
   tags?: TagData[];
+  goal?: { id: string; title: string } | null;
 };
 
 type EditFormState = {
@@ -49,6 +52,7 @@ type EditFormState = {
   description: string;
   dueDate: string;
   priority: string;
+  goalId: string | null;
 };
 
 type Props = {
@@ -113,6 +117,7 @@ export function ActionListFull({
     description: "",
     dueDate: "",
     priority: "MEDIUM",
+    goalId: null,
   });
   const [optimisticItems, setOptimisticItems] = useOptimistic(
     actionItems,
@@ -150,6 +155,7 @@ export function ActionListFull({
       description: item.description,
       dueDate: item.dueDate ? new Date(item.dueDate).toISOString().split("T")[0] : "",
       priority: item.priority,
+      goalId: item.goalId ?? null,
     });
   }
 
@@ -165,6 +171,7 @@ export function ActionListFull({
         description: editForm.description,
         dueDate: editForm.dueDate || undefined,
         priority: editForm.priority as "HIGH" | "MEDIUM" | "LOW",
+        goalId: editForm.goalId,
       });
       if (result.success) {
         toast.success(TOAST_MESSAGES.actionItem.updateSuccess);
@@ -262,6 +269,11 @@ export function ActionListFull({
                       {" ・ "}
                       {formatDate(item.meeting.date)}
                     </p>
+                    {item.goal && (
+                      <Badge variant="outline" className="text-xs mt-1">
+                        {item.goal.title}
+                      </Badge>
+                    )}
                     {item.tags && item.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">
                         {item.tags.map((tag) => (
