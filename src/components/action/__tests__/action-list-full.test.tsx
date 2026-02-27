@@ -113,27 +113,26 @@ describe("ActionListFull", () => {
     expect(link.closest("a")?.getAttribute("href")).toBe("/members/member-1");
   });
 
-  it("編集ボタンが各行に表示される", () => {
-    render(<ActionListFull actionItems={baseItems} />);
-    const editButtons = screen.getAllByRole("button", { name: /編集/ });
-    expect(editButtons.length).toBe(2);
-  });
-
-  it("編集ボタンクリックで編集フォームが表示される", async () => {
+  it("行クリックで編集フォームが表示される", async () => {
     const user = userEvent.setup();
     render(<ActionListFull actionItems={baseItems} />);
-    const editButtons = screen.getAllByRole("button", { name: /編集/ });
-    await user.click(editButtons[0]);
+    const title = screen.getByText("レビュー依頼");
+    await user.click(title.closest('[data-testid="action-card-action-1"]')!);
     expect(screen.getByDisplayValue("レビュー依頼")).toBeDefined();
     expect(screen.getByRole("button", { name: /保存/ })).toBeDefined();
     expect(screen.getByRole("button", { name: /キャンセル/ })).toBeDefined();
   });
 
+  it("編集ボタンは表示されない", () => {
+    render(<ActionListFull actionItems={baseItems} />);
+    expect(screen.queryByRole("button", { name: /編集/ })).toBeNull();
+  });
+
   it("キャンセルボタンで編集モードを終了する", async () => {
     const user = userEvent.setup();
     render(<ActionListFull actionItems={baseItems} />);
-    const editButtons = screen.getAllByRole("button", { name: /編集/ });
-    await user.click(editButtons[0]);
+    const card = screen.getByText("レビュー依頼").closest('[data-testid="action-card-action-1"]')!;
+    await user.click(card);
     const cancelBtn = screen.getByRole("button", { name: /キャンセル/ });
     await user.click(cancelBtn);
     expect(screen.queryByDisplayValue("レビュー依頼")).toBeNull();
@@ -143,8 +142,8 @@ describe("ActionListFull", () => {
     const user = userEvent.setup();
     mockUpdateActionItem.mockResolvedValue({ success: true, data: {} });
     render(<ActionListFull actionItems={baseItems} />);
-    const editButtons = screen.getAllByRole("button", { name: /編集/ });
-    await user.click(editButtons[0]);
+    const card = screen.getByText("レビュー依頼").closest('[data-testid="action-card-action-1"]')!;
+    await user.click(card);
 
     const titleInput = screen.getByDisplayValue("レビュー依頼");
     await user.clear(titleInput);
@@ -163,8 +162,8 @@ describe("ActionListFull", () => {
     const user = userEvent.setup();
     mockUpdateActionItem.mockResolvedValue({ success: true, data: {} });
     render(<ActionListFull actionItems={baseItems} />);
-    const editButtons = screen.getAllByRole("button", { name: /編集/ });
-    await user.click(editButtons[0]);
+    const card = screen.getByText("レビュー依頼").closest('[data-testid="action-card-action-1"]')!;
+    await user.click(card);
 
     const saveBtn = screen.getByRole("button", { name: /保存/ });
     await user.click(saveBtn);
@@ -176,8 +175,8 @@ describe("ActionListFull", () => {
     const user = userEvent.setup();
     mockUpdateActionItem.mockResolvedValue({ success: false, error: "Error" });
     render(<ActionListFull actionItems={baseItems} />);
-    const editButtons = screen.getAllByRole("button", { name: /編集/ });
-    await user.click(editButtons[0]);
+    const card = screen.getByText("レビュー依頼").closest('[data-testid="action-card-action-1"]')!;
+    await user.click(card);
 
     const saveBtn = screen.getByRole("button", { name: /保存/ });
     await user.click(saveBtn);
