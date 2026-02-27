@@ -36,6 +36,7 @@ type LastMeetingData = {
 
 type Props = {
   memberId: string;
+  memberName: string;
   pendingActions: PendingAction[];
   lastMeetingData: LastMeetingData;
   customTemplates?: DbMeetingTemplate[];
@@ -44,6 +45,7 @@ type Props = {
 
 export function MeetingPrepare({
   memberId,
+  memberName,
   pendingActions,
   lastMeetingData,
   customTemplates = [],
