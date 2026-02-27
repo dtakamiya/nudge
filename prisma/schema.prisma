@@ -74,7 +74,8 @@ model ActionItem {
   memberId    String
   title       String
   description String           @default("")
-  status      ActionItemStatus @default(TODO)
+  status      ActionItemStatus  @default(TODO)
+  priority    ActionItemPriority @default(MEDIUM)
   sortOrder   Int              @default(0)
   dueDate     DateTime?
   completedAt DateTime?
@@ -90,12 +91,19 @@ model ActionItem {
   @@index([memberId])
   @@index([memberId, status])
   @@index([status])
+  @@index([priority])
 }
 
 enum ActionItemStatus {
   TODO
   IN_PROGRESS
   DONE
+}
+
+enum ActionItemPriority {
+  HIGH
+  MEDIUM
+  LOW
 }
 
 model Tag {

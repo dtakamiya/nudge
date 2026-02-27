@@ -10,12 +10,12 @@ import { getMembers } from "@/lib/actions/member-actions";
 import { getTags } from "@/lib/actions/tag-actions";
 import type { GroupByType } from "@/lib/group-actions";
 import type { DateFilterType, SortByType } from "@/lib/types";
-import type { ActionItemStatusType } from "@/lib/validations/action-item";
+import type { ActionItemPriorityType, ActionItemStatusType } from "@/lib/validations/action-item";
 
 export const dynamic = "force-dynamic";
 
 const DATE_FILTERS: DateFilterType[] = ["all", "overdue", "this-week", "this-month", "no-date"];
-const SORT_OPTIONS: SortByType[] = ["dueDate", "createdAt", "updatedAt", "memberName"];
+const SORT_OPTIONS: SortByType[] = ["dueDate", "createdAt", "updatedAt", "memberName", "priority"];
 const GROUP_BY_OPTIONS: GroupByType[] = ["none", "member", "dueDate", "tag"];
 const PER_PAGE = 20;
 const PER_PAGE_GROUPED = 1000;
@@ -23,6 +23,7 @@ const PER_PAGE_GROUPED = 1000;
 type Props = {
   searchParams: Promise<{
     status?: string;
+    priority?: string;
     memberId?: string;
     tag?: string;
     q?: string;
@@ -38,6 +39,7 @@ export default async function ActionsPage({ searchParams }: Props) {
 
   const filters: {
     status?: ActionItemStatusType;
+    priority?: ActionItemPriorityType;
     memberId?: string;
     tagIds?: string[];
     keyword?: string;
@@ -49,6 +51,9 @@ export default async function ActionsPage({ searchParams }: Props) {
 
   if (params.status && ["TODO", "IN_PROGRESS", "DONE"].includes(params.status)) {
     filters.status = params.status as ActionItemStatusType;
+  }
+  if (params.priority && ["HIGH", "MEDIUM", "LOW"].includes(params.priority)) {
+    filters.priority = params.priority as ActionItemPriorityType;
   }
   if (params.memberId) {
     filters.memberId = params.memberId;
@@ -91,6 +96,7 @@ export default async function ActionsPage({ searchParams }: Props) {
 
   const hasFilter =
     !!filters.status ||
+    !!filters.priority ||
     !!filters.memberId ||
     !!filters.tagIds ||
     !!filters.keyword ||

@@ -53,6 +53,7 @@ export async function createMeeting(
               description: item.description,
               sortOrder: item.sortOrder ?? index,
               dueDate: item.dueDate ? new Date(item.dueDate) : null,
+              priority: item.priority ?? "MEDIUM",
             })),
           },
         },
@@ -234,6 +235,7 @@ export async function updateMeeting(
               description: item.description,
               sortOrder: item.sortOrder,
               dueDate: item.dueDate ? new Date(item.dueDate) : null,
+              priority: item.priority ?? "MEDIUM",
             },
           });
           // タグを全削除してから再作成
@@ -252,6 +254,7 @@ export async function updateMeeting(
               description: item.description,
               sortOrder: item.sortOrder,
               dueDate: item.dueDate ? new Date(item.dueDate) : null,
+              priority: item.priority ?? "MEDIUM",
             },
           });
           if (allTagIds.length > 0) {

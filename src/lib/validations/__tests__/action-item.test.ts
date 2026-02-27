@@ -1,6 +1,23 @@
 import { describe, expect, it } from "vitest";
 
-import { updateActionItemSchema, updateActionItemStatusSchema } from "../action-item";
+import {
+  actionItemPriority,
+  updateActionItemSchema,
+  updateActionItemStatusSchema,
+} from "../action-item";
+
+describe("actionItemPriority", () => {
+  it("HIGH / MEDIUM / LOW を受け入れる", () => {
+    expect(actionItemPriority.parse("HIGH")).toBe("HIGH");
+    expect(actionItemPriority.parse("MEDIUM")).toBe("MEDIUM");
+    expect(actionItemPriority.parse("LOW")).toBe("LOW");
+  });
+
+  it("不正な値はエラーになる", () => {
+    expect(() => actionItemPriority.parse("URGENT")).toThrow();
+    expect(() => actionItemPriority.parse("")).toThrow();
+  });
+});
 
 describe("updateActionItemStatusSchema", () => {
   it("accepts valid status", () => {
@@ -57,5 +74,34 @@ describe("updateActionItemSchema", () => {
       dueDate: "",
     });
     expect(result.success).toBe(true);
+  });
+});
+
+describe("updateActionItemSchema - priority", () => {
+  it("priority を含むオブジェクトを検証できる", () => {
+    const result = updateActionItemSchema.parse({
+      title: "タスク",
+      description: "",
+      priority: "HIGH",
+    });
+    expect(result.priority).toBe("HIGH");
+  });
+
+  it("priority を省略した場合は MEDIUM がデフォルト", () => {
+    const result = updateActionItemSchema.parse({
+      title: "タスク",
+      description: "",
+    });
+    expect(result.priority).toBe("MEDIUM");
+  });
+
+  it("priority に不正な値はエラーになる", () => {
+    expect(() =>
+      updateActionItemSchema.parse({
+        title: "タスク",
+        description: "",
+        priority: "CRITICAL",
+      }),
+    ).toThrow();
   });
 });

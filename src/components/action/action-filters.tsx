@@ -89,6 +89,20 @@ export function ActionFilters({ members, tags = [] }: Props) {
           </SelectContent>
         </Select>
         <Select
+          value={searchParams.get("priority") ?? "all"}
+          onValueChange={(val) => updateFilter("priority", val)}
+        >
+          <SelectTrigger className="flex-1 min-w-[7rem] sm:w-36" aria-label="優先度で絞り込み">
+            <SelectValue placeholder="優先度" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">すべての優先度</SelectItem>
+            <SelectItem value="HIGH">高</SelectItem>
+            <SelectItem value="MEDIUM">中</SelectItem>
+            <SelectItem value="LOW">低</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select
           value={searchParams.get("memberId") ?? "all"}
           onValueChange={(val) => updateFilter("memberId", val)}
         >
@@ -131,6 +145,7 @@ export function ActionFilters({ members, tags = [] }: Props) {
             <SelectItem value="createdAt">作成日順</SelectItem>
             <SelectItem value="updatedAt">更新日順</SelectItem>
             <SelectItem value="memberName">メンバー名順</SelectItem>
+            <SelectItem value="priority">優先度順</SelectItem>
           </SelectContent>
         </Select>
         {tags.length > 0 && <TagFilter tags={tags} />}

@@ -9,12 +9,15 @@ export type TopicFormData = {
   tags: TagData[];
 };
 
+export type ActionPriority = "HIGH" | "MEDIUM" | "LOW";
+
 export type ActionFormData = {
   id?: string;
   title: string;
   description: string;
   sortOrder: number;
   dueDate: string;
+  priority: ActionPriority;
   tags: TagData[];
 };
 
@@ -41,6 +44,7 @@ export type MeetingInitialData = {
     readonly sortOrder: number;
     readonly dueDate: string;
     readonly status: string;
+    readonly priority: ActionPriority;
     readonly tags?: ReadonlyArray<TagData>;
   }>;
 };
@@ -64,7 +68,7 @@ export function createEmptyTopic(sortOrder: number): TopicFormData {
 }
 
 export function createEmptyAction(sortOrder: number): ActionFormData {
-  return { title: "", description: "", sortOrder, dueDate: "", tags: [] };
+  return { title: "", description: "", sortOrder, dueDate: "", priority: "MEDIUM", tags: [] };
 }
 
 export function buildTagParams(tags: TagData[]) {

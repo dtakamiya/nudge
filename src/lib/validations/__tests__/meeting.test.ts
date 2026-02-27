@@ -546,3 +546,40 @@ describe("updateTopicNotesSchema", () => {
     expect(result.success).toBe(false);
   });
 });
+
+describe("createMeetingSchema - actionItems priority", () => {
+  it("actionItem に priority を指定できる", () => {
+    const input = {
+      memberId: "test-id",
+      date: "2026-03-01",
+      topics: [],
+      actionItems: [{ title: "タスク", priority: "HIGH" }],
+    };
+    const result = createMeetingSchema.safeParse(input);
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.actionItems[0].priority).toBe("HIGH");
+  });
+
+  it("actionItem の priority 省略時は MEDIUM がデフォルト", () => {
+    const input = {
+      memberId: "test-id",
+      date: "2026-03-01",
+      topics: [],
+      actionItems: [{ title: "タスク" }],
+    };
+    const result = createMeetingSchema.parse(input);
+    expect(result.actionItems[0].priority).toBe("MEDIUM");
+  });
+
+  it("actionItem に不正な priority を指定するとバリデーションエラー", () => {
+    const input = {
+      memberId: "test-id",
+      date: "2026-03-01",
+      topics: [],
+      actionItems: [{ title: "タスク", priority: "INVALID" }],
+    };
+    const result = createMeetingSchema.safeParse(input);
+    expect(result.success).toBe(false);
+  });
+});

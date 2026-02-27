@@ -505,6 +505,95 @@ describe("getActionItems - sortBy: updatedAt", () => {
   });
 });
 
+describe("getActionItems - priority filter", () => {
+  it("priority=HIGH でフィルタリングできる", async () => {
+    await prisma.actionItem.create({
+      data: {
+        meetingId,
+        memberId,
+        title: "高優先度タスク",
+        description: "",
+        priority: "HIGH",
+      },
+    });
+    await prisma.actionItem.create({
+      data: {
+        meetingId,
+        memberId,
+        title: "低優先度タスク",
+        description: "",
+        priority: "LOW",
+      },
+    });
+
+    const result = await getActionItems({ priority: "HIGH" });
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].title).toBe("高優先度タスク");
+    expect(result.items[0].priority).toBe("HIGH");
+  });
+});
+
+describe("getActionItems - priority sort", () => {
+  it("sortBy=priority で HIGH → MEDIUM → LOW の順になる", async () => {
+    await prisma.actionItem.create({
+      data: { meetingId, memberId, title: "低優先", description: "", priority: "LOW" },
+    });
+    await prisma.actionItem.create({
+      data: { meetingId, memberId, title: "高優先", description: "", priority: "HIGH" },
+    });
+    await prisma.actionItem.create({
+      data: { meetingId, memberId, title: "中優先", description: "", priority: "MEDIUM" },
+    });
+
+    const result = await getActionItems({ sortBy: "priority" });
+    expect(result.items[0].title).toBe("高優先");
+    expect(result.items[1].title).toBe("中優先");
+    expect(result.items[2].title).toBe("低優先");
+  });
+});
+
+describe("updateActionItem - priority", () => {
+  it("priority を更新できる", async () => {
+    const createResult = await createActionItemForMeeting(meetingId, memberId, {
+      title: "テストタスク",
+      description: "",
+    });
+    if (!createResult.success) throw new Error(createResult.error);
+
+    const updateResult = await updateActionItem(createResult.data.id, {
+      title: "テストタスク",
+      description: "",
+      priority: "HIGH",
+    });
+    expect(updateResult.success).toBe(true);
+    if (!updateResult.success) return;
+    expect(updateResult.data.priority).toBe("HIGH");
+  });
+});
+
+describe("createActionItemForMeeting - priority", () => {
+  it("priority を指定して作成できる", async () => {
+    const result = await createActionItemForMeeting(meetingId, memberId, {
+      title: "高優先アクション",
+      description: "",
+      priority: "HIGH",
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.priority).toBe("HIGH");
+  });
+
+  it("priority を省略した場合は MEDIUM がデフォルト", async () => {
+    const result = await createActionItemForMeeting(meetingId, memberId, {
+      title: "デフォルト優先度",
+      description: "",
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.priority).toBe("MEDIUM");
+  });
+});
+
 describe("getLastMeetingPendingActions", () => {
   it("前回ミーティングの未完了アクションを返す", async () => {
     // beforeEach のミーティングより確実に新しい日付を使用（タイミング競合を防ぐ）

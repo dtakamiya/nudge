@@ -1,6 +1,7 @@
 export { MeetingForm } from "./meeting-form";
 export type {
   ActionFormData,
+  ActionPriority,
   MeetingFormProps,
   MeetingInitialData,
   PreviousConditions,

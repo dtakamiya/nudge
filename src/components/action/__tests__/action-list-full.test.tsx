@@ -42,6 +42,7 @@ const baseItems = [
     title: "レビュー依頼",
     description: "PRのレビューをする",
     status: "TODO",
+    priority: "HIGH",
     dueDate: new Date("2099-12-31"),
     member: { id: "member-1", name: "田中太郎" },
     meeting: { id: "meeting-1", date: new Date("2026-02-15") },
@@ -51,6 +52,7 @@ const baseItems = [
     title: "ドキュメント更新",
     description: "",
     status: "IN_PROGRESS",
+    priority: "LOW",
     dueDate: null,
     member: { id: "member-2", name: "佐藤花子" },
     meeting: { id: "meeting-2", date: new Date("2026-02-10") },
@@ -197,6 +199,7 @@ describe("ActionListFull", () => {
           title: "ドキュメント更新",
           description: "",
           status: "IN_PROGRESS",
+          priority: "MEDIUM",
           dueDate: null,
           member: { id: "member-2", name: "佐藤花子" },
           meeting: { id: "meeting-2", date: new Date("2026-02-10") },
@@ -227,6 +230,7 @@ describe("ActionListFull", () => {
           title: "期限切れタスク",
           description: "",
           status: "TODO",
+          priority: "MEDIUM",
           dueDate: new Date("2020-01-01"),
           member: { id: "member-1", name: "田中太郎" },
           meeting: { id: "meeting-1", date: new Date("2020-01-01") },
@@ -243,6 +247,7 @@ describe("ActionListFull", () => {
           title: "完了タスク",
           description: "",
           status: "DONE",
+          priority: "MEDIUM",
           dueDate: new Date("2020-01-01"),
           member: { id: "member-1", name: "田中太郎" },
           meeting: { id: "meeting-1", date: new Date("2020-01-01") },
@@ -261,6 +266,7 @@ describe("ActionListFull", () => {
           title: "タスクA",
           description: "",
           status: "TODO",
+          priority: "MEDIUM",
           dueDate: null,
           member: { id: "member-1", name: "田中太郎" },
           meeting: { id: "meeting-1", date: new Date("2026-02-01") },
@@ -282,6 +288,7 @@ describe("ActionListFull", () => {
           title: "もうすぐ期限タスク",
           description: "",
           status: "TODO",
+          priority: "MEDIUM",
           dueDate: twoDaysFromNow,
           member: { id: "member-1", name: "田中太郎" },
           meeting: { id: "meeting-1", date: new Date("2026-01-01") },
@@ -289,6 +296,14 @@ describe("ActionListFull", () => {
       ];
       render(<ActionListFull actionItems={dueSoonItems} />);
       expect(screen.getByText("もうすぐ期限")).toBeDefined();
+    });
+  });
+
+  describe("ActionListFull - priority", () => {
+    it("優先度バッジが表示される", () => {
+      render(<ActionListFull actionItems={baseItems} />);
+      expect(screen.getByText("高")).toBeDefined();
+      expect(screen.getByText("低")).toBeDefined();
     });
   });
 });

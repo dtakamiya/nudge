@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import type { ConditionField } from "@/components/meeting/checkin";
 import {
   type ActionFormData,
+  type ActionPriority,
   buildTagParams,
   createEmptyAction,
   createEmptyTopic,
@@ -70,6 +71,7 @@ export function useMeetingForm({
           description: a.description,
           sortOrder: a.sortOrder ?? index,
           dueDate: a.dueDate,
+          priority: (a.priority ?? "MEDIUM") as ActionPriority,
           tags: a.tags ? [...a.tags] : [],
         }))
       : [],
@@ -162,6 +164,10 @@ export function useMeetingForm({
     setActionItems((prev) => prev.map((a, i) => (i === index ? { ...a, tags } : a)));
   }
 
+  function updateActionPriority(index: number, priority: ActionPriority) {
+    setActionItems((prev) => prev.map((a, i) => (i === index ? { ...a, priority } : a)));
+  }
+
   function handleActionDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -204,6 +210,7 @@ export function useMeetingForm({
             description: a.description,
             sortOrder: a.sortOrder ?? index,
             dueDate: a.dueDate || undefined,
+            priority: a.priority,
             ...buildTagParams(a.tags),
           })),
           deletedTopicIds,
@@ -241,6 +248,7 @@ export function useMeetingForm({
             description: a.description,
             sortOrder: a.sortOrder ?? index,
             dueDate: a.dueDate || undefined,
+            priority: a.priority,
             ...buildTagParams(a.tags),
           })),
         });
@@ -338,6 +346,7 @@ export function useMeetingForm({
     removeAction,
     updateAction,
     updateActionTags,
+    updateActionPriority,
     handleActionDragEnd,
     handleSubmit,
     handleClosingConfirm,

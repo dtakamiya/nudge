@@ -4,12 +4,20 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 
+import type { ActionPriority } from "@/components/meeting/form";
 import { TagBadge } from "@/components/tag/tag-badge";
 import { TagInput } from "@/components/tag/tag-input";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export type TagData = {
   id?: string;
@@ -22,6 +30,7 @@ type Props = {
   readonly title: string;
   readonly description: string;
   readonly dueDate: string;
+  readonly priority: ActionPriority;
   readonly index: number;
   readonly tags?: TagData[];
   readonly onTagsChange?: (index: number, tags: TagData[]) => void;
@@ -30,6 +39,7 @@ type Props = {
     field: "title" | "description" | "dueDate",
     value: string,
   ) => void;
+  readonly onPriorityChange?: (index: number, priority: ActionPriority) => void;
   readonly onRemove: (index: number) => void;
 };
 
@@ -38,10 +48,12 @@ export function SortableActionItem({
   title,
   description,
   dueDate,
+  priority,
   index,
   tags = [],
   onTagsChange,
   onUpdate,
+  onPriorityChange,
   onRemove,
 }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -96,6 +108,22 @@ export function SortableActionItem({
             value={dueDate}
             onChange={(value) => onUpdate(index, "dueDate", value)}
           />
+        </div>
+        <div className="flex-none w-20">
+          <Label htmlFor={`action-${itemId}-priority`}>優先度</Label>
+          <Select
+            value={priority}
+            onValueChange={(val) => onPriorityChange?.(index, val as ActionPriority)}
+          >
+            <SelectTrigger id={`action-${itemId}-priority`} className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="HIGH">高</SelectItem>
+              <SelectItem value="MEDIUM">中</SelectItem>
+              <SelectItem value="LOW">低</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <Button type="button" variant="ghost" size="sm" onClick={() => onRemove(index)}>
           削除
