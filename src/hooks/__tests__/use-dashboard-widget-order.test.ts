@@ -1,8 +1,8 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import { useDashboardWidgetOrder } from "../use-dashboard-widget-order";
 import { WIDGET_KEYS, type WidgetKey } from "../use-dashboard-widget-settings";
-import { DEFAULT_WIDGET_ORDER, useDashboardWidgetOrder } from "../use-dashboard-widget-order";
 
 const ORDER_STORAGE_KEY = "nudge-dashboard-widget-order";
 
