@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { GoalProgressBar } from "./goal-progress-bar";
 
 type Props = {
-  goal: Goal;
+  goal: Goal & { actionItems?: { id: string; status: string }[] };
   onEdit: (goal: Goal) => void;
 };
 
@@ -123,9 +123,16 @@ export function GoalCard({ goal, onEdit }: Props) {
         </div>
       </div>
 
-      <GoalProgressBar progress={goal.progress} />
+      <div className="flex items-center gap-2">
+        <div className="flex-1">
+          <GoalProgressBar progress={goal.progress} />
+        </div>
+        {goal.progressMode === "AUTO" && (
+          <span className="text-xs text-muted-foreground shrink-0">(自動)</span>
+        )}
+      </div>
 
-      {goal.status === "IN_PROGRESS" && (
+      {goal.status === "IN_PROGRESS" && goal.progressMode !== "AUTO" && (
         <Slider
           value={[goal.progress]}
           onValueCommit={handleProgressChange}
@@ -135,6 +142,13 @@ export function GoalCard({ goal, onEdit }: Props) {
           className="w-full"
           aria-label="進捗スライダー"
         />
+      )}
+
+      {goal.actionItems && goal.actionItems.length > 0 && (
+        <p className="text-xs text-muted-foreground">
+          アクション {goal.actionItems.filter((a) => a.status === "DONE").length}/
+          {goal.actionItems.length} 完了
+        </p>
       )}
 
       {dueDateStr && (
