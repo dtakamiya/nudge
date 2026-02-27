@@ -4,8 +4,10 @@ import { AnalyticsFilterBar } from "@/components/analytics/analytics-filter-bar"
 import { MeetingFrequencyChart } from "@/components/analytics/meeting-frequency-chart";
 import { MeetingHeatmap } from "@/components/analytics/meeting-heatmap";
 import { MeetingIntervalTable } from "@/components/analytics/meeting-interval-table";
+import { QualityTrendChart } from "@/components/analytics/quality-trend-chart";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import {
+  getAggregatedQualityTrend,
   getAllMembersWithInterval,
   getDepartments,
   getMeetingFrequencyByMonth,
@@ -37,11 +39,12 @@ export default async function AnalyticsPage({
   const period = parsePeriod(params.period);
   const sort = parseSort(params.sort);
 
-  const [frequencyData, heatmapData, allMembers, departments] = await Promise.all([
+  const [frequencyData, heatmapData, allMembers, departments, qualityTrend] = await Promise.all([
     getMeetingFrequencyByMonth(period, department || undefined),
     getMemberMeetingHeatmap(period, department || undefined),
     getAllMembersWithInterval({ department: department || undefined, sort }),
     getDepartments(),
+    getAggregatedQualityTrend(period, department || undefined),
   ]);
 
   return (
@@ -69,6 +72,13 @@ export default async function AnalyticsPage({
 
       <div className="mb-8">
         <MeetingHeatmap data={heatmapData} />
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
+          品質スコアの推移（直近{period}ヶ月）
+        </h2>
+        <QualityTrendChart data={qualityTrend} />
       </div>
 
       <div>
