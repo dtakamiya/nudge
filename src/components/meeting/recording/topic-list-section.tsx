@@ -40,7 +40,13 @@ export function TopicListSection({
       <CardHeader className="pb-3">
         <div className="flex justify-between items-center">
           <CardTitle className="text-sm font-medium">話題</CardTitle>
-          <Button type="button" variant="outline" size="sm" onClick={onAdd}>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="hidden md:inline-flex"
+            onClick={onAdd}
+          >
             + 話題を追加
           </Button>
         </div>
