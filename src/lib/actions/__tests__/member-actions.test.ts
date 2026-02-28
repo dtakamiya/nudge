@@ -337,6 +337,48 @@ describe("getMemberTimeline", () => {
     }
   });
 
+  it("includes goal_completed entries for COMPLETED goals", async () => {
+    const memberResult = await createMember({ name: "Goal Member" });
+    if (!memberResult.success) throw new Error(memberResult.error);
+
+    // ゴールを作成して COMPLETED にする
+    const goal = await prisma.goal.create({
+      data: {
+        memberId: memberResult.data.id,
+        title: "Completed Goal",
+        status: "COMPLETED",
+        progress: 100,
+      },
+    });
+
+    const entries = await getMemberTimeline(memberResult.data.id);
+    const goalEntries = entries.filter((e) => e.type === "goal_completed");
+    expect(goalEntries).toHaveLength(1);
+    if (goalEntries[0].type === "goal_completed") {
+      expect(goalEntries[0].title).toBe("Completed Goal");
+      expect(goalEntries[0].memberId).toBe(memberResult.data.id);
+      expect(goalEntries[0].id).toBe(goal.id);
+    }
+  });
+
+  it("does not include IN_PROGRESS goals in timeline", async () => {
+    const memberResult = await createMember({ name: "Active Goal Member" });
+    if (!memberResult.success) throw new Error(memberResult.error);
+
+    await prisma.goal.create({
+      data: {
+        memberId: memberResult.data.id,
+        title: "In Progress Goal",
+        status: "IN_PROGRESS",
+        progress: 50,
+      },
+    });
+
+    const entries = await getMemberTimeline(memberResult.data.id);
+    const goalEntries = entries.filter((e) => e.type === "goal_completed");
+    expect(goalEntries).toHaveLength(0);
+  });
+
   it("does not include non-overdue pending actions", async () => {
     const memberResult = await createMember({ name: "Future Action" });
     if (!memberResult.success) throw new Error(memberResult.error);

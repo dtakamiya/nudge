@@ -72,6 +72,21 @@ export type ActionOverdueEntry = {
 };
 
 /**
+ * タイムラインエントリ（ゴール達成）
+ */
+export type GoalCompletedEntry = {
+  type: "goal_completed";
+  id: string;
+  title: string;
+  completedAt: Date;
+  memberId: string;
+};
+
+/**
  * メンバータイムラインエントリ（ユニオン型）
  */
-export type MemberTimelineEntry = MeetingTimelineEntry | ActionCompletedEntry | ActionOverdueEntry;
+export type MemberTimelineEntry =
+  | MeetingTimelineEntry
+  | ActionCompletedEntry
+  | ActionOverdueEntry
+  | GoalCompletedEntry;
