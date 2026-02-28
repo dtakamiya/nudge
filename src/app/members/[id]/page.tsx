@@ -18,7 +18,7 @@ import {
 import { MemberNoteTab } from "@/components/member/member-note-tab";
 import { MemberQuickActions } from "@/components/member/member-quick-actions";
 import { MemberStatsBar } from "@/components/member/member-stats-bar";
-import { MemberTimeline } from "@/components/member/member-timeline";
+import { MemberTimelineWrapper } from "@/components/member/member-timeline-wrapper";
 import { MoodTrendChart } from "@/components/member/mood-trend-chart";
 import { AvatarInitial } from "@/components/ui/avatar-initial";
 import { Button } from "@/components/ui/button";
@@ -129,7 +129,7 @@ export default async function MemberDetailPage({ params, searchParams }: Props) 
         <MemberDetailTabNav memberId={id} currentTab={currentTab} />
 
         {currentTab === "timeline" && timeline !== null && (
-          <MemberTimeline entries={timeline} memberId={id} />
+          <MemberTimelineWrapper entries={timeline} memberId={id} />
         )}
 
         {currentTab === "history" && meetingsPage !== null && (

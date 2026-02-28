@@ -53,6 +53,14 @@ const overdueEntry: MemberTimelineEntry = {
   meetingId: "meeting-extra",
 };
 
+const goalCompletedEntry: MemberTimelineEntry = {
+  type: "goal_completed",
+  id: "goal-1",
+  title: "TypeScript 習得",
+  completedAt: new Date("2026-01-15T00:00:00Z"),
+  memberId: "member-1",
+};
+
 function generateEntries(count: number): MemberTimelineEntry[] {
   return Array.from({ length: count }, (_, i) => ({
     type: "meeting" as const,
@@ -101,6 +109,28 @@ describe("MemberTimeline", () => {
       <MemberTimeline entries={generateEntries(4).concat(overdueEntry)} memberId={memberId} />,
     );
     expect(screen.getByText("期限切れアクション")).toBeDefined();
+  });
+
+  it("ゴール達成エントリのタイトルを表示する", () => {
+    render(
+      <MemberTimeline
+        entries={generateEntries(4).concat(goalCompletedEntry)}
+        memberId={memberId}
+      />,
+    );
+    expect(screen.getByText("TypeScript 習得")).toBeDefined();
+  });
+
+  it("ゴール達成エントリのリンク先が正しい", () => {
+    render(
+      <MemberTimeline
+        entries={generateEntries(4).concat(goalCompletedEntry)}
+        memberId={memberId}
+      />,
+    );
+    const links = screen.getAllByRole("link");
+    const goalLink = links.find((l) => l.getAttribute("href") === `/members/${memberId}?tab=goals`);
+    expect(goalLink).toBeDefined();
   });
 
   it("タイムラインエントリにリンクが設定されている", () => {

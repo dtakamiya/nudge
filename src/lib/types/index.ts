@@ -32,6 +32,7 @@ export type {
   ActionCompletedEntry,
   ActionItemWithMeeting,
   ActionOverdueEntry,
+  GoalCompletedEntry,
   MeetingsPage,
   MeetingTimelineEntry,
   MeetingWithRelations,

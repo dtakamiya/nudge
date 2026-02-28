@@ -105,7 +105,7 @@ export async function getMemberMeetings(
 export async function getMemberTimeline(memberId: string): Promise<MemberTimelineEntry[]> {
   if (!memberId) return [];
   const now = new Date();
-  const [meetings, completedActions, overdueActions] = await Promise.all([
+  const [meetings, completedActions, overdueActions, completedGoals] = await Promise.all([
     prisma.meeting.findMany({
       where: { memberId },
       orderBy: { date: "desc" },
@@ -128,6 +128,9 @@ export async function getMemberTimeline(memberId: string): Promise<MemberTimelin
         dueDate: { lt: now },
       },
       include: { meeting: { select: { id: true } } },
+    }),
+    prisma.goal.findMany({
+      where: { memberId, status: "COMPLETED" },
     }),
   ]);
 
@@ -164,12 +167,22 @@ export async function getMemberTimeline(memberId: string): Promise<MemberTimelin
           meetingId: a.meeting!.id,
         }),
       ),
+    ...completedGoals.map(
+      (g): MemberTimelineEntry => ({
+        type: "goal_completed",
+        id: g.id,
+        title: g.title,
+        completedAt: g.updatedAt,
+        memberId: g.memberId,
+      }),
+    ),
   ];
 
   return entries.sort((a, b) => {
     const getDate = (e: MemberTimelineEntry): Date => {
       if (e.type === "meeting") return e.date;
       if (e.type === "action_completed") return e.completedAt;
+      if (e.type === "goal_completed") return e.completedAt;
       return e.dueDate;
     };
     return getDate(b).getTime() - getDate(a).getTime();

@@ -1,4 +1,4 @@
-import { Activity, AlertTriangle, Calendar, CheckCircle2 } from "lucide-react";
+import { Activity, AlertTriangle, Calendar, CheckCircle2, Target } from "lucide-react";
 import Link from "next/link";
 
 import { EmptyState } from "@/components/ui/empty-state";
@@ -79,6 +79,26 @@ function ActionOverdueContent({
   );
 }
 
+function GoalCompletedContent({
+  entry,
+}: {
+  entry: Extract<MemberTimelineEntry, { type: "goal_completed" }>;
+}) {
+  return (
+    <Link
+      href={`/members/${entry.memberId}?tab=goals`}
+      className="block group rounded-lg border border-purple-200 bg-purple-50 px-4 py-3 hover:bg-purple-100 transition-colors dark:border-purple-800 dark:bg-purple-900/20 dark:hover:bg-purple-900/30"
+    >
+      <p className="text-sm font-medium text-foreground group-hover:text-purple-700 dark:group-hover:text-purple-400">
+        {entry.title}
+      </p>
+      <p className="mt-1 text-sm text-purple-600 dark:text-purple-400">
+        達成日: {formatDate(entry.completedAt)}
+      </p>
+    </Link>
+  );
+}
+
 const ENTRY_STYLES = {
   meeting: {
     icon: Calendar,
@@ -91,6 +111,10 @@ const ENTRY_STYLES = {
   action_overdue: {
     icon: AlertTriangle,
     iconClass: "text-destructive bg-destructive/10",
+  },
+  goal_completed: {
+    icon: Target,
+    iconClass: "text-purple-600 bg-purple-100 dark:bg-purple-900/30",
   },
 } as const;
 
@@ -132,6 +156,7 @@ export function MemberTimeline({ entries, memberId }: Props) {
                 {entry.type === "action_overdue" && (
                   <ActionOverdueContent entry={entry} memberId={memberId} />
                 )}
+                {entry.type === "goal_completed" && <GoalCompletedContent entry={entry} />}
               </div>
             </li>
           );
